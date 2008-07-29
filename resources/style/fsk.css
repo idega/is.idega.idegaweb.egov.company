@@ -1,0 +1,104 @@
+@CHARSET "UTF-8";
+
+form#periodEditor div.datePicker {
+	float: left;
+	margin-right: 12px;
+	width: 160px;
+}
+
+form#periodEditor div.datePicker input {
+	width: 130px;
+	margin-right: 6px;
+}
+
+div.formItem.columnHeader {
+	overflow: hidden;
+	margin-left: 160px;
+	width: 382px;
+}
+
+div.columnHeader span {
+	font-size: 11px;
+	font-weight: bold;
+	width: 160px;
+	margin-right: 12px;
+}
+
+form#courseRegistration input.personalID {
+	width: 90px;
+	margin-right: 12px;
+}
+
+form#courseRegistration input.userResults {
+	width: 230px;
+}
+
+form#courseRegistration input.inactive {
+	font-style: italic;
+	background-color: #fff0cc;
+}
+
+form#courseRegistration div.columnHeader span {
+	width: 90px;
+	margin-right: 16px;
+}
+
+div.formItem select.bigSelectionBox {
+	width: 360px;
+	height: 280px;
+}
+
+div.formItem textarea.messageArea {
+	width: 360px;
+	height: 280px;
+}
+
+table.parentAllocation {
+	width: 542px;
+}
+
+table.parentAllocation tr th, table.parentAllocation tr td {
+	padding: 2px 5px;
+}
+
+table.parentAllocation tr th {
+	text-align: left;
+}
+
+table.parentAllocation tr.paidAllocation td {
+	color: #f09e00;
+}
+
+ul.legend li.paidAllocation {
+	color: #f09e00;
+}
+
+table.adminTable tr td.copy, table.adminTable tr th.copy {
+	text-align: center;		
+}
+
+table.parentAllocation tr td input {
+	width: 60px;
+	font-size: 11px;
+}
+
+div#parentAllocationOverviewSection div.attention {
+	margin-top: 0;
+	margin-bottom: 20px;
+}
+
+table.adminTable tr td.costsCount, table.adminTable tr th.costsCount,
+table.adminTable tr td.costsAmount, table.adminTable tr th.costsAmount,
+table.adminTable tr td.allocationCount, table.adminTable tr th.allocationCount,
+table.adminTable tr td.allocationAmount, table.adminTable tr th.allocationAmount {
+	text-align: right;
+}
+
+table.parentAllocation tr td.closedCourse {
+	text-align: center;
+	color: #c00;
+}
+
+p.nonRemoved {
+	color: #f00;
+}

@@ -1,0 +1,86 @@
+<document>
+	<properties>
+		<title>eGov FSK changes</title>
+		<author email="laddi@idega.com">Thorhallur "Laddi" Helgason</author>
+	</properties>
+	<body>
+	
+		<release version="1.0.12" date="2008-02-22">
+			<action dev="alexis" type="update">
+				Updated core version to 3.1.82
+			</action>
+		</release>
+		
+		<release version="1.0.11" date="2008-02-14">
+			<action dev="laddi" type="update">
+				Small fixes for ÍTR
+			</action>
+		</release>
+		
+		<release version="1.0.10" date="2008-01-25">
+			<action dev="laddi" type="update">
+				Added possibility to add discounts to participants for each course.
+			</action>
+		</release>
+		
+		<release version="1.0.9" date="2008-01-14">
+			<action dev="laddi" type="update">
+				Opened possibility for companies to close courses (not allowing more allocations for them).
+			</action>
+		</release>
+		
+		<release version="1.0.8" date="2007-12-12">
+			<action dev="laddi" type="update">
+				Fixes made by laddi according to change requests from rvk.
+			</action>
+		</release>
+		
+		<release version="1.0.7" date="2007-10-24">
+			<action dev="laddi" type="update">
+				Fixes made by laddi according to specs from rvk.
+			</action>
+		</release>
+		
+		<release version="1.0.6" date="2007-10-10">
+			<action dev="laddi" type="update">
+				Added possibility to see all participants in a division simultaneously.
+				Changed so that all dropdowns are disabled when no company is selected (admin user).
+				Fixed error when creating Excel files when company names are too long or contain illegal characters.
+			</action>
+		</release>
+		
+		<release version="1.0.5" date="2007-09-17">
+			<action dev="laddi" type="update">
+				Added sorting to participants list.
+				Added check to prevent storing allocations multiple times and to courses with no relation to child.
+			</action>
+		</release>
+		
+		<release version="1.0.4" date="2007-08-16">
+			<action dev="laddi" type="update">
+				Bug fixes and refinements.
+			</action>
+		</release>
+		
+		<release version="1.0.3" date="2007-08-14">
+			<action dev="laddi" type="update">
+				Bug fixes and refinements.
+			</action>
+		</release>
+		
+		<release version="1.0.2" date="2007-08-07">
+			<action dev="valdas" type="update">
+				Set one more property to Simple User App
+				Updated com.idega.user to 3.1.16
+				Updated com.idega.core to 3.1.60
+			</action>
+		</release>
+		
+		<release version="1.0.1" date="2007-06-04">
+			<action dev="laddi" type="update">
+				Declaring new version of block.
+			</action>
+		</release>
+
+	</body>
+</document>

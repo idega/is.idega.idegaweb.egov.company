@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document
+	PUBLIC "-//UJAC.org//Print Document//EN" 
+	"http://ujac.sourceforge.net/ujac-print-document.dtd">
+
+<document size="A4" margin-left="70" margin-right="70" margin-top="70" margin-bottom="70">
+	
+	<font-def name="normal" family="Helvetica" size="10" style="normal"/>
+	<font-def name="normalBold" family="Helvetica" size="10" style="bold"/>
+	<font-def name="small" family="Helvetica" size="8" style="normal"/>
+	<font-def name="big" family="Helvetica" size="14" style="normal"/>
+	<font-def name="heading" family="Helvetica" size="18" style="bold"/>
+	<font-def name="extraBig" family="Helvetica" size="22" style="bold"/>
+	
+	<header>
+		<header-part><image source="rvk.jpg" width="148" height="33" /></header-part>
+    </header>
+
+	<footer font="small">
+		<footer-part>
+			Íþrótta- og tómstundasvið Reykjavíkur, Fríkirkjuvegi 11, sími 411 5000 – www.itr.is
+		</footer-part>
+	</footer>
+	
+	<paragraph halign="center" font="extraBig" spacing-after="24">
+		FRÍSTUNDAKORTIÐ
+	</paragraph>
+
+	<paragraph halign="center" font="heading" spacing-after="24">
+		Samningur um aðild að styrkjakerfi til æskulýðs-, íþrótta- og menningarstarfsemi
+	</paragraph>
+
+	<paragraph font="big" spacing-after="18.0">
+		Íþrótta- og tómstundasvið Reykjavíkur, hér eftir í samningi þessum nefnt ÍTR, kt. 521286-1569 og félagið ${name} kt. ${personalID} gera með sér eftirfarandi samstarfssamning vegna greiðslu á hluta þátttökugjalda 6 - 18 ára iðkenda í starfi félagsins. Samningurinn er gerður á grundvelli samþykktar borgarráðs frá 30. nóvember 2006 um innleiðingu Frístundakorts og “Frístundakortið - reglur og skilyrði” sem samþykkt var í borgarráði 7. júní 2007.
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		1. gr. MARKMIÐ OG TILGANGUR
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Samningur þessi kveður á um samstarf Reykjavíkurborgar og fyrirtækisins/félagsins ${name} um styrkjakerfi á grundvelli Frístundakortsins. Í samningnum kemur fram hvaða starfsemi á vegum félagsins fellur undir Frístundakortið, að hvaða aldurhópi hún beinist, hvar starfsemin fer fram, hvenær og hvernig orðið er við gæðakröfum. Þá er skilgreint hvað ÍTR leggur félaginu til vegna samstarfsins um innleiðingu Frístundakortsins og umsýslukostnaðar við framkvæmd samnings þessa. Styrkhæf starfsemi sem Frístundakortið nær yfir er skilgreind í 10 grein reglna og skilyrða Frístundakortsins.
+	</paragraph>
+ 
+	<paragraph font="normal" spacing-after="18.0">
+		Markmið samningsins er m.a. að skapa félaginu sem bestar aðstæður til að reka starfsemi sem tryggir íbúum borgarinnar aðgang að fyrsta flokks þjónustu með hliðsjón af markmiðum félagsins hvað varðar iðkun aldurshópsins 6 – 18 ára.
+	</paragraph>
+ 
+	<paragraph font="normal" spacing-after="18.0">
+		Frístundakortið beinist ekki einvörðungu að aukinni iðkun heldur ekki síður að hollri og uppbyggilegri frístundaiðju, jöfnuði og bættu aðgengi að þeim gæðum sem slíkri starfsemi fylgir.
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		2. gr. ÁBYRGÐ REYKJAVÍKURBORGAR
+	</paragraph>
+
+	<paragraph font="normal">
+		Með samningnum leitast Reykjavíkurborg við að tryggja börnum og ungmennum aðgang að öflugu frístundastarfi í viðkomandi hverfi og borginni í heild, heilsu og félagslífi þeirra til heilla.
+	</paragraph>
+
+	<paragraph font="normal">
+		Með samningnum er stefnt að skilvirkni þess starfs sem innt er af hendi í íþrótta- og tómstundamálum og tryggð samræming á þeirri þjónustu sem í boði er fyrir íbúa.
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Með samningnum eru m.a. sköpuð skilyrði fyrir auknu samstarfi þeirra aðila sem vinna að þjónustu fyrir íbúa hverfisins s.s. æskulýðs- og íþróttafélaga, menningarstarfsemi, frístundamiðstöð, lögreglu, félagsþjónustu, skóla, þjónustumiðstöð í hverfinu og fleiri.
+	</paragraph>
+ 
+	<paragraph font="normalBold" spacing-after="18.0">
+		3. gr. ÁBYRGÐ FÉLAGS
+	</paragraph>
+
+	<paragraph font="normal">
+		Aðalstjórn félagsins fer með réttindi og skyldur samkvæmt samningi þessum fyrir hönd félagsins  Félagið gerir ÍTR grein fyrir því með hvaða hætti staðið er að starfsemi þess, stjórnskipan, fjármálum og gæðaviðmiðum.
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Félagið gerir jafnframt grein fyrir hvernig það leitast við að mæta óskum um jafnrétti og jafnan aðgang að þeirri starfsemi sem félagið stendur fyrir.  
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		4. gr. STARFSSVÆÐI
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Starfssvæði félagsins er ${commune} og fer starfsemin fram á eftirtöldum stöðum: ${postalCodes}
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		5. gr. SKILGREINING Á FÉLAGI
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Starfsemi félagsins beinist að ${type} á því svæði sem tilgreint er samkvæmt 4. grein og skal það leitast við að bjóða upp á starfsemi fyrir börn og unglinga á starfssvæði sínu.
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		6. gr. STARFSEMI
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Greinar og starfsemi sem fellur undir Frístundakortið er skilgreint í starfsáætlun félagsins og liggur sú áætlun til grundvallar við samning þennan í viðhengi.
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		7. gr. AÐSTAÐA
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Aðstaða félagsins er skilgreind í umsókn þess og fylgir samningi þessum í viðhengi. Þar kemur fram lýsing á aðstöðu þess og fleiru er lýtur að daglegri starfsemi.
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		8. gr. EFTIRLIT
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Telji ÍTR að aðstaða og starfsemi félagsins sé ekki rekin samkvæmt samningi þessum, og eins og gildandi lög og reglur gera ráð fyrir, varðandi færslu bókhalds, reglur um vinnueftirlit, samninga um réttindi og kjör starfsmanna, reglur um heilbrigði og öryggi á vinnustöðum, skal það skriflega knýja á um úrbætur á því sem ábótavant er. Verði félagið ekki við þeim tilmælum er ÍTR heimilt að stöðva greiðslur samkvæmt samningi þessum uns úrbætur hafa átt sér stað.
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		9. gr. UPPGJÖR
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Íþrótta- og tómstundaráð annast greiðslur og uppgjör við félagið skv. sérstöku greiðslufyrirkomulagi vegna Frístundakortsins. Uppgjörið byggir á rafrænni skráningu þar sem fram kemur iðkendafjöldi sem nýtir Frístundakortið sem hluta af greiðslu til félagsins, tíðni iðkunar og hvaða grein er stunduð. Einnig kemur fram heildarfjöldi iðkenda í aldurshópnum og iðkun greind eftir búsetu, aldri, kyni og heildariðkun.
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		10. gr. STARFSÁÆTLUN 
+	</paragraph>
+
+	<paragraph font="normal">
+		Félagið skal fyrir upphaf samningstímans leggja fram starfsáætlun fyrir ÍTR um helstu verkefni og áherslur á samningstímabilinu. Þar skal m.a. koma fram hvaða starfsemi eða greinar falla undir styrki Frístundakortsins, hvernig félagið hyggst bregðast við auknum iðkendafjölda og hvernig árangur er metinn. Samvinna skal vera milli félagsins og ÍTR vegna gerðar þessarar áætlunar. Í framhaldi af því skal ÍTR taka afstöðu til markmiða, mælikvarða og forgangsröðunar verkefna sem þar koma fram. Fyrir 15. júní ár hvert skal liggja fyrir greinagerð um árangur samningsins. Þar skal gerður samanburður á árangri og þeim markmiðum sem lágu til grundvallar.
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Styrkhæf starfsemi sem Frístundakortið nær yfir er skilgreind á heimasíðu ÍTR á hverju tímabili. Áskilin er heimild til þess að breyta þeim áherslum og viðmiðunum sem þar koma fram sbr. 12. gr. í reglum og skilyrðum um Frístundakortið.
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		11. gr. ANNAÐ
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Í þeim tilfellum að félag hafi gert aðra samninga við Reykjavíkurborg sem áhrif gætu haft á samning þennan á gildistíma hans, er heimilt að endurskoða samning þennan í heild eða einstakar greinar hans.
+	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		12. gr. GILDISTÍMI
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="24.0">
+		Samningur þessi gildir til ársloka árið 2009.  Heimilt er  að endurskoða samning þennan eða fella úr gildi  verði verulegar breytingar á umfangi rekstrar eða að forsendur fyrir starfsemi breytast. Gert er ráð fyrir að samningur þessi verði tekinn til endurskoðunar svo oft sem þurfa þykir. Endurskoðun þessa samnings skal þó fara fram eigi síðar en 1. október ár hvert. Þá skal leggja  mat á starfsemi frá gildistöku samningsins og árangur af Frístundakortinu.
+	</paragraph>
+
+	<paragraph halign="center" font="normal">
+		_____________________________________________
+	</paragraph>
+
+	<paragraph halign="center" font="normal" spacing-after="24">
+		Staður, dagsetning
+	</paragraph>
+
+	<table font="small" padding="0" columns="3" width="100" widths="42,16,42" halign="center" border-style="none">
+		<cell height="24">_____________________________________________</cell>
+		<cell height="24"></cell>
+		<cell height="24">_____________________________________________</cell>
+		<cell>Nafn fyrir hönd félags/fyrirtækis</cell>
+		<cell></cell>
+		<cell>Nafn fyrir hönd ÍTR</cell>
+	</table>
+
+</document>

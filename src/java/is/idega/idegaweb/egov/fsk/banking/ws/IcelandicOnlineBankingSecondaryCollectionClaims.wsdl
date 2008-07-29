@@ -1,0 +1,389 @@
+<definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cws="http://IcelandicOnlineBanking/2005/12/01/SecondaryCollectionClaims" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:ct="http://IcelandicOnlineBanking/2005/12/01/CommonTypes" xmlns:clt="http://IcelandicOnlineBanking/2005/12/01/ClaimTypes" targetNamespace="http://IcelandicOnlineBanking/2005/12/01/SecondaryCollectionClaims">
+	<types>
+		<xs:schema elementFormDefault="qualified" targetNamespace="http://IcelandicOnlineBanking/2005/12/01/SecondaryCollectionClaims">
+			<xs:import namespace="http://IcelandicOnlineBanking/2005/12/01/CommonTypes" schemaLocation="IcelandicOnlineBankingTypes.xsd"/>
+			<xs:import namespace="http://IcelandicOnlineBanking/2005/12/01/ClaimTypes" schemaLocation="IcelandicOnlineBankingClaimTypes.xsd"/>
+			<xs:element name="AlterClaims">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="claims" type="clt:ClaimCollection"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AlterClaimsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AlterClaimsResult" type="ct:OperationID"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CancelClaims">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="keys" type="clt:ClaimKeyCollection"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CancelClaimsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="CancelClaimsResult" type="ct:OperationID"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AlterClaim">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="claim" type="clt:Claim"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="AlterClaimResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AlterClaimResult" type="clt:ClaimOperationResult"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CancelClaim">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="key" type="clt:ClaimKey"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CancelClaimResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="CancelClaimResult" type="clt:ClaimOperationResult"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetClaimOperationResult">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="id" type="ct:OperationID"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetClaimOperationResultResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="GetClaimOperationResultResult" type="clt:ClaimOperationResult"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QueryClaims">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="query" type="clt:ClaimsQuery"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QueryClaimsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="QueryClaimsResult" type="clt:QueryClaimsResult"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QueryClaim">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="key" type="clt:ClaimKey"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QueryClaimResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="QueryClaimResult" type="clt:ClaimInfo"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QueryPayments">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="query" type="clt:PaymentsQuery"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QueryPaymentsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="QueryPaymentsResult" type="clt:QueryPaymentsResult"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QuerySecondaryCollectionPayments">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="query" type="clt:SecondaryCollectionPaymentsQuery"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QuerySecondaryCollectionPaymentsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="QuerySecondaryCollectionPaymentsResult" type="clt:QueryPaymentsResult"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QuerySecondaryCollectionClaims">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="query" type="clt:SecondaryCollectionClaimsQuery"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="QuerySecondaryCollectionClaimsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="QuerySecondaryCollectionClaimsResult" type="clt:QueryClaimsResult"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SecondaryCollectionReturnClaim">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="key" type="clt:ClaimKey"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SecondaryCollectionReturnClaimResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SecondaryCollectionReturnClaimResult" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>
+	</types>
+	<message name="AlterClaimsSoapIn">
+		<part name="parameters" element="cws:AlterClaims"/>
+	</message>
+	<message name="AlterClaimsSoapOut">
+		<part name="parameters" element="cws:AlterClaimsResponse"/>
+	</message>
+	<message name="CancelClaimsSoapIn">
+		<part name="parameters" element="cws:CancelClaims"/>
+	</message>
+	<message name="CancelClaimsSoapOut">
+		<part name="parameters" element="cws:CancelClaimsResponse"/>
+	</message>
+	<message name="AlterClaimSoapIn">
+		<part name="parameters" element="cws:AlterClaim"/>
+	</message>
+	<message name="AlterClaimSoapOut">
+		<part name="parameters" element="cws:AlterClaimResponse"/>
+	</message>
+	<message name="CancelClaimSoapIn">
+		<part name="parameters" element="cws:CancelClaim"/>
+	</message>
+	<message name="CancelClaimSoapOut">
+		<part name="parameters" element="cws:CancelClaimResponse"/>
+	</message>
+	<message name="GetClaimOperationResultSoapIn">
+		<part name="parameters" element="cws:GetClaimOperationResult"/>
+	</message>
+	<message name="GetClaimOperationResultSoapOut">
+		<part name="parameters" element="cws:GetClaimOperationResultResponse"/>
+	</message>
+	<message name="QueryClaimsSoapIn">
+		<part name="parameters" element="cws:QueryClaims"/>
+	</message>
+	<message name="QueryClaimsSoapOut">
+		<part name="parameters" element="cws:QueryClaimsResponse"/>
+	</message>
+	<message name="QueryClaimSoapIn">
+		<part name="parameters" element="cws:QueryClaim"/>
+	</message>
+	<message name="QueryClaimSoapOut">
+		<part name="parameters" element="cws:QueryClaimResponse"/>
+	</message>
+	<message name="QueryPaymentsSoapIn">
+		<part name="parameters" element="cws:QueryPayments"/>
+	</message>
+	<message name="QueryPaymentsSoapOut">
+		<part name="parameters" element="cws:QueryPaymentsResponse"/>
+	</message>
+	<message name="QuerySecondaryCollectionPaymentsSoapIn">
+		<part name="parameters" element="cws:QuerySecondaryCollectionPayments"/>
+	</message>
+	<message name="QuerySecondaryCollectionPaymentsSoapOut">
+		<part name="parameters" element="cws:QuerySecondaryCollectionPaymentsResponse"/>
+	</message>
+	<message name="QuerySecondaryCollectionClaimsSoapIn">
+		<part name="parameters" element="cws:QuerySecondaryCollectionClaims"/>
+	</message>
+	<message name="QuerySecondaryCollectionClaimsSoapOut">
+		<part name="parameters" element="cws:QuerySecondaryCollectionClaimsResponse"/>
+	</message>
+	<message name="SecondaryCollectionReturnClaimSoapIn">
+		<part name="parameters" element="cws:SecondaryCollectionReturnClaim"/>
+	</message>
+	<message name="SecondaryCollectionReturnClaimSoapOut">
+		<part name="parameters" element="cws:SecondaryCollectionReturnClaimResponse"/>
+	</message>
+	<portType name="IcelandicOnlineBankingSecondaryCollectionClaimsSoap">
+		<operation name="AlterClaims">
+			<documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Alter existings claims.</documentation>
+			<input message="cws:AlterClaimsSoapIn"/>
+			<output message="cws:AlterClaimsSoapOut"/>
+		</operation>
+		<operation name="CancelClaims">
+			<documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Cancel claims corresponding to the list of unique keys.</documentation>
+			<input message="cws:CancelClaimsSoapIn"/>
+			<output message="cws:CancelClaimsSoapOut"/>
+		</operation>
+		<operation name="AlterClaim">
+			<documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Alter an existing claim.</documentation>
+			<input message="cws:AlterClaimSoapIn"/>
+			<output message="cws:AlterClaimSoapOut"/>
+		</operation>
+		<operation name="CancelClaim">
+			<documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Cancel a claim corresponding to the unique key.</documentation>
+			<input message="cws:CancelClaimSoapIn"/>
+			<output message="cws:CancelClaimSoapOut"/>
+		</operation>
+		<operation name="GetClaimOperationResult">
+			<documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Returns the result of an operation where claims have been created, updated or canceled.</documentation>
+			<input message="cws:GetClaimOperationResultSoapIn"/>
+			<output message="cws:GetClaimOperationResultSoapOut"/>
+		</operation>
+		<operation name="QueryClaims">
+			<documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return the status of claims that fall within the parameters of the query.</documentation>
+			<input message="cws:QueryClaimsSoapIn"/>
+			<output message="cws:QueryClaimsSoapOut"/>
+		</operation>
+		<operation name="QueryClaim">
+			<documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return the status of a claim corresponding to a unique key.</documentation>
+			<input message="cws:QueryClaimSoapIn"/>
+			<output message="cws:QueryClaimSoapOut"/>
+		</operation>
+		<operation name="QueryPayments">
+			<documentation xmlns="http://schemas.xmlsoap.org/wsdl/">Return the payments that fall within the parameters of the query.</documentation>
+			<input message="cws:QueryPaymentsSoapIn"/>
+			<output message="cws:QueryPaymentsSoapOut"/>
+		</operation>
+		<operation name="QuerySecondaryCollectionPayments">
+			<input message="cws:QuerySecondaryCollectionPaymentsSoapIn"/>
+			<output message="cws:QuerySecondaryCollectionPaymentsSoapOut"/>
+		</operation>
+		<operation name="QuerySecondaryCollectionClaims">
+			<input message="cws:QuerySecondaryCollectionClaimsSoapIn"/>
+			<output message="cws:QuerySecondaryCollectionClaimsSoapOut"/>
+		</operation>
+		<operation name="SecondaryCollectionReturnClaim">
+			<input message="cws:SecondaryCollectionReturnClaimSoapIn"/>
+			<output message="cws:SecondaryCollectionReturnClaimSoapOut"/>
+		</operation>
+	</portType>
+	<binding name="IcelandicOnlineBankingSecondaryCollectionClaimsSoap" type="cws:IcelandicOnlineBankingSecondaryCollectionClaimsSoap">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="AlterClaims">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/AlterClaims" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelClaims">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/CancelClaims" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="AlterClaim">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/AlterClaim" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="CancelClaim">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/CancelClaim" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="GetClaimOperationResult">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/GetClaimOperationResult" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="QueryClaims">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/QueryClaims" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="QueryClaim">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/QueryClaim" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="QueryPayments">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/QueryPayments" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="QuerySecondaryCollectionPayments">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/QuerySecondaryCollectionPayments" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="QuerySecondaryCollectionClaims">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/QuerySecondaryCollectionClaims" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+		<operation name="SecondaryCollectionReturnClaim">
+			<soap:operation soapAction="http://IcelandicOnlineBanking/2005/12/01/SecondaryCollectionReturnClaim" style="document"/>
+			<input>
+				<soap:body use="literal"/>
+			</input>
+			<output>
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="IcelandicOnlineBankingSecondaryCollectionClaimsService">
+		<port name="IcelandicOnlineBankingSecondaryCollectionClaimsSoap" binding="cws:IcelandicOnlineBankingSecondaryCollectionClaimsSoap">
+			<soap:address location="https://b2bws.fbl.is/secondarycollectionclaims.asmx"/>
+		</port>
+	</service>
+</definitions>

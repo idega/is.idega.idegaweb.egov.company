@@ -1,0 +1,1268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://IcelandicOnlineBanking/2005/12/01/ClaimTypes" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ct="http://IcelandicOnlineBanking/2005/12/01/CommonTypes" xmlns:clt="http://IcelandicOnlineBanking/2005/12/01/ClaimTypes" elementFormDefault="qualified" attributeFormDefault="unqualified" id="CommonTypes">
+	<xs:import namespace="http://IcelandicOnlineBanking/2005/12/01/CommonTypes" schemaLocation="IcelandicOnlineBankingTypes.xsd"/>
+	<xs:complexType name="ClaimKey">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">The combination of fields that uniquely identifies a claim.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Samsett svæði fyrir einkvæman lykil innheimtukröfu.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ClaimantID" type="ct:PersonID">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The person identification number of the claimant and part of the unique key of the claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Kennitala kröfuhafa, þ.e. eiganda kröfunnar, og hluti af lykli innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Account" type="ct:AccountID">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The Bank number of the claim, ledger number (66) and number of claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Bankanúmer, höfuðbók (66) og númer innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DueDate" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Due date of the claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Gjalddagi innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="PrintInformation">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Information about whether a claim should be printed and if not, the reason why not.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Upplýsingar um hvort prentun þurfi út innheimtukröfu eða ástæður þess að ekki er krafist útprentunar.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="NoInformation">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">No information about printing is returned, mainly when claims are updated or cancelled. </xs:documentation>
+					<xs:documentation xml:lang="is-IS">Engum upplýsingum um prentun er skilað, einkum þegar innheimtukröfum er breytt eða eytt.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Print">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Claim should be printed, either by the claimant or the bank depending on contractual obligations. </xs:documentation>
+					<xs:documentation xml:lang="is-IS">Prenta á innheimtukröfuna, hjá kröfuhafa eða banka eftir því sem um hefur samist milli þeirra.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DirectPaymentClaim">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">A claim whose payor has instructed his bank to pay it on the due date out of a specified debit account.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Beingreiðslukrafa, sem kröfugreiðandi hefur samið um við bankastofnun að greiðist á gjalddaga út af tilgreindum reikningi.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InternetBankingClaim">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">A claim whose payor has marked so that no copy is printed but it appears in his Internet Bank.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Netkrafa, sem kröfugreiðanda vill að birtist í netbanka en er ekki prentuð út.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ClaimStatus">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Indicates the status of the claim. </xs:documentation>
+			<xs:documentation xml:lang="is-IS">Segir til um ástand innheimtukröfu.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Unpaid">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Claim has not yet been settled.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Innheimtukrafa er ógreidd.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Paid">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Claim has been settled.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Innheimtukrafa hefur greidd að fullu.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Cancelled">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Claim has been cancelled.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Innheimtukrafa hefur verið felld niður.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="SecondaryCollection">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The claim has been sent to secondary collection.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Innheimtukrafan hefur verið sett í milliinnheimtu.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="LegalCollection">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Legal action will be taken for dept recovery.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Innheimtukrafa hefur verið sett í lögfræðiinnheimtu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BatchStatus">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Status of the batch, i.e. where in the process it is situated.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Staða bunka, þ.e. hvar hann er staddur í ferlinu.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="InProgress">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The batch is being processed.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Bunkinn er í vinnslu.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Completed">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The batch has been processed an no errors found.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Vinnslu á bunka er lokið án villu.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CompletedWithErrors">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The batch has been processed with errors.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Vinnslu á bunka er lokið. Villa hefur komið upp.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="NotConfirmed">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The batch was not securely submitted and is waiting for manual confirmation.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Óstaðfestur bunki, bíður eftir að verða staðfestur handvirkt.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Identifier">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">An identifier unique to each claimant indicating primarily the account into which payments will be made. Can consist of alphanumeric characters, maximum three letters.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Auðkenni kröfuhafa sem vísar einkum á númer þess reiknings sem greiðsla til kröfuhafa á að ráðstafast inná. Má vera tölu- og bókstafir alls 3 stafa langt.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9A-Za-z]{3}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Reference">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Refence determined by claimant. Alphanumeric, maximum 16 letters.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Tilvísunarnúmer kröfuhafa má vera tölu- og bókstafir, alls 16 stafa langt.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9A-Za-z]{1,16}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CustomerNumber">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Customer number of payor, claimant's unique code for the customer.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Einkvæmt viðskiptanúmer greiðanda í kerfi kröfuhafa.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="16"/>
+			<xs:pattern value="[0-9A-Za-z]{1,16}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="NoticeAndPaymentFee">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Charge for calculation and printout of payment slip and sending to payer.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Gjald fyrir útreikning og útskrift greiðsluseðils ásamt sendingu hans til greiðanda.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Printing" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Charge used if claim is printed.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Gjald sem er notað ef innheimtukrafa er prentuð út.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Paperless" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Charge used if claim is not printed.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Gjald sem er notað ef innheimtukrafa er pappírslaus, þ.e ekki prentuð út.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DateRestrictedCharge">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Used for defaultcharge and as base for discounts</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Notað fyrir vanskilagjald og grunnur að afsláttum.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="First" type="clt:DiscountOrDefaultChargeBase" minOccurs="0"/>
+			<xs:element name="Second" type="clt:DiscountOrDefaultChargeBase" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="ReferenceDate" type="clt:ReferenceDate" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="DiscountCharge">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Used for discounts</xs:documentation>
+			<xs:documentation xml:lang="is-IS">NotaÃ° fyrir afslÃ¦tti</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="clt:DateRestrictedCharge">
+				<xs:attribute name="IsPostRefDate" type="xs:boolean" default="false">
+					<xs:annotation>
+						<xs:documentation xml:lang="en-US">Indicates wheter number of days is before or after reference date.</xs:documentation>
+						<xs:documentation xml:lang="is-IS">Segir til um hvort uppgefinn dagafjöldi er fyrir eða eftir viðmiðunardag.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="DiscountOrDefaultChargePercentage">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Percentage for default charge or discount</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Prósenta fyrir vanskilagjald eða afslátt</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:restriction base="clt:DiscountOrDefaultChargeBase">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">This content should follow the exact pattern of ct:Percentage2. Due to limitations in certain tools, the restriction is repeated instead of being referenced through a restricion on a simpleContent sub-element.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Innihaldið ætti að fylgja í öllu skilgreiningu á ct:Percentage2. Takmarkanir tiltekinna XML tóla leiða til þess að skilyrðingin er endurtekin, í staðinn fyrir að vísað sé í fyrrgreinda skilgreiningu gegnum simpleContent undirtag.</xs:documentation>
+				</xs:annotation>
+				<xs:minInclusive value="0"/>
+				<xs:maxExclusive value="100.00"/>
+				<xs:totalDigits value="4"/>
+				<xs:fractionDigits value="2"/>
+			</xs:restriction>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="DiscountOrDefaultChargeAmount">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Amount of discount or default charge.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Upphæð afsláttar eða vanskilagjalda.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:restriction base="clt:DiscountOrDefaultChargeBase">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">This content should follow the exact pattern of ct:Amount. Due to limitations in certain tools, the restriction is repeated instead of being referenced through a restricion on a simpleContent sub-element.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Innihaldið ætti að fylgja í öllu skilgreiningu á ct:Amount. Takmarkanir tiltekinna XML tóla leiða til þess að skilyrðingin er endurtekin, í staðinn fyrir að vísað sé í fyrrgreinda skilgreiningu gegnum simpleContent undirtag.</xs:documentation>
+				</xs:annotation>
+				<xs:fractionDigits value="2"/>
+			</xs:restriction>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="DiscountOrDefaultChargeBase" abstract="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Base for discount or default charge.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Grunnur fyrir afslætti eða vanskilagjald.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:decimal">
+				<xs:attribute name="Days" type="xs:int" use="required">
+					<xs:annotation>
+						<xs:documentation xml:lang="en-US">Indicates the count of days relative to reference date when rule takes effect.</xs:documentation>
+						<xs:documentation xml:lang="is-IS">Segir til um dagafjöldi út frá viðmiðunardegi sem gjald á við.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="ReferenceDate">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Indicates which date is used as basis for calculation.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Segir til um hvaða dagsetning er notuð sem grunnur fyrir útreikninga.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DueDate">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Due date is basis.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Gjalddagi er viðmiðunardagur.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FinalDueDate">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Final due date is basis.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Eindagi er viðmiðunardagur.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="DefaultInterestRule">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Indicates whether default interest should be imposed and if so, how it should be calculated.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Segir til um hvort leggja eigi dráttarvexti á og ef svo, þá hvernig þeir skuli reiknaðir.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="NoDefaultInterest">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">No default interest should be imposed.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Engir dráttarvextir skulu vera á kröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DefaultInterestAmount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Indicates that default interest should be calculated from the amount of the claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Segir til um að dráttarvextir reiknast út frá upphæð kröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DefaultInterestAmountAndDefaultCharge">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Indicates if default interest should be calculated from the amount and default charge of the claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Segir til um hvort dráttarvextir reiknast út frá upphæð og vanskilagjaldi kröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="DefaultInterest">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Default interest</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Dráttarvextir</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Rule" type="clt:DefaultInterestRule">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Determines if the claim should incur default interests after the reference date and if so, how it should be calculated.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Segir til um hvort dráttarvextir skuli reiknast eftir viðmiðunardag og ef svo, þá þá hvernig.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Percentage4" type="ct:Percentage4" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">If used, default interest on a claim is calculated based on this percentage and not on the default interest period, as in the case of Central Bank default interest. Not specifying the percentage ensures that the Central Bank default interest is used, and interest is compounded every twelve months, i.e. the default interest is added to the principal.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Segir til um prósentu dráttarvaxta, má ekki vera hærra en hæsta leyfilega dráttarvaxtaprósenta Seðlabankans. Ef dráttarvaxtarregla tilgreinir að dráttarvextir eigi að reiknast og þetta gildi er ekki tilgreint, eru hæstu leyfilegu dráttarvextir Seðlabankans notaðir sjálfkrafa.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SpecialCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Sending in a special code is the only way to set certain interest rules that map to RB Penalty interest rules. Further documentation can be found in RB documentation.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Til að setja tiltekin gildi á kröfu þarf að senda inn gildi sem eru í samræmi við dráttavaxtareglur RB. Frekari upplýsingar er að finna í skjölun RB.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="[2-9]"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CurrencyInformation">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Combines fields that define currency information for claim.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Samsett svæði fyrir gengiskröfu.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ReferenceRate">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The reference used to determine which currency type to use.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Tegund gengis sem miðað er við.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="ExchangeRate">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-US">Regular exchange rate of the institution. Same as code A.</xs:documentation>
+								<xs:documentation xml:lang="is-IS">Seðlagengi stofnunar. Sama og val A.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="NoteRate">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-US">Note rate of the institution. Same as code S.</xs:documentation>
+								<xs:documentation xml:lang="is-IS">Seðlagengi stofnunar. Sama og val S.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="CentralBankMidRate">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-US">Mid rate of the Central Bank of Iceland. Same as code F.</xs:documentation>
+								<xs:documentation xml:lang="is-IS">Miðgengi Seðlabanka Íslands. Sama og val F.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="CentralBankStatutoryRate">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-US">The statutory rate and posted rate of the Central Bank of Iceland. Same as code L.</xs:documentation>
+								<xs:documentation xml:lang="is-IS">Lögboðið gengi, fundargengi Seðlabankans. Sama og val L.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Currency" type="ct:CurrencyCode">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">3 letter currency code.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">3 stafa tákn myntar. Myntkóði kröfu (í hvaða mynt krafa er).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PaymentRate">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Currency code, Indicates the spot rate to be used in the calculation of an IK forex claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Gengiskóði, segir til um hvaða dagsgengi á að miða við þegar greiðsla á IK gengiskröfu er reiknuð út.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="DueDateRate">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-US">The due date exchange rate should be used. Same as code J.</xs:documentation>
+								<xs:documentation xml:lang="is-IS">Gjalddagagengi skal notað. Sama og val J.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="PaymentDateRate">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-US">Payment date exchange rate should be used. Same as code L.</xs:documentation>
+								<xs:documentation xml:lang="is-IS">Greiðsludagsgengi skal notað. Sama og val L.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BillPresentmentSystem">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Indicates the bill presentment system to which the claim pertains.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Samsett svæði er geymir upplýsingar um birtingarkerfi.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Type">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Which bill presentment system</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Hvaða birtingarkerfi</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="[0-9A-Z]{1}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Parameters" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Parameters and values needed to display a unique document from a bill presentment system. (URL style)</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Færibreytur og gildi sem þarf til að kalla fram ákveðið skjal í birtingarkerfi. (URL form)</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="200"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="Comment">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Comments that are displayed on the lower half of the payment slip.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Athugasemdir sem prentaðar eru neðanmáls á seðilinn.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="80"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ItemRow">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">A subitem of a claim, used for printing.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Undirlína innheimtukröfu, notuð við prentun.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Text">
+				<xs:simpleType>
+					<xs:annotation>
+						<xs:documentation xml:lang="en-US">The desciption of the item.</xs:documentation>
+						<xs:documentation xml:lang="is-IS">Texti undirlínunnar.</xs:documentation>
+					</xs:annotation>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="57"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Amount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The amount of the item.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Upphæð undirlínunnar.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Printing">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Contains information used for displaying and printing the claim. Changing this info on a claim that has already been created will not result in it being printed again. </xs:documentation>
+			<xs:documentation xml:lang="is-IS">Samsett svæði sem notað er til að stjórna útprentun innheimtukröfu (ef banki prentar). Printing svæðið er notað ef innheimtukrafa er prentuð hjá banka / sparisjóð til þess að stýra útprentun innheimtukröfunnar. Ef prentun er breytt í breytingarfærslu eftir að búið er að prenta út seðil, hefur það ekki í för með sér að hann sé prentaður út aftur.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ClaimantAddress" type="ct:Address" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Alternate address for claimant if address from the National Register should not be used.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Breytt heimilisfang kröfuhafa. Ef sleppt, þá er notað skráð lögheimili greiðanda.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PayorAddress" type="ct:Address" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Alternate address for payor if address from the National Register should not be used.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Breytt póstfang kröfugreiðanda. Ef sleppt, þá er notað skráð lögheimili greiðanda.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ItemRows" type="clt:ItemRow" minOccurs="0" maxOccurs="20">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Details of claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Sundurliðun á innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Comments" type="clt:Comment" minOccurs="0" maxOccurs="5">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Comments that are displayed on the lower half of the payment slip.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Athugasemdir sem prentaðar eru neðanmáls á seðilinn.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Claim">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Encapsulates a claim, used for creating and changing.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Hjúpar innheimtukröfu, notað við stofnun og breytingar.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Key" type="clt:ClaimKey">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The combination of fields that uniquely identifies a claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Samsett svæði fyrir einkvæman lykil innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PayorID" type="ct:PersonID">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Payor person id.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Kennitala kröfugreiðanda.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CancellationDate" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Date of cancellation, when the claim is no longer valid in the system.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Niðurfellingardagur innheimtukröfu, hve lengi á krafan að lifa í innheimtukerfi.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Identifier" type="clt:Identifier">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The unique identifier of the claimant that the claim relates to.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Auðkenni kröfuhafa sem innheimtukrafan tengist.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Amount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Amount of claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Upphæð innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Reference" type="clt:Reference">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Refence determined by claimant. Alphanumeric, maximum 16 letters.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Tilvísunarnúmer ákveðið af kröfuhafa. Má vera tölu- og bókstafir, 16 stafa langt að hámarki.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FinalDueDate" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Final due date of claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Eindagi innheimtukröfu</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BillNumber" type="ct:BillNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Billnumber, optional. Information provided by claimant.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Seðilnúmer, valkvætt. Upplýsingar settar af kröfuhafa.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CustomerNumber" type="clt:CustomerNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Customer number, optional key used by claimant to identify payor. Necessary if payor is to be able to enable automotic debiting of claims.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Viðskiptanúmer greiðanda. Valkvæður lykill greiðanda kröfunar hjá kröfuhafa. Nauðsynlegur ef hægt á að vera að stofna beingreiðslusamning tengdan innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="NoticeAndPaymentFee" type="clt:NoticeAndPaymentFee">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Charge for calculation and printout of payment slip and sending to payer.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Gjald fyrir útreikning og útskrift greiðsluseðils ásamt sendingu hans til greiðanda.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DefaultCharge" type="clt:DateRestrictedCharge">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Default charge that claims incur when they default, either a percentage or fixed amount.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Vanskilagjald má vera gefið upp annaðhvort í prósentum eða fastri upphæð.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OtherCosts" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">For special charges to be paid by the payer of the claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Fyrir sérákvörðuð gjöld sem greidd eru af greiðanda innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OtherDefaultCosts" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">For special charges, e.g. temporary collection charge, to be paid by the payer of the claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Annar vanskilakostnaður.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DefaultInterest" type="clt:DefaultInterest">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Rule for calculating default interest.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Segir til um hvernig dráttarvextir eru reiknaðir.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CurrencyInformation" type="clt:CurrencyInformation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">For claims which are linked to a foreign currency.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Notist ef innheimtukrafa er í erlendri mynt.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PermitOutOfSequencePayment" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Payment of claim allowed if earlier due date is unpaid.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Greiðsluregla, segir til um hvort megi greiða innheimtukröfu sem á ógreidda eldri gjalddaga.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Discount" type="clt:DiscountCharge">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Two amount or percentage fields can be attached to a claim base, the first and second discount, which are used to reduce the payment if made before a fixed date.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Afsláttur er gefin upp annaðhvort í prósentum eða sem föst upphæð.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="IsPartialPaymentAllowed" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Indicates whether partial payment is permitted.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Segir til um hvort greiða megi inn á innheimtukröfu eða ekki.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BillPresentmentSystem" type="clt:BillPresentmentSystem" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Indicates the bill presentment system to which the claim pertains.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Upplýsingar um í hvaða birtingarkerfi innheimtukrafa er birt ef um slíkt er að ræða.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Printing" type="clt:Printing" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Information that is used when printing a claim, if it is to be printed by the bank. </xs:documentation>
+					<xs:documentation xml:lang="is-IS">Prentun svæðið er notað ef innheimtukrafa er prentuð hjá banka / sparisjóð til þess að stýra útprentun innheimtukröfunnar. Ef prentun er breytt í breytingarfærslu eftir að búið er að prenta út seðil, hefur það ekki í för með sér að hann sé prentaður út aftur.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClaimInfo">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Information about the current status of a claim.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Upplýsingar um stöðu innheimtukröfu.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="clt:Claim">
+				<xs:sequence>
+					<xs:element name="Status" type="clt:ClaimStatus">
+						<xs:annotation>
+							<xs:documentation xml:lang="en-US">The status of the claim.</xs:documentation>
+							<xs:documentation xml:lang="is-IS">Staða innheimtukröfu.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CategoryCode" type="ct:CategoryCode" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en-US">Claimant's text key, explanation of payment. Optional property of claim.</xs:documentation>
+							<xs:documentation xml:lang="is-IS">Textalykill kröfuhafa, skýring á greiðslu. Valkvætt eigindi á innheimtukröfu.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="TotalAmountDue" type="ct:Amount">
+						<xs:annotation>
+							<xs:documentation xml:lang="en-US">The total amount due for payment.</xs:documentation>
+							<xs:documentation xml:lang="is-IS">Heildarupphæð greiðslu.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="NoticeChargeAmount" type="ct:Amount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en-US">Notice charge due for payment</xs:documentation>
+							<xs:documentation xml:lang="is-IS">Upphæð tilkynningargjalds til greiðslu.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DefaultChargeAmount" type="ct:Amount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en-US">Default charge due for payment</xs:documentation>
+							<xs:documentation xml:lang="is-IS">Upphæð vanskilagjalda til greiðslu.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="OtherCostsAmount" type="ct:Amount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en-US">Other costs due to be paid.</xs:documentation>
+							<xs:documentation xml:lang="is-IS">Annars kostnaður til greiðslu.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="OtherDefaultCostsAmount" type="ct:Amount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en-US">Other default costs due for payment.</xs:documentation>
+							<xs:documentation xml:lang="is-IS">Annar vanskilakostnaður til greiðslu.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DefaultInterestAmount" type="ct:Amount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en-US">Default interest amount due for payment.</xs:documentation>
+							<xs:documentation xml:lang="is-IS">Upphæð áfallinna dráttarvaxta.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DiscountAmount" type="ct:Amount" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation xml:lang="en-US">The discount amount that is due to be granted.</xs:documentation>
+							<xs:documentation xml:lang="is-IS">Afsláttur sem verður veittur þegar innheimtukrafa er greidd miðað við stöðu.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CurrencyExchangeRate">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Information about currency.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Samsett svæði fyrir gengisupplýsingar.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Currency" type="ct:CurrencyCode">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The currency of the claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Mynt innheimtukröfunnar.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Rate" type="ct:CurrencyAmount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The exchange rate used.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Upplýsingar um gengi gjaldmiðils innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Payment">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Describes a discrete payment.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Lýsir stakri greiðslu.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Key" type="clt:ClaimKey">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The combination of fields that uniquely identifies a claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Samsett svæði fyrir einkvæman lykil innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PayorID" type="ct:PersonID">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Payor person id.</xs:documentation>
+					<xs:documentation xml:lang="is-IS"> Kennitala kröfugreiðanda.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Amount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Amount of claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Upphæð innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="FinalDueDate" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Final due date of claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Eindagi innheimtukröfu</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Identifier" type="clt:Identifier">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The unique identifier of the claimant that the claim relates to.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Auðkenni kröfuhafa sem innheimtukrafan tengist.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Reference" type="clt:Reference">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Reference determined by claimant.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Tilvísun ákveðin af kröfuhafa.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CategoryCode" type="ct:CategoryCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Claimant’s text key, explanation of payment. Optional property of claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Textalykill kröfuhafa, skýring á greiðslu. Valkvætt eigindi á innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RedeemingBank" type="ct:Bank">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Where the payment comes from.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Sá banki sem greiðsla kemur frá.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransactionDate" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The date on which a transaction in the Claims File is effected.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Sá dagur sem uppfærsla á kröfuskrá er framkvæmd á.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BookingDate" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The date when the transaction is booked.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Dagsetning þegar færsla er bókuð hjá RB.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ValueDate" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="is-IS">The validation date used to calculate default interests and charges.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Fjárhagsleg viðmiðunardagssetning útreikninga á vöxtum og gjöldum.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PaymentType">
+				<xs:simpleType>
+					<xs:annotation>
+						<xs:documentation xml:lang="en-US">Types of payment, complete payment, partial payment or refund payment.</xs:documentation>
+						<xs:documentation xml:lang="is-IS">Tegund greiðslu, fullnaðargreiðsla, innáborgun, endurgreiðsla.</xs:documentation>
+					</xs:annotation>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Complete">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-US">The claim has been paid fully paid.</xs:documentation>
+								<xs:documentation xml:lang="is-IS">Innheimtukrafan hefur verið greidd að fullu.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="Partial">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-US">The payment was partial.</xs:documentation>
+								<xs:documentation xml:lang="is-IS">Greitt var að hluta.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="Refund">
+							<xs:annotation>
+								<xs:documentation xml:lang="en-US">The payment was a refund.</xs:documentation>
+								<xs:documentation xml:lang="is-IS">Greidd endurgreiðslukrafa.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="AmountDeposited" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Amount deposited in the account used for the disposal of payments.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Upphæð sem lögð var inn til ráðstöfunar í reikning kröfuhafa.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TotalAmount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Total amount paid, with default interest and costs.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Heildarupphæð greidd með áföllnum vöxtum og gjöldum.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CapitalGainsTax" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Withheld capital gains tax.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Afdreginn fjármagnstekjuskattur.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BillNumber" type="ct:BillNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Billnumber, optional. Information provided by claimant.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Seðilnúmer, valkvætt. Upplýsingar settar af kröfuhafa.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CustomerNumber" type="clt:CustomerNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Customer number of payor, claimant's unique code for the customer.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Svæði fyrir einkvæmt viðskiptanúmer greiðanda úr kerfi kröfuhafa.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="NoticeChargeAmount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Notice charge paid.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Greitt tilkynningargjald.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DefaultChargeAmount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Default charge paid.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Greitt vanskilagjald.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OtherCostsAmount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Other costs paid.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Greiddur annar kostnaður.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="OtherDefaultCostsAmount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Other default costs paid.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Greiddur annar vanskilakostnaður.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DefaultInterestAmount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Paid default interest.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Greiddir dráttarvextir.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DiscountAmount" type="ct:Amount">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Discount granted.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Veittur afsláttur.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Currency" type="clt:CurrencyExchangeRate" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Currency information, only available for forex claims.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Gengisupplýsingar, aðeins á innheimtukröfum í erlendu gengi.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="BatchNumber" type="ct:BatchNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Batch number of payment.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Bunkanúmer greiðslu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClaimError">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Information about claim that has generated an error.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Upplýsingar um innheimtukröfu sem lenti á villu.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Key" type="clt:ClaimKey"/>
+			<xs:element name="Error" type="ct:Error">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Information about an error when processing a claim.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Villa sem kom upp við aðgerð á innheimtukröfu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClaimResult">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">The result of an operation on a claim. If is was created it contains information indicating whether it should be printed and if it is connected to an automatic debit aggreement.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Niðurstaða af aðgerð á innheimtukröfu. Ef hún var stofnuð eru upplýsingar um hvor það eigi að prenta hana og hvort hún tengist beingreiðslusamningi.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Key" type="clt:ClaimKey"/>
+			<xs:element name="Print" type="clt:PrintInformation">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Indicates whether the payment slip needs to be printed or not. If the claimant has an agreement with the bank, it will handle the printing.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Segir til um hvort prenta þarf innheimtukröfu. Bankastofnun sér um útprentun ef um það er samkomulag.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClaimOperationResult">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">The results returned from operations on claims. A list of claims and/or errors is returned. Information about printing and direct payment is only relevant to creation of claims.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Upplýsingar um niðurstöðu aðgerðar. Skilað er lista af innheimtukröfum og/eða villum. Upplýsingar um prentun og beingreiðslu eiga aðeins við þegar innheimtukrafa er stofnuð.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="ID" type="ct:OperationID">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The unique identifier of the operation. If an error has occured, this can return an empty Id.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Auðkenni aðgerðar á stakri innheimtukröfu. Getur verið tómt ef villa kom upp.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Status" type="clt:BatchStatus">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Status of the batch of claims .</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Staða mengis innheimtukrafna sem aðgerð var framkvæmd á.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Success" type="clt:ClaimResult" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">List of claims whose operation was a success.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Listi yfir innheimtukröfur sem aðgerð tókst á.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Errors" type="clt:ClaimError" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">List of claims with errors.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Listi yfir innheimtukröfur sem lentu á villu.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AlterClaims">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Alter claims that have been submitted to the system.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Breyta innheimtukröfum sem búið er að skrá í kerfið.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Claim" type="clt:Claim" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SecondaryCollectionPaymentsQuery">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Query on a secondary collection payment.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Fyrirspurn um greiðslu á milliinnheimtu</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Claimant" type="ct:PersonID" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The Person ID of the claimant whose data is being queried.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Kennitala þess kröfuhafa sem verið er að fletta gögnum upp fyrir.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransactionDateFrom" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Date from inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Dags frá og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransactionDateTo" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Date to inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Dags til og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EntryFrom" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Entry from inclusive will be returned, starting from 1.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Skilar færslum frá og með. Fyrsta færsla hefur númer 1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EntryTo" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Entry to inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Færsla til og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SecondaryCollectionClaimsQuery">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Query on claims in secondary cellection.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Fyrirspurn um innheimtukröfur í milliinnheimtu.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Claimant" type="ct:PersonID" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The persion Id of the claimant.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Kennitala kröfuhafa.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CollectionDateFrom" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Date from inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Dags frá og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CollectionDateTo" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Date to inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Dags til og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Status" type="clt:ClaimStatus" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Status of the claims.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Staða innheimtukrafna.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EntryFrom" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Entry from inclusive will be returned, starting from 1.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Skilar færslum frá og með. Fyrsta færsla hefur númer 1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EntryTo" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Entry to inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Færsla til og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SecondaryCollectionReturnClaim">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Result of query on claims in secondary ceollection.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Niðurstaða fyrirspurnar um innheimtukröfur í milliinnheimtu.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Key" type="clt:ClaimKey" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PaymentsQuery">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Query on payment.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Fyrirspurn um greiðslu.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Claimant" type="ct:PersonID">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The persion Id of the claimant.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Kennitala kröfuhafa.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Identifier" type="clt:Identifier" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The claim identifier belonging to the claimant used to filter the query.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Auðkenni kröfuhafa sem notað er til síunar.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DisposalAccount" type="ct:AccountID" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The account to filter by. A convenience when many identifiers are connected to the same disposal account, to query for all payments connected to that account.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Reikningur til að sía eftir. Auðveldar leit að öllum kröfum sem tengjast tilteknum reikningi þegar mörg auðkenni vísa á sama reikning.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransactionDateFrom" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Date from inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Dags frá og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="TransactionDateTo" type="xs:date">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Date to inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Dags til og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EntryFrom" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Entry from inclusive will be returned, starting from 1.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Skilar færslum frá og með. Fyrsta færsla hefur númer 1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EntryTo" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Entry to inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Færsla til og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="DateSpanReferenceDate">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Reference dates, used in queries.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Tilgreinir viðmiðunardagsetningar, notað í leitum.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="DueDate">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Reference date is due date.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Gjalddagi er viðmiðunardagsetning.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="FinalDueDate">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Reference date is final due date.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Eindagi er viðmiðunardagsetning.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CancellationDate">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Reference date is cancellation date.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Niðurfellingardagur er viðmiðunardagsetning.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="CreationDate">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Reference date is creation date.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Skráningardagur er viðmiðunardagsetning.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ClaimsQueryDateSpan">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Datespan of claims query.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Tímabil fyrir fyrirspurn um innheimtukröfur.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="DateFrom" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Date from inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Dags frá og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DateTo" type="xs:date" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Date to inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Dags til og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="DateSpanReferenceDate" type="clt:DateSpanReferenceDate"/>
+	</xs:complexType>
+	<xs:complexType name="ClaimsQuery">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Query on claims.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Fyrirspurn um innheimtukröfur.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Claimant" type="ct:PersonID">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The person identifier of the claimant whose data is being queried. If empty, data will be returned for all person ids linked to the authenticated user.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Kennitala þess kröfuhafa sem verið er að fletta gögnum upp fyrir. Gögnum er skilað fyrir alla kröfuhafa tengda innskráðum notanda ef gildið er ekki sent inn.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Identifier" type="clt:Identifier" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">The unique identifier of the claimant used to filter the query. If empty, data will be returned for all identifiers.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Auðkenni kröfuhafa sem notað er til síunar. Gögnum er skilað fyrir öll auðkenni ef gildið er ekki sent inn.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Period" type="clt:ClaimsQueryDateSpan">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Time period used to filter result set.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Tímabil sem sía á eftir.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Payor" type="ct:PersonID" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Person Id of the payor.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Kennitala greiðanda.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Status" type="clt:ClaimStatus" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Status of the claims.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Staða innheimtukrafna.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EntryFrom" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Entry from inclusive will be returned, starting from 1.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Skilar færslum frá og með. Fyrsta færsla hefur númer 1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="EntryTo" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Entry to inclusive.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Færsla til og með.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="QueryPaymentsResult">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Result of payment query.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Niðurstaða úr fyrirspurn um greiðslur.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TotalCount" type="xs:unsignedInt">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Total count of entries defined by the query.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Skilar heildarfjölda færslna sem fyrirspurnin nær til.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Payments" type="clt:Payment" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="QueryClaimsResult">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">Result of claims query.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Skil fyrirspurnar um innheimtukröfur.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="TotalCount" type="xs:unsignedInt">
+				<xs:annotation>
+					<xs:documentation xml:lang="en-US">Total count of entries defined by the query.</xs:documentation>
+					<xs:documentation xml:lang="is-IS">Skilar heildarfjölda færslna sem fyrirspurnin nær til.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Claims" type="clt:ClaimInfo" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClaimCollection">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">List of claims.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Listi af innheimtukröfum.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="clt:Claim" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ClaimKeyCollection">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">List of claim keys.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Listi af lyklum innheimtukrafna.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="clt:ClaimKey" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Claim" type="clt:Claim" nillable="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">A claim.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Innheimtukrafa.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="ClaimKey" type="clt:ClaimKey" nillable="true">
+		<xs:annotation>
+			<xs:documentation xml:lang="en-US">A unique key of claim.</xs:documentation>
+			<xs:documentation xml:lang="is-IS">Einstakur lykill innheimtukröfu.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

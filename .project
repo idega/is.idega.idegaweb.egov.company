@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>is.idega.idegaweb.egov.company</name>
+	<comment>
+  </comment>
+	<projects>
+		<project>com.idega.company</project>
+		<project>is.idega.block.family</project>
+		<project>is.idega.idegaweb.egov</project>
+		<project>is.idega.idegaweb.egov.application</project>
+		<project>is.idega.idegaweb.egov.citizen</project>
+		<project>is.idega.idegaweb.egov.message</project>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+	</natures>
+</projectDescription>
