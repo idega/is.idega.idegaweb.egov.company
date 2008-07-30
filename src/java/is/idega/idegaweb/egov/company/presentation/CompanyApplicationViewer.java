@@ -1,69 +1,20 @@
 /*
- * $Id: ApplicationViewer.java,v 1.1 2008/07/29 12:57:41 anton Exp $ Created on Jun 11, 2007
+ * $Id: CompanyApplicationViewer.java,v 1.1 2008/07/29 12:57:41 anton
  * 
- * Copyright (C) 2007 Idega Software hf. All Rights Reserved.
+ * Copyright (C) 2008 Idega Software hf. All Rights Reserved.
  * 
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
 package is.idega.idegaweb.egov.company.presentation;
 
-import is.idega.idegaweb.egov.company.FSKConstants;
-import is.idega.idegaweb.egov.company.business.AdminUser;
-import is.idega.idegaweb.egov.company.data.Application;
-import is.idega.idegaweb.egov.company.data.ApplicationFiles;
-import is.idega.idegaweb.egov.company.data.Season;
+import is.idega.idegaweb.egov.fsk.presentation.ApplicationViewer;
 
-import java.rmi.RemoteException;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.ejb.CreateException;
-import javax.ejb.FinderException;
-
-import com.idega.block.process.data.Case;
-import com.idega.block.process.data.CaseStatus;
-import com.idega.block.process.message.data.Message;
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
-import com.idega.business.IBORuntimeException;
-import com.idega.company.data.Company;
-import com.idega.company.data.CompanyType;
-import com.idega.core.contact.data.Email;
-import com.idega.core.contact.data.Phone;
-import com.idega.core.file.data.ICFile;
-import com.idega.core.location.data.PostalCode;
-import com.idega.data.IDORelationshipException;
-import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Layer;
-import com.idega.presentation.Span;
-import com.idega.presentation.text.Heading1;
-import com.idega.presentation.text.Link;
-import com.idega.presentation.text.ListItem;
-import com.idega.presentation.text.Lists;
-import com.idega.presentation.text.Paragraph;
-import com.idega.presentation.text.Text;
-import com.idega.presentation.ui.Form;
-import com.idega.presentation.ui.HiddenInput;
-import com.idega.presentation.ui.Label;
-import com.idega.presentation.ui.TextArea;
-import com.idega.presentation.ui.TextInput;
-import com.idega.user.business.NoEmailFoundException;
-import com.idega.user.business.NoPhoneFoundException;
-import com.idega.user.business.UserBusiness;
-import com.idega.user.data.User;
-import com.idega.util.CoreConstants;
-import com.idega.util.EmailValidator;
-import com.idega.util.IWTimestamp;
-import com.idega.util.PersonalIDFormatter;
-import com.idega.util.text.Name;
 
-public class ApplicationViewer extends FSKBlock {
+//	TODO: adopt this class
+public class CompanyApplicationViewer extends ApplicationViewer {
 
+/*
 	private static final String PARAMETER_ACTION = "prm_action";
 	private static final String PARAMETER_MESSAGE = "prm_message";
 	private static final String PARAMETER_PHONE = "prm_phone";
@@ -92,9 +43,10 @@ public class ApplicationViewer extends FSKBlock {
 	private static final int ACTION_CLOSE = 10;
 	private static final int ACTION_EDIT_FORM = 11;
 	private static final int ACTION_STORE = 12;
-
+*/
 	public void present(IWContext iwc) {
-		if (!iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_ADMIN, iwc) && !iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_COMPANY_ADMIN, iwc)) {
+		super.present(iwc);
+		/*if (!iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_ADMIN, iwc) && !iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_COMPANY_ADMIN, iwc)) {
 			showNoPermission(iwc);
 			return;
 		}
@@ -159,18 +111,10 @@ public class ApplicationViewer extends FSKBlock {
 		}
 		catch (RemoteException re) {
 			throw new IBORuntimeException(re);
-		}
+		}*/
 	}
 
-	private int parseAction(IWContext iwc) {
-		int action = ACTION_VIEW;
-		if (iwc.isParameterSet(PARAMETER_ACTION)) {
-			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
-		}
-
-		return action;
-	}
-
+	/*@SuppressWarnings("unchecked")
 	private void getViewerForm(IWContext iwc, Application application) throws RemoteException {
 		Form form = new Form();
 		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
@@ -393,7 +337,7 @@ public class ApplicationViewer extends FSKBlock {
 		}
 
 		try {
-			Collection postalCodes = application.getPostalCodes();
+			Collection<PostalCode> postalCodes = application.getPostalCodes();
 
 			heading = new Heading1(getResourceBundle().getLocalizedString("application.postal_information_overview", "Postal information"));
 			heading.setStyleClass("subHeader");
@@ -408,9 +352,9 @@ public class ApplicationViewer extends FSKBlock {
 			section.add(list);
 
 			if (postalCodes != null) {
-				Iterator iterator = postalCodes.iterator();
+				Iterator<PostalCode> iterator = postalCodes.iterator();
 				while (iterator.hasNext()) {
-					PostalCode code = (PostalCode) iterator.next();
+					PostalCode code = iterator.next();
 
 					ListItem item = new ListItem();
 					item.add(new Text(code.getPostalAddress()));
@@ -424,7 +368,7 @@ public class ApplicationViewer extends FSKBlock {
 			e.printStackTrace();
 		}
 
-		Collection files = application.getFiles();
+		Collection<ApplicationFiles> files = application.getFiles();
 		if (!files.isEmpty()) {
 			heading = new Heading1(getResourceBundle().getLocalizedString("application.uploaded_attachments_info", "Uploaded attachments information"));
 			heading.setStyleClass("subHeader");
@@ -434,9 +378,9 @@ public class ApplicationViewer extends FSKBlock {
 			section.setStyleClass("formSection");
 			form.add(section);
 
-			Iterator iterator = files.iterator();
+			Iterator<ApplicationFiles> iterator = files.iterator();
 			while (iterator.hasNext()) {
-				ApplicationFiles applicationFile = (ApplicationFiles) iterator.next();
+				ApplicationFiles applicationFile = iterator.next();
 				ICFile file = applicationFile.getFile();
 				String fileType = applicationFile.getType();
 				IWTimestamp created = new IWTimestamp(file.getCreationDate());
@@ -491,16 +435,15 @@ public class ApplicationViewer extends FSKBlock {
 			section.add(clearLayer);
 		}
 
-		if (iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_ADMIN, iwc)) {
-			Iterator iter = application.getChildrenIterator();
-			if (iter != null) {
-				Collection messages = new ArrayList();
+		if (iwc.getAccessController().hasRole(EgovCompanyConstants.ROLE_KEY_FSK_ADMIN, iwc)) {
+			Collection<Case> children = application.getChildren();
+			if (ListUtil.isEmpty(children)) {
+				Collection<Message> messages = new ArrayList<Message>();
 
-				while (iter.hasNext()) {
-					Case theCase = (Case) iter.next();
+				for (Case theCase: children) {
 					try {
 						Message message = getBusiness().getMessageBusiness().getMessage(theCase.getPrimaryKey());
-						if (message.getContentCode() != null && message.getContentCode().equals(FSKConstants.CONTENT_CODE_REQUEST_INFORMATION)) {
+						if (message.getContentCode() != null && message.getContentCode().equals(EgovCompanyConstants.CONTENT_CODE_REQUEST_INFORMATION)) {
 							messages.add(message);
 						}
 					}
@@ -509,10 +452,8 @@ public class ApplicationViewer extends FSKBlock {
 					}
 				}
 
-				if (!messages.isEmpty()) {
-					Iterator iterator = messages.iterator();
-					while (iterator.hasNext()) {
-						Message message = (Message) iterator.next();
+				if (ListUtil.isEmpty(messages)) {
+					for (Message message: messages) {
 						User receiver = message.getOwner();
 						User sender = message.getSender();
 						IWTimestamp created = new IWTimestamp(message.getCreated());
@@ -584,7 +525,7 @@ public class ApplicationViewer extends FSKBlock {
 
 		application.getChildrenIterator();
 
-		if (iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_ADMIN, iwc)) {
+		if (iwc.getAccessController().hasRole(EgovCompanyConstants.ROLE_KEY_FSK_ADMIN, iwc)) {
 			CaseStatus status = application.getCaseStatus();
 
 			if (status.equals(getBusiness().getCaseStatusOpen()) || status.equals(getBusiness().getCaseStatusReview())) {
@@ -885,7 +826,7 @@ public class ApplicationViewer extends FSKBlock {
 		if (iEmail != null && iEmail.getEmailAddress() != null) {
 			email.setContent(iEmail.getEmailAddress());
 		}
-		email.setDisabled(!iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_ADMIN, iwc));
+		email.setDisabled(!iwc.getAccessController().hasRole(EgovCompanyConstants.ROLE_KEY_FSK_ADMIN, iwc));
 
 		TextInput bankAccount = new TextInput(PARAMETER_BANK_ACCOUNT);
 		bankAccount.setID("companyBankAccount");
@@ -894,7 +835,7 @@ public class ApplicationViewer extends FSKBlock {
 		if (company.getBankAccount() != null) {
 			bankAccount.setContent(company.getBankAccount());
 		}
-		bankAccount.setDisabled(!iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_ADMIN, iwc));
+		bankAccount.setDisabled(!iwc.getAccessController().hasRole(EgovCompanyConstants.ROLE_KEY_FSK_ADMIN, iwc));
 
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
@@ -935,7 +876,7 @@ public class ApplicationViewer extends FSKBlock {
 		clearLayer.setStyleClass("Clear");
 		section.add(clearLayer);
 
-		if (iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_ADMIN, iwc)) {
+		if (iwc.getAccessController().hasRole(EgovCompanyConstants.ROLE_KEY_FSK_ADMIN, iwc)) {
 			heading = new Heading1(getResourceBundle().getLocalizedString("application.enter_admin_info", "Enter admin info"));
 			heading.setStyleClass("subHeader");
 			form.add(heading);
@@ -1115,7 +1056,7 @@ public class ApplicationViewer extends FSKBlock {
 			return false;
 		}
 
-		if (iwc.getAccessController().hasRole(FSKConstants.ROLE_KEY_FSK_ADMIN, iwc)) {
+		if (iwc.getAccessController().hasRole(EgovCompanyConstants.ROLE_KEY_FSK_ADMIN, iwc)) {
 			if (!iwc.isParameterSet(PARAMETER_EMAIL)) {
 				getParentPage().setAlertOnLoad(getResourceBundle().getLocalizedString("application_error.must_enter_email", "You have to enter an e-mail address."));
 				return false;
@@ -1220,5 +1161,5 @@ public class ApplicationViewer extends FSKBlock {
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
 		}
-	}
+	}*/
 }
