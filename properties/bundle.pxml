@@ -11,13 +11,28 @@
       <value>
         <map>
           <key>
-            <name>is.idega.idegaweb.egov.company.presentation.CompanyApplicationViewer</name>
+            <name>is.idega.idegaweb.egov.company.presentation.company.CompanyApplicationViewer</name>
             <value>
               <map>
                 <key>
                   <name>component_property_file</name>
                   <type>java.lang.String</type>
-                  <value>is.idega.idegaweb.egov.company.presentation.CompanyApplicationViewer.pxml</value>
+                  <value>is.idega.idegaweb.egov.company.presentation.company.CompanyApplicationViewer.pxml</value>
+                </key>
+              </map>
+            </value>
+            <type>map</type>
+          </key>
+          <key>
+            <name>is.idega.idegaweb.egov.company.presentation.institution.ServicesRegister</name>
+            <value>
+              <map>
+                <key>
+                  <name>component_property_file</name>
+                  <type>java.lang.String</type>
+                  <value>is.idega.idegaweb.egov.company.presentation.institution.ServicesRegister.pxml</value>
+                  <simple>false</simple>
+                  <reload>false</reload>
                 </key>
               </map>
             </value>
@@ -29,3 +44,4 @@
     </key>
   </map>
 </pxml>
+
