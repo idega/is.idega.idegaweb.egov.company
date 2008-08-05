@@ -5,7 +5,7 @@
  * 
  * This software is the proprietary information of Idega hf. Use is subject to license terms.
  */
-package is.idega.idegaweb.egov.company.presentation;
+package is.idega.idegaweb.egov.company.presentation.company;
 
 import is.idega.idegaweb.egov.fsk.presentation.ApplicationViewer;
 
