@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -100,8 +101,13 @@ public class ServicesRegister extends ApplicationCreator {
 	}
 	
 	@Override
-	protected String saveApplication(IWContext iwc, List<ICLocale> locales) throws RemoteException, CreateException, FinderException, IDOAddRelationshipException{
-		String appId = super.saveApplication(iwc, locales);
+	protected String saveApplication(IWContext iwc, List<ICLocale> locales) throws RemoteException, CreateException, FinderException {
+		String appId = null;
+		try {
+			appId = super.saveApplication(iwc, locales);
+		} catch (IDOAddRelationshipException e) {
+			Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error saving application!", e);
+		}
 		if (StringUtil.isEmpty(appId)) {
 			return null;
 		}
@@ -128,7 +134,11 @@ public class ServicesRegister extends ApplicationCreator {
 			return appId;
 		}
 		for (Group group: groupsForApp) {
-			app.addGroup(group);
+			try {
+				app.addGroup(group);
+			} catch(IDOAddRelationshipException e) {
+				Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error adding group " + group + " to application: " + app, e);
+			}
 		}
 		app.store();
 		
@@ -164,7 +174,19 @@ public class ServicesRegister extends ApplicationCreator {
 		
 		removeOldGroups(app, selectedGroups);
 		
-		return selectedGroups;
+		Collection<Group> currentGroups = app.getGroups();
+		if (ListUtil.isEmpty(currentGroups)) {
+			return selectedGroups;
+		}
+		
+		List<Group> newGroups = new ArrayList<Group>();
+		for (Group selectedGroup: selectedGroups) {
+			if (!currentGroups.contains(selectedGroup)) {
+				newGroups.add(selectedGroup);
+			}
+		}
+		
+		return newGroups;
 	}
 	
 	private void removeOldGroups(Application app, List<Group> newGroups) {
