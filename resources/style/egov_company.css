@@ -102,3 +102,27 @@ table.parentAllocation tr td.closedCourse {
 p.nonRemoved {
 	color: #f00;
 }
+
+th.applicationViewHeader {
+	text-align: center !important;
+}
+
+th.applicationApproveHeader {
+	text-align: center !important;
+}
+
+th.applicationRejectHeader {
+	text-align: center !important;
+}
+
+td.applicationViewBody {
+	text-align: center !important;
+}
+
+td.applicationApproveBody {
+	text-align: center !important;
+}
+
+td.applicationRejectBody {
+	text-align: center !important;
+}
