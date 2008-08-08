@@ -3,7 +3,6 @@ package is.idega.idegaweb.egov.company.presentation.institution;
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
-import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 
@@ -338,11 +337,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		Heading4 label = new Heading4(iwrb.getLocalizedString("there_are_no_applications_of_this_type", "There are no applications of this type"));
 		label.setStyleClass("noApplicationsOfThisTypeStyle");
 		return label;
-	}
-	
-	@Override
-	public String getBundleIdentifier() {
-		return EgovCompanyConstants.IW_BUNDLE_IDENTIFIER;
 	}
 
 	public String getCaseCode() {

@@ -2,6 +2,7 @@ package is.idega.idegaweb.egov.company.presentation.institution;
 
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
+import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.groups.GroupsFilter;
+import com.idega.presentation.text.Heading1;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
 import com.idega.util.ListUtil;
@@ -66,6 +68,17 @@ public class ServicesRegister extends ApplicationCreator {
 		setAdditionalComponents(additionalComponents);
 		
 		super.main(iwc);
+	}
+	
+	@Override
+	public void present(IWContext iwc) throws Exception {
+		add(new Heading1(getResourceBundle(iwc).getLocalizedString("company_services_register", "Company applications register")));
+		
+		super.present(iwc);
+	}
+	
+	public String getBundleIdentifier() {
+		return EgovCompanyConstants.IW_BUNDLE_IDENTIFIER;
 	}
 	
 	private List<String> getGroupsFroCurrentApplication(IWContext iwc) {
