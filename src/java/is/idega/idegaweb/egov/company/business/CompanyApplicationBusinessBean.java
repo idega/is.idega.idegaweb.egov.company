@@ -16,12 +16,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.idega.company.data.Company;
+import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.contact.data.Email;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
+import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.SendMail;
@@ -134,7 +136,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		try {
 			SendMail.send(from, email.getEmailAddress(), null, null, host, subject, text);
 		} catch (MessagingException e) {
-			e.printStackTrace();
+			logger.log(Level.WARNING, "Error sending mail!", e);
 			return false;
 		}
 		
@@ -156,5 +158,27 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		
 		return new StringBuilder(getApplicationName(compApp, locale)).append(CoreConstants.COLON).append(CoreConstants.SPACE).toString();
+	}
+
+	public boolean isCompanyAdministrator(IWContext iwc) {
+		if (iwc == null) {
+			return false;
+		}
+		
+		User user = null;
+		try {
+			user = iwc.getCurrentUser();
+		} catch(NotLoggedOnException e) {
+			logger.log(Level.SEVERE, "User is not logged!", e);
+		}
+		if (user == null) {
+			return false;
+		}
+		
+		if (iwc.isSuperAdmin()) {	//	TODO:	Is this correct?
+			return true;
+		}
+		
+		return false;
 	}
 }

@@ -66,6 +66,16 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		
 		PresentationUtil.addStyleSheetToHeader(iwc, bundle.getVirtualPathWithFileNameString("style/egov_company.css"));
 		
+		if (!getCompanyBusiness().isCompanyAdministrator(iwc)) {
+			Layer container = new Layer();
+			add(container);
+			container.setStyleClass("insufficientRigthsToManageApplicationsStyle");
+			Heading1 errorMessage = new Heading1(iwrb.getLocalizedString("insufficient_rigths_to_manage_applications",
+					"You have insufficient rights to approve/reject applications!"));
+			container.add(errorMessage);
+			return;
+		}
+		
 		if (iwc.isParameterSet(VIEW_APPLICATION_PARAMETER)) {
 			viewApplication(iwc);
 			return;

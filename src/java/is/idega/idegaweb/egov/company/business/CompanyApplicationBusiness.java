@@ -1,5 +1,7 @@
 package is.idega.idegaweb.egov.company.business;
 
+import com.idega.presentation.IWContext;
+
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.company.data.CompanyApplication;
 
@@ -13,4 +15,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public boolean approveApplication(String applicationId);
 
 	public boolean rejectApplication(String applicationId, String explanationText);
+	
+	public boolean isCompanyAdministrator(IWContext iwc);
 }
