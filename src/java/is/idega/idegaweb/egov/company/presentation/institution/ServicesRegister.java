@@ -25,10 +25,10 @@ import com.idega.data.IDORemoveRelationshipException;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.groups.GroupsFilter;
 import com.idega.presentation.text.Heading1;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
+import com.idega.user.presentation.group.GroupsFilter;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
