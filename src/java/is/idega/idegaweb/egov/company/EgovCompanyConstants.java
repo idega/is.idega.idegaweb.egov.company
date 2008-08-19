@@ -12,5 +12,8 @@ public class EgovCompanyConstants {
 	private EgovCompanyConstants() {}
 
 	public static final String IW_BUNDLE_IDENTIFIER = "is.idega.idegaweb.egov.company";
+	
+	public static final String COMPANY_ADMIN_ROLE = "company_admin_role";
+	public static final String COMPANY_EMPLOYEE_ROLE = "company_employee_role";
 
 }
