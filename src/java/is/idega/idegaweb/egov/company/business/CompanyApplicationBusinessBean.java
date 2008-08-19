@@ -22,6 +22,7 @@ import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
@@ -159,26 +160,27 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 		return new StringBuilder(getApplicationName(compApp, locale)).append(CoreConstants.COLON).append(CoreConstants.SPACE).toString();
 	}
-
-	public boolean isCompanyAdministrator(IWContext iwc) {
-		if (iwc == null) {
+	
+	private boolean isUserLogged(IWUserContext iwuc) {
+		if (iwuc == null) {
 			return false;
 		}
 		
 		User user = null;
 		try {
-			user = iwc.getCurrentUser();
+			user = iwuc.getCurrentUser();
 		} catch(NotLoggedOnException e) {
 			logger.log(Level.SEVERE, "User is not logged!", e);
 		}
-		if (user == null) {
-			return false;
-		}
 		
-		if (iwc.isSuperAdmin()) {	//	TODO:	Is this correct?
-			return true;
-		}
-		
-		return false;
+		return user == null ? false : true;
+	}
+
+	public boolean isCompanyAdministrator(IWContext iwc) {
+		return isUserLogged(iwc) && iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_ADMIN_ROLE, iwc);
+	}
+	
+	public boolean isCompanyEmployee(IWContext iwc) {
+		return isCompanyAdministrator(iwc) || iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE, iwc);
 	}
 }
