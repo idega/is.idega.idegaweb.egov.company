@@ -18,8 +18,6 @@ import javax.ejb.FinderException;
 import javax.faces.component.UIComponent;
 
 import com.idega.builder.bean.AdvancedProperty;
-import com.idega.idegaweb.IWBundle;
-import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -40,7 +38,6 @@ import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.util.ListUtil;
-import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 
 public class ApplicationApproverRejecter extends CompanyBlock {
@@ -54,24 +51,15 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	
 	private String caseCode;
 	
-	private IWBundle bundle;
-	private IWResourceBundle iwrb;
 	private String applicationHandlingResultMessage;
 	
 	@Override
-	public void present(IWContext iwc) throws Exception {
-		bundle = getBundle(iwc);
-		iwrb = bundle.getResourceBundle(iwc);
-		
-		PresentationUtil.addStyleSheetToHeader(iwc, bundle.getVirtualPathWithFileNameString("style/egov_company.css"));
+	protected void present(IWContext iwc) throws Exception {
+		super.present(iwc);
 		
 		if (!getCompanyBusiness().isCompanyAdministrator(iwc)) {
-			Layer container = new Layer();
-			add(container);
-			container.setStyleClass("insufficientRigthsToManageApplicationsStyle");
-			Heading1 errorMessage = new Heading1(iwrb.getLocalizedString("insufficient_rigths_to_manage_applications",
+			showInsufficientRightsMessage(iwrb.getLocalizedString("insufficient_rigths_to_manage_applications",
 					"You have insufficient rights to approve/reject applications!"));
-			container.add(errorMessage);
 			return;
 		}
 		
