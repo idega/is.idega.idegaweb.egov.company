@@ -13,6 +13,8 @@ import com.idega.idegaweb.IWBundleStartable;
 
 public class IWBundleStarter extends is.idega.idegaweb.egov.fsk.IWBundleStarter implements IWBundleStartable {
 
+	public static final String BUNDLE_IDENTIFIER = "is.idega.idegaweb.egov.company";
+	
 	public void start(IWBundle starterBundle) {
 		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
 		

@@ -4,7 +4,9 @@ import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.data.CompanyApplication;
+import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
 
+import java.rmi.RemoteException;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.idega.company.data.Company;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.contact.data.Email;
+import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
@@ -37,7 +40,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	private static final long serialVersionUID = 2473252235079303894L;
 	private static final Logger logger = Logger.getLogger(CompanyApplicationBusinessBean.class.getName());
 	
-	private CompanyApplicationBusinessBean() {}
+	public CompanyApplicationBusinessBean() {}
 	
 	@Override
 	public CompanyApplication getApplication(String applicationId) {
@@ -57,6 +60,17 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return null;
 		}
 		
+		return (CompanyApplication) app;
+	}
+	
+	public CompanyApplication getApplication(Company company) {
+		CompanyApplication app;
+		try {
+			app = getCompanyApplicationHome().findByCompany(company);
+		} catch (FinderException e) {
+			e.printStackTrace();
+			return null;
+		}
 		return (CompanyApplication) app;
 	}
 	
@@ -182,5 +196,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	
 	public boolean isCompanyEmployee(IWContext iwc) {
 		return isCompanyAdministrator(iwc) || iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE, iwc);
+	}
+	
+	public CompanyApplicationHome getCompanyApplicationHome() {
+		try {
+			return (CompanyApplicationHome) IDOLookup.getHome(CompanyApplication.class);
+		}
+		catch (RemoteException rme) {
+			throw new RuntimeException(rme.getMessage());
+		}
 	}
 }
