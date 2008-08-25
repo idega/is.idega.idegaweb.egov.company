@@ -1,6 +1,6 @@
 package is.idega.idegaweb.egov.company.presentation.company;
 
-import is.idega.idegaweb.egov.company.IWBundleStarter;
+import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
 import is.idega.idegaweb.egov.fsk.presentation.CompanyApplication;
 
@@ -11,8 +11,6 @@ import java.util.regex.Pattern;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
-import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
@@ -20,13 +18,12 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.contact.data.PhoneTypeBMPBean;
-import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Link;
-import com.idega.presentation.ui.Form;
 import com.idega.user.data.User;
 import com.idega.util.EmailValidator;
+import com.idega.util.expression.ELUtil;
 import com.idega.util.text.SocialSecurityNumber;
 
 /**
@@ -45,10 +42,12 @@ public class CompanyAdminApplication extends CompanyApplication {
 	protected static final int ACTION_OVERVIEW = 3;
 	protected static final int ACTION_SAVE = 4;
 
+	@Override
 	public String getBundleIdentifier() {
-		return IWBundleStarter.BUNDLE_IDENTIFIER;
+		return EgovCompanyConstants.IW_BUNDLE_IDENTIFIER;
 	}
 	
+	@Override
 	protected void present(IWContext iwc) {
 		this.iwrb = getResourceBundle(iwc);
 
@@ -78,8 +77,6 @@ public class CompanyAdminApplication extends CompanyApplication {
 	
 	@Override
 	protected void showOverview(IWContext iwc, int prevPhase, int currentPhase, int nextPhase, int iNumberOfPhases) throws RemoteException {
-		Form form = createForm(ACTION_OVERVIEW);
-		
 		if (!iwc.isParameterSet(PARAMETER_PERSONAL_ID)) {
 			setError(PARAMETER_PERSONAL_ID, this.iwrb.getLocalizedString("application_error.must_enter_personal_id", "You have to enter a personal ID."));
 		}
@@ -98,7 +95,7 @@ public class CompanyAdminApplication extends CompanyApplication {
 			is.idega.idegaweb.egov.company.data.CompanyApplication application = null;
 			
 			try {
-				application = getCompanyApplicationBusiness(iwc).getCompanyApplicationHome().findByCompany(company);
+				application = getCompanyApplicationBusiness().getCompanyApplicationHome().findByCompany(company);
 			} catch (FinderException e) {
 				e.printStackTrace();
 			}
@@ -209,7 +206,7 @@ public class CompanyAdminApplication extends CompanyApplication {
 			company.store();
 
 			try {
-				is.idega.idegaweb.egov.company.data.CompanyApplication application = getCompanyApplicationBusiness(iwc).getCompanyApplicationHome().create();
+				is.idega.idegaweb.egov.company.data.CompanyApplication application = getCompanyApplicationBusiness().getCompanyApplicationHome().create();
 				
 				application.setAdminUser(admin);
 				application.setCompany(company);
@@ -266,12 +263,8 @@ public class CompanyAdminApplication extends CompanyApplication {
 		}
 	}
 	
-	protected CompanyApplicationBusiness getCompanyApplicationBusiness(IWApplicationContext iwac) {
-		try {
-			return (CompanyApplicationBusiness) IBOLookup.getServiceInstance(iwac, CompanyApplicationBusiness.class);
-		}
-		catch (IBOLookupException ile) {
-			throw new IBORuntimeException(ile);
-		}
+	protected CompanyApplicationBusiness getCompanyApplicationBusiness() {
+		CompanyApplicationBusiness compAppBusiness = ELUtil.getInstance().getBean(CompanyApplicationBusiness.SPRING_BEAN_IDENTIFIER);
+		return compAppBusiness;
 	}
 }

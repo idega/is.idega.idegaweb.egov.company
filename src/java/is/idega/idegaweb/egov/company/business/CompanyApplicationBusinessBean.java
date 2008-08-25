@@ -40,7 +40,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	private static final long serialVersionUID = 2473252235079303894L;
 	private static final Logger logger = Logger.getLogger(CompanyApplicationBusinessBean.class.getName());
 	
-	public CompanyApplicationBusinessBean() {}
+	//	It's a Spring bean, use ELUtil to get instance of it!
+	private CompanyApplicationBusinessBean() {}
 	
 	@Override
 	public CompanyApplication getApplication(String applicationId) {
@@ -71,7 +72,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			e.printStackTrace();
 			return null;
 		}
-		return (CompanyApplication) app;
+		return app;
 	}
 	
 	@Override
