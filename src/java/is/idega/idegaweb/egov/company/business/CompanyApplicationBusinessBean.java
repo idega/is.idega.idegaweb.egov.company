@@ -94,6 +94,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
 		subject.append(iwrb.getLocalizedString("application_approved_mail_subject", "application was approved"));
 		String text = iwrb.getLocalizedString("application_approved_mail_text", "Application was approved.");
+		
+		//	TODO: Make account for company, send email with "random" password
+		
 		return sendMail(compApp, subject.toString(), text);
 	}
 
@@ -192,11 +195,21 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	}
 
 	public boolean isCompanyAdministrator(IWContext iwc) {
-		return isUserLogged(iwc) && iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_ADMIN_ROLE, iwc);
+		try {
+			return isUserLogged(iwc) && iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_ADMIN_ROLE, iwc);
+		} catch(NotLoggedOnException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	public boolean isCompanyEmployee(IWContext iwc) {
-		return isCompanyAdministrator(iwc) || iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE, iwc);
+		try {
+			return isCompanyAdministrator(iwc) || iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE, iwc);
+		} catch(NotLoggedOnException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	public CompanyApplicationHome getCompanyApplicationHome() {
