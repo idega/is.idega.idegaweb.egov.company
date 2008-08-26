@@ -148,6 +148,7 @@ public class CompanyAdminApplication extends CompanyApplication {
 		}
 	}
 	
+	@Override
 	protected void save(IWContext iwc) throws RemoteException {
 		CompanyType companyType = iwc.isParameterSet(PARAMETER_TYPE) ? getBusiness(iwc).getCompanyType(iwc.getParameter(PARAMETER_TYPE)) : null;
 
