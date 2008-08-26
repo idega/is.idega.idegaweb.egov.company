@@ -12,6 +12,7 @@ import com.idega.presentation.Layer;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.Age;
+import com.idega.util.ListUtil;
 
 public class CompanyServicesViewer extends CompanyBlock {
 
@@ -20,34 +21,42 @@ public class CompanyServicesViewer extends CompanyBlock {
 	protected void present(IWContext iwc) throws Exception {
 		super.present(iwc);
 
-		if (getCompanyBusiness().isCompanyEmployee(iwc)) {
-			Layer container = new Layer();
-			add(container);
+		if (!getCompanyBusiness().isCompanyEmployee(iwc)) {
+			//	Add message that user has insufficient rights
+			return;
+		}
+		
+		Layer container = new Layer();
+		add(container);
 
-			User user = iwc.getCurrentUser();
+		User user = iwc.getCurrentUser();
+		Collection<Application> allApplications = getCompanyBusiness().getApplicationHome().findAll();
 
-			Collection<Application> allApplications = getCompanyBusiness().getApplicationHome().findAll();
-
-			List<Application> userApplicationList = new ArrayList<Application>();
-
-			for (Application app : allApplications) {
-				boolean appAdded = false;
-				for (Group group : app.getGroups()) {
-					if (!appAdded && getUserBusiness(iwc).isGroupUnderUsersTopGroupNode(iwc, group, user)) {
-
+		List<Application> userApplicationList = new ArrayList<Application>();
+		for (Application app : allApplications) {
+			boolean appAdded = false;
+			for (Group group : app.getGroups()) {
+				try {
+					if (!appAdded && getUserBusiness(iwc).isMemberOfGroup(Integer.valueOf(group.getId()), user)) {
 						userApplicationList.add(app);
 						appAdded = true;
-					}
+					}	
+				} catch(NumberFormatException e) {
+					e.printStackTrace();
 				}
 			}
-			
-			Age[] ages = null;
-			boolean checkAges = false;
-			ages = getApplicationBusiness(iwc).getAgesForUserAndChildren(user);
-			checkAges = (ages != null);
-			
-			container.add(getApplicationList(iwc, checkAges, userApplicationList, ages));
-
 		}
+		
+		if (ListUtil.isEmpty(userApplicationList)) {
+			//	TODO: add message that no services found
+			return;
+		}
+		
+		Age[] ages = null;
+		boolean checkAges = false;
+		ages = getApplicationBusiness(iwc).getAgesForUserAndChildren(user);
+		checkAges = (ages != null);
+		
+		container.add(getApplicationList(iwc, checkAges, userApplicationList, ages));
 	}
 }
