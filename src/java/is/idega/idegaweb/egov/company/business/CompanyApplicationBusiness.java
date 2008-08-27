@@ -24,4 +24,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public boolean isCompanyEmployee(IWContext iwc);
 	
 	public CompanyApplicationHome getCompanyApplicationHome();
+	
+	public boolean sendEmail(String email, String subject, String text);
 }

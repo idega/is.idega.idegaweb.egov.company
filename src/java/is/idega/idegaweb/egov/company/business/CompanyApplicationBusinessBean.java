@@ -128,12 +128,30 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return true;
 	}
 	
-	private boolean sendMail(CompanyApplication compApp, String subject, String text) {
-		if (compApp == null || StringUtil.isEmpty(text)) {
-			return false;
-		}
+	public boolean sendEmail(String email, String subject, String text) {
 		IWMainApplicationSettings settings = IWMainApplication.getDefaultIWMainApplication().getSettings();
 		if (settings == null) {
+			return false;
+		}
+		
+		String from = settings.getProperty(CoreConstants.PROP_SYSTEM_MAIL_FROM_ADDRESS);
+		String host = settings.getProperty(CoreConstants.PROP_SYSTEM_SMTP_MAILSERVER);
+		if (StringUtil.isEmpty(from) || StringUtil.isEmpty(host)) {
+			logger.log(Level.WARNING, "Cann't send email from: " + from + " via: " + host + ". Set properties for application!");
+			return false;
+		}
+		try {
+			SendMail.send(from, email, null, null, host, subject, text);
+		} catch (MessagingException e) {
+			logger.log(Level.WARNING, "Error sending mail!", e);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private boolean sendMail(CompanyApplication compApp, String subject, String text) {
+		if (compApp == null || StringUtil.isEmpty(text)) {
 			return false;
 		}
 		
@@ -146,20 +164,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return false;
 		}
 		
-		String from = settings.getProperty(CoreConstants.PROP_SYSTEM_MAIL_FROM_ADDRESS);
-		String host = settings.getProperty(CoreConstants.PROP_SYSTEM_SMTP_MAILSERVER);
-		if (StringUtil.isEmpty(from) || StringUtil.isEmpty(host)) {
-			logger.log(Level.WARNING, "Cann't send email from: " + from + " via: " + host + ". Set properties for application!");
-			return false;
-		}
-		try {
-			SendMail.send(from, email.getEmailAddress(), null, null, host, subject, text);
-		} catch (MessagingException e) {
-			logger.log(Level.WARNING, "Error sending mail!", e);
-			return false;
-		}
-		
-		return true;
+		return sendEmail(email.getEmailAddress(), subject, text);
 	}
 	
 	private IWResourceBundle getResourceBundle() {
