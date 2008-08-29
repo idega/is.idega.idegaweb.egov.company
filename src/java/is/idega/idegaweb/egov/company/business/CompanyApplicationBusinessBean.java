@@ -14,8 +14,6 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ejb.CreateException;
-import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 import javax.mail.MessagingException;
 
@@ -24,14 +22,13 @@ import org.springframework.stereotype.Service;
 
 import com.idega.business.IBOLookup;
 import com.idega.company.data.Company;
-import com.idega.core.accesscontrol.business.AccessControl;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.core.accesscontrol.business.LoginDBHandler;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
+import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
-import com.idega.core.contact.data.Phone;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
@@ -40,13 +37,13 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
-import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 import com.idega.util.SendMail;
 import com.idega.util.StringUtil;
 
@@ -325,5 +322,51 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 	protected CitizenBusiness getCitizenBusiness() throws RemoteException {
 		return (CitizenBusiness) this.getServiceInstance(CitizenBusiness.class);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Group getUserCompany(IWContext iwc, User user) {
+		if (user == null && !isCompanyEmployee(iwc)) {
+			return null;
+		}
+		
+		UserBusiness userBusiness = null;
+		try {
+			userBusiness = (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		if (userBusiness == null) {
+			return null;
+		}
+		
+		try {
+			return getGroupByType(userBusiness.getUsersTopGroupNodesByViewAndOwnerPermissions(user, iwc), StandardRoles.ROLE_KEY_COMPANY);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private Group getGroupByType(Collection<Group> groups, String groupTypeKey) {
+		if (ListUtil.isEmpty(groups) || StringUtil.isEmpty(groupTypeKey)) {
+			return null;
+		}
+		
+		Group groupFromRecursion = null;
+		for (Group group: groups) {
+			if (groupTypeKey.equals(group.getGroupType())) {
+				return group;
+			}
+			
+			groupFromRecursion = getGroupByType(group.getChildren(), groupTypeKey);
+			if (groupFromRecursion != null) {
+				return groupFromRecursion;
+			}
+		}
+		
+		return null;
 	}
 }

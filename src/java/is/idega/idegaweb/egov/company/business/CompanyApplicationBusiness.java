@@ -13,6 +13,7 @@ import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
 import com.idega.company.data.Company;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.presentation.IWContext;
+import com.idega.user.data.Group;
 import com.idega.user.data.User;
 
 public interface CompanyApplicationBusiness extends ApplicationBusiness {
@@ -32,8 +33,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public boolean isCompanyEmployee(IWContext iwc);
 
 	public CompanyApplicationHome getCompanyApplicationHome();
-
-	public boolean sendEmail(String email, String subject, String text);
 
 	/**
 	 * Creates a logging(personal-id) for user and sends email with user name and password
@@ -62,5 +61,8 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 * @throws FinderException
 	 */
 	public Collection<Application> getUserApplications(IWContext iwc, User user) throws FinderException;
-
+	
+	public boolean sendEmail(String email, String subject, String text);
+	
+	public Group getUserCompany(IWContext iwc, User user);
 }

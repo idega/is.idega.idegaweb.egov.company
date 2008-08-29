@@ -10,6 +10,7 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
 import com.idega.util.PresentationUtil;
+import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
 public abstract class CompanyBlock extends ApplicationBlock {
@@ -36,12 +37,30 @@ public abstract class CompanyBlock extends ApplicationBlock {
 	}
 	
 	protected void showInsufficientRightsMessage(String message) {
+		showMessage(message, "insufficientRigthsStyle");
+	}
+	
+	protected void showMessage(String message) {
+		showMessage(message, null);
+	}
+	
+	protected void showMessage(String message, String styleClass) {	
+		add(getMessage(message, styleClass));
+	}
+	
+	protected Layer getMessage(String message) {
+		return getMessage(message, null);
+	}
+	
+	protected Layer getMessage(String message, String styleClass) {
 		Layer container = new Layer();
-		add(container);
-		container.setStyleClass("insufficientRigthsStyle");
+		if (!StringUtil.isEmpty(styleClass)) {
+			container.setStyleClass(styleClass);
+		}
 		
 		Heading1 errorMessage = new Heading1(message);
 		container.add(errorMessage);
+		return container;
 	}
 
 }
