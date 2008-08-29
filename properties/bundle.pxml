@@ -53,14 +53,14 @@
             </value>
             <type>map</type>
           </key>
-                    <key>
-            <name>is.idega.idegaweb.egov.company.presentation.company.CompanyAccountManager</name>
+          <key>
+            <name>is.idega.idegaweb.egov.company.presentation.institution.CompanyAccountManager</name>
             <value>
               <map>
                 <key>
                   <name>component_property_file</name>
                   <type>java.lang.String</type>
-                  <value>is.idega.idegaweb.egov.company.presentation.company.CompanyAccountManager.pxml</value>
+                  <value>is.idega.idegaweb.egov.company.presentation.institution.CompanyAccountManager.pxml</value>
                   <simple>false</simple>
                   <reload>false</reload>
                 </key>
