@@ -27,14 +27,13 @@ public class CompanyServicesViewer extends CompanyBlock {
 		this.group = group;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 		super.present(iwc);
 
 		Layer container = new Layer();
 		add(container);
-		container.add(new Heading1(getResourceBundle(iwc).getLocalizedString("services", "Services")));
+		container.add(new Heading1(getResourceBundle(iwc).getLocalizedString("company_services", "Company services")));
 
 		// Temporal remove this after testing
 		/*Collection<Group> selectedGroups = getUserBusiness(iwc).getGroupBusiness().getGroupsByGroupName("company group");
@@ -51,15 +50,15 @@ public class CompanyServicesViewer extends CompanyBlock {
 
 		User user = iwc.getCurrentUser();
 		Collection<Application> userApplicationList = getCompanyBusiness().getUserApplications(iwc, user);
-		Collection<Application> applicationForSelectedGroup = new ArrayList<Application>();
+		Collection<Application> applicationsForSelectedGroup = new ArrayList<Application>();
 		for (Application application : userApplicationList) {
 			if (application.getGroups().contains(getGroup())) {
-				applicationForSelectedGroup.add(application);
+				applicationsForSelectedGroup.add(application);
 			}
 		}
 
-		if (ListUtil.isEmpty(userApplicationList)) {
-			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("no_services_faund", "No services faund")));
+		if (ListUtil.isEmpty(applicationsForSelectedGroup)) {
+			container.add(getMessage(getResourceBundle(iwc).getLocalizedString("no_services_found", "No services found")));
 			return;
 		}
 
@@ -68,6 +67,6 @@ public class CompanyServicesViewer extends CompanyBlock {
 		ages = getApplicationBusiness(iwc).getAgesForUserAndChildren(user);
 		checkAges = (ages != null);
 
-		container.add(getApplicationList(iwc, checkAges, applicationForSelectedGroup, ages));
+		container.add(getApplicationList(iwc, checkAges, applicationsForSelectedGroup, ages));
 	}
 }

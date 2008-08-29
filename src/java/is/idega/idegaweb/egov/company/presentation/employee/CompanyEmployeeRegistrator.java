@@ -74,6 +74,7 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void submitSimpleForm(IWContext iwc) throws RemoteException {
 		boolean hasErrors = false;
@@ -83,7 +84,7 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 			if (iwc.isParameterSet(COMMUNE_KEY)) {
 				String URL = iwc.getParameter(COMMUNE_KEY);
 				StringBuffer query = new StringBuffer();
-				Enumeration enumeration = iwc.getParameterNames();
+				Enumeration<?> enumeration = iwc.getParameterNames();
 				if (enumeration != null) {
 					query.append("?");
 
