@@ -5,7 +5,6 @@ import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -18,6 +17,16 @@ import com.idega.util.ListUtil;
 
 public class CompanyServicesViewer extends CompanyBlock {
 
+	protected Group group;
+
+	public Group getGroup() {
+		return group;
+	}
+
+	public void setGroup(Group group) {
+		this.group = group;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void present(IWContext iwc) throws Exception {
@@ -27,26 +36,25 @@ public class CompanyServicesViewer extends CompanyBlock {
 		add(container);
 		container.add(new Heading1(getResourceBundle(iwc).getLocalizedString("services", "Services")));
 
+		// Temporal remove this after testing
+		/*Collection<Group> selectedGroups = getUserBusiness(iwc).getGroupBusiness().getGroupsByGroupName("company group");
+		setGroup(selectedGroups.iterator().next());*/
+
 		if (!getCompanyBusiness().isCompanyEmployee(iwc)) {
 			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("insufficient_rights", "Insufficient rights")));
 			return;
 		}
+		if (group == null) {
+			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("select_group", "Select a group")));
+			return;
+		}
 
 		User user = iwc.getCurrentUser();
-		Collection<Application> allApplications = getCompanyBusiness().getApplicationHome().findAll();
-
-		List<Application> userApplicationList = new ArrayList<Application>();
-		for (Application app : allApplications) {
-			boolean appAdded = false;
-			for (Group group : app.getGroups()) {
-				try {
-					if (!appAdded && (getUserBusiness(iwc).isMemberOfGroup(Integer.valueOf(group.getId()), user) || iwc.isSuperAdmin())) {
-						userApplicationList.add(app);
-						appAdded = true;
-					}
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				}
+		Collection<Application> userApplicationList = getCompanyBusiness().getUserApplications(iwc, user);
+		Collection<Application> applicationForSelectedGroup = new ArrayList<Application>();
+		for (Application application : userApplicationList) {
+			if (application.getGroups().contains(getGroup())) {
+				applicationForSelectedGroup.add(application);
 			}
 		}
 
@@ -60,6 +68,6 @@ public class CompanyServicesViewer extends CompanyBlock {
 		ages = getApplicationBusiness(iwc).getAgesForUserAndChildren(user);
 		checkAges = (ages != null);
 
-		container.add(getApplicationList(iwc, checkAges, userApplicationList, ages));
+		container.add(getApplicationList(iwc, checkAges, applicationForSelectedGroup, ages));
 	}
 }
