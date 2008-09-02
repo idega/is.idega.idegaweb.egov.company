@@ -13,8 +13,7 @@ import java.util.Enumeration;
 
 import javax.ejb.FinderException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import com.idega.business.IBOLookup;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.core.accesscontrol.data.ICRole;
@@ -27,19 +26,12 @@ import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.user.data.User;
-import com.idega.util.expression.ELUtil;
 import com.idega.util.text.SocialSecurityNumber;
 
 public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 
 	private static final String ROLES_DROP_DOWN_KEY = "roles_drop_down_key";
 
-	@Autowired
-	private CompanyApplicationBusiness companyApplicationBusiness;
-
-	public CompanyEmployeeRegistrator() {
-		ELUtil.getInstance().autowire(this);
-	}
 
 	@Override
 	public void present(IWContext iwc) {
@@ -183,7 +175,7 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 			if (!hasErrors) {
 				try {
 
-					boolean wasLoginCreatedSuccessfully = companyApplicationBusiness.createLogginForUser(iwc, user, phoneHome, phoneWork, emailRepeat, selectedRoleKey, true);
+					boolean wasLoginCreatedSuccessfully = getCompanyBusiness(iwc).createLogginForUser(iwc, user, phoneHome, phoneWork, emailRepeat, selectedRoleKey, true);
 					if (!wasLoginCreatedSuccessfully) {
 						hasErrors = true;
 						errors.add(this.getResourceBundle(iwc).getLocalizedString("account_creation_error", "Error occurred while creating account"));
@@ -249,6 +241,10 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 			}
 		}
 
+	}
+	
+	protected CompanyApplicationBusiness getCompanyBusiness(IWContext iwc) throws RemoteException{
+		return (CompanyApplicationBusiness)IBOLookup.getServiceInstance(iwc, CompanyApplicationBusiness.class);
 	}
 
 }
