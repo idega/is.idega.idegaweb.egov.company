@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.idega.company.CompanyConstants;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -57,7 +58,7 @@ public class CompanyAccountManager extends CompanyBlock {
 		container.add(getSwitcherLink(iwrb.getLocalizedString("manage_company_account", "Manage company account"), PARAMETER_MANAGE_COMPANY_ACCOUNT));
 		
 		Layer suaInContainer = getSimpleUserApplication(iwc, ListUtil.convertListOfStringsToCommaseparatedString(Arrays.asList(new String [] {
-				StandardRoles.ROLE_KEY_COMPANY, EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISIONS, EgovCompanyConstants.GROUP_TYPE_COMPANY_COURSE,
+				CompanyConstants.GROUP_TYPE_COMPANY, EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISIONS, EgovCompanyConstants.GROUP_TYPE_COMPANY_COURSE,
 				EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISION, EgovCompanyConstants.GROUP_TYPE_COMPANY_SUB_GROUP})), false);
 		container.add(suaInContainer);
 		
@@ -75,7 +76,7 @@ public class CompanyAccountManager extends CompanyBlock {
 				PARAMETER_MANAGE_COMPANY_EMPLOYEES_ACCOUNT));
 		
 		Layer suaInContainer = getSimpleUserApplication(iwc, ListUtil.convertListOfStringsToCommaseparatedString(Arrays.asList(new String [] {
-				StandardRoles.ROLE_KEY_COMPANY, EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISIONS, EgovCompanyConstants.GROUP_TYPE_COMPANY_COURSE,
+				CompanyConstants.GROUP_TYPE_COMPANY, EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISIONS, EgovCompanyConstants.GROUP_TYPE_COMPANY_COURSE,
 				EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISION, EgovCompanyConstants.GROUP_TYPE_COMPANY_SUB_GROUP})), true);
 		container.add(suaInContainer);
 	}
@@ -88,7 +89,7 @@ public class CompanyAccountManager extends CompanyBlock {
 		container.add(sua);
 		sua.setParentGroup(group);
 		sua.setUseChildrenOfTopNodesAsParentGroups(!juridicalPerson);
-		sua.setGroupTypes(StandardRoles.ROLE_KEY_COMPANY);
+		sua.setGroupTypes(juridicalPerson ? CompanyConstants.GROUP_TYPE_COMPANY : groupTypesForChildrenGroups);
 		sua.setGroupTypesForChildGroups(groupTypesForChildrenGroups);
 		sua.setRoleTypesForChildGroups(getRoleTypesForChildGroups());
 		sua.setJuridicalPerson(juridicalPerson);
@@ -96,6 +97,10 @@ public class CompanyAccountManager extends CompanyBlock {
 		sua.setAllFieldsEditable(true);
 		sua.setSendMailToUser(true);
 		sua.setChangePasswordNextTime(true);
+		sua.setAddGroupCreateButton(false);
+		sua.setAddGroupEditButton(juridicalPerson);
+		sua.setAddChildGroupCreateButton(true);
+		sua.setAddChildGroupEditButton(true);
 		
 		return container;
 	}
@@ -106,7 +111,7 @@ public class CompanyAccountManager extends CompanyBlock {
 			roles.add(StandardRoles.ROLE_KEY_AUTHOR);
 			roles.add(StandardRoles.ROLE_KEY_EDITOR);
 			roles.addAll(Arrays.asList(new String[] {EgovCompanyConstants.COMPANY_ADMIN_ROLE, EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE,
-													EgovCompanyConstants.COMPANY_ROLE}));
+													StandardRoles.ROLE_KEY_COMPANY}));
 			roleTypes = ListUtil.convertListOfStringsToCommaseparatedString(roles);
 		}
 		return roleTypes;

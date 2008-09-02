@@ -17,16 +17,13 @@ import java.util.logging.Logger;
 import javax.ejb.FinderException;
 import javax.mail.MessagingException;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
 import com.idega.business.IBOLookup;
+import com.idega.company.CompanyConstants;
 import com.idega.company.data.Company;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.core.accesscontrol.business.LoginDBHandler;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
-import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
 import com.idega.data.IDOLookup;
@@ -47,16 +44,10 @@ import com.idega.util.ListUtil;
 import com.idega.util.SendMail;
 import com.idega.util.StringUtil;
 
-@Scope("singleton")
-@Service(CompanyApplicationBusiness.SPRING_BEAN_IDENTIFIER)
 public class CompanyApplicationBusinessBean extends ApplicationBusinessBean implements CompanyApplicationBusiness {
 
 	private static final long serialVersionUID = 2473252235079303894L;
 	private static final Logger logger = Logger.getLogger(CompanyApplicationBusinessBean.class.getName());
-
-	// It's a Spring bean, use ELUtil to get instance of it!
-	private CompanyApplicationBusinessBean() {
-	}
 
 	@Override
 	public CompanyApplication getApplication(String applicationId) {
@@ -341,7 +332,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		
 		try {
-			return getGroupByType(userBusiness.getUsersTopGroupNodesByViewAndOwnerPermissions(user, iwc), StandardRoles.ROLE_KEY_COMPANY);
+			return getGroupByType(userBusiness.getUsersTopGroupNodesByViewAndOwnerPermissions(user, iwc), CompanyConstants.GROUP_TYPE_COMPANY);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

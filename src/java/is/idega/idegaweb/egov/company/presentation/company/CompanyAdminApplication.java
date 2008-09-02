@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
@@ -18,12 +20,12 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.contact.data.PhoneTypeBMPBean;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Link;
 import com.idega.user.data.User;
 import com.idega.util.EmailValidator;
-import com.idega.util.expression.ELUtil;
 import com.idega.util.text.SocialSecurityNumber;
 
 /**
@@ -265,7 +267,11 @@ public class CompanyAdminApplication extends CompanyApplication {
 	}
 	
 	protected CompanyApplicationBusiness getCompanyApplicationBusiness() {
-		CompanyApplicationBusiness compAppBusiness = ELUtil.getInstance().getBean(CompanyApplicationBusiness.SPRING_BEAN_IDENTIFIER);
-		return compAppBusiness;
+		try {
+			return (CompanyApplicationBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CompanyApplicationBusiness.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

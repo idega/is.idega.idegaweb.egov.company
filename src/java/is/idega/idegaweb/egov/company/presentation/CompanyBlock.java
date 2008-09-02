@@ -4,14 +4,16 @@ import is.idega.idegaweb.egov.application.presentation.ApplicationBlock;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
 
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
-import com.idega.util.expression.ELUtil;
 
 public abstract class CompanyBlock extends ApplicationBlock {
 	
@@ -19,8 +21,12 @@ public abstract class CompanyBlock extends ApplicationBlock {
 	protected IWResourceBundle iwrb;
 	
 	protected CompanyApplicationBusiness getCompanyBusiness() {
-		CompanyApplicationBusiness compAppBusiness = ELUtil.getInstance().getBean(CompanyApplicationBusiness.SPRING_BEAN_IDENTIFIER);
-		return compAppBusiness;
+		try {
+			return (CompanyApplicationBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CompanyApplicationBusiness.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	@Override

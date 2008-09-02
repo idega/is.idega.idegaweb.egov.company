@@ -88,13 +88,15 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	}
 	
 	private void approveApplication(IWContext iwc) {
+		boolean result = false;
 		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
-		if (compAppBusiness.approveApplication(iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER))) {
-			applicationHandlingResultMessage = iwrb.getLocalizedString("application_successfully_approved", "Application was successfully approved!");
+		try {
+			result = compAppBusiness.approveApplication(iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER));
+		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
-		else {
-			applicationHandlingResultMessage = iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred.");
-		}
+		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_approved", "Application was successfully approved!") :
+			iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred.");
 	}
 	
 	private void showRejectionForm(IWContext iwc) {
@@ -155,13 +157,15 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	}
 	
 	private void rejectApplication(IWContext iwc) {
+		boolean result = false;
 		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
-		if (compAppBusiness.rejectApplication(iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER), iwc.getParameter(REJECTION_EXPLANATION_TEXT))) {
-			applicationHandlingResultMessage = iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully rejected!");
+		try {
+			result = compAppBusiness.rejectApplication(iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER), iwc.getParameter(REJECTION_EXPLANATION_TEXT));
+		} catch (RemoteException e) {
+			e.printStackTrace();
 		}
-		else {
-			applicationHandlingResultMessage = iwrb.getLocalizedString("application_was_not_rejected", "Application was not rejected! Some error occurred.");
-		}
+		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully rejected!") :
+			iwrb.getLocalizedString("application_was_not_rejected", "Application was not rejected! Some error occurred.");
 	}
 	
 	private Heading3 getNoApplicationSelectedLabel() {

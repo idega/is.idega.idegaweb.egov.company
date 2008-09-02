@@ -15,7 +15,6 @@ public class EgovCompanyConstants {
 	
 	public static final String COMPANY_ADMIN_ROLE = "company_admin_role";
 	public static final String COMPANY_EMPLOYEE_ROLE = "company_employee_role";
-	public static final String COMPANY_ROLE = "company_role";
 	
 	public static final String GROUP_TYPE_COMPANY_DIVISIONS = "iw_company_divisions";
 	public static final String GROUP_TYPE_COMPANY_DIVISION = "iw_company_division";
