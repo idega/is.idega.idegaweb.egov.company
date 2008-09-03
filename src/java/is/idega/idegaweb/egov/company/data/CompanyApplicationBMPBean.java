@@ -52,7 +52,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	private static final String COLUMN_COMPANY = "company_id";
 
 	private static final String COLUMN_ADMIN_USER = "admin_user";
-	private static final String COLUMN_APPLICANT_USER = "applicant_user";
+	private static final String COLUMN_APPLICANT_USER = "admin_user";
 	
 	private static final String NAME = "application_name";
 	private static final String CATEGORY = "application_category_id";
