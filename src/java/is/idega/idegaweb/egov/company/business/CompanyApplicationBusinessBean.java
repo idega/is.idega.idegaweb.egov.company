@@ -101,7 +101,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		subject.append(iwrb.getLocalizedString("application_approved_mail_subject", "application was approved"));
 		String text = iwrb.getLocalizedString("application_approved_mail_text", "Application was approved.");
 
-		// TODO: Make account for company, send email with "random" password
+		// TODO: Make account for company, send email with "random" password,
+		// make new user from applicant's user contacts and set new admin for company application
 
 		return sendMail(compApp, subject.toString(), text);
 	}
@@ -229,6 +230,23 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		} catch (RemoteException rme) {
 			throw new RuntimeException(rme.getMessage());
 		}
+	}
+	
+	public boolean makeUserCompanyAdmin(User user, Group company) {
+		if (user == null || company == null) {
+			return false;
+		}
+		//	TODO:	implement
+		return true;
+	}
+	
+	public boolean makeUserCommonEmployee(User user, Group company) {
+		if (user == null || company == null) {
+			return false;
+		}
+		
+		//	TODO:	implement
+		return true;
 	}
 
 	/**

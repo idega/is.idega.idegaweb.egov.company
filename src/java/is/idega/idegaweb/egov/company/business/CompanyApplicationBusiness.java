@@ -102,4 +102,8 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 */
 	public Group getUserCompany(IWContext iwc, User user)
 			throws RemoteException;
+	
+	public boolean makeUserCompanyAdmin(User user, Group company);
+	
+	public boolean makeUserCommonEmployee(User user, Group company);
 }

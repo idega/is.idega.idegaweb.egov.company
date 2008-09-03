@@ -15,6 +15,7 @@ import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.ListUtil;
 
 
 /**
@@ -75,6 +76,9 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 	}
 	
 	public void setFieldsInRvk(Collection<EmployeeField> fields) {
+		if (ListUtil.isEmpty(fields)) {
+			return;
+		}
 		for(EmployeeField field : fields) {
 			addFieldInRvk(field);
 		}
@@ -113,7 +117,11 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 	}
 	
 	public void setServices(Collection<Application> services) {
-		for(Application app : services) {
+		if (ListUtil.isEmpty(services)) {
+			return;
+		}
+		
+		for (Application app : services) {
 			addService(app);
 		}
 	}

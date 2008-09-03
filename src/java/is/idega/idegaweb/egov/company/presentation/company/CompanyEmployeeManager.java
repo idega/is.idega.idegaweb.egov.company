@@ -20,6 +20,7 @@ import javax.ejb.FinderException;
 import javax.faces.component.html.HtmlMessages;
 
 import com.idega.business.IBOLookup;
+import com.idega.company.CompanyConstants;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWApplicationContext;
@@ -44,6 +45,7 @@ import com.idega.user.app.SimpleUserApp;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+import com.idega.util.ArrayUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
@@ -115,11 +117,11 @@ public class CompanyEmployeeManager extends CompanyBlock {
 					return;
 				}
 			} else if(action.equals(PARAMETER_SAVE_COMPANY_EMPLOYEE)) {
-				SaveEmployee(iwc);
+				saveEmployee(iwc);
 				showCompanyUserList(iwc);
 				return;
 			} else if (action.equals(PARAMETER_DELETE_COMPANY_EMPLOYEE)) {
-				RemoveEmployee(iwc);
+				removeEmployee(iwc);
 //				try {
 //					CompanyEmployee emp = getEmployeeHome().findByPrimaryKey(new Integer(employeeId));
 //					emp.remove();
@@ -160,7 +162,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		
 		Layer employeeUserForm = getEmployeeAccountManager(iwc, 
 				                                           ListUtil.convertListOfStringsToCommaseparatedString(Arrays.asList(new String [] {
-				                                        		   StandardRoles.ROLE_KEY_COMPANY, 
+				                                        		   CompanyConstants.GROUP_TYPE_COMPANY, 
 				                                        		   EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISIONS, 
 				                                        		   EgovCompanyConstants.GROUP_TYPE_COMPANY_COURSE,
 				                                        		   EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISION, 
@@ -179,11 +181,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		try {
 			employee = getEmployeeHome().findByPrimaryKey(employeeId);
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (FinderException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		
 		Layer employeeEditForm = getEmployeeEditForm(iwc, employee);
@@ -200,10 +198,8 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		try {
 			user = getUserBusiness(iwc).getUser(Integer.parseInt(userId));
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -303,12 +299,9 @@ public class CompanyEmployeeManager extends CompanyBlock {
 				try {
 					emp = getEmployeeHome().findByUser(usr);
 				} catch (RemoteException e) {
-					e.printStackTrace();
 				} catch (FinderException e) {
-					e.printStackTrace();
 				}
-				
-				
+
 				row = table.createRow();
 				
 				Link edit = new Link(this.iwb.getImage("images/edit.png", this.iwrb.getLocalizedString("edit", "Edit")));
@@ -530,7 +523,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		return container;
 	}
 	
-	private void SaveEmployee(IWContext iwc) {
+	private void saveEmployee(IWContext iwc) {
 		String[] rvkFields = iwc.getParameterValues(RVK_FIELDS_INPUT);
 		String[] services = iwc.getParameterValues(SERVICES_INPUT);
 		
@@ -538,6 +531,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		
 		CompanyEmployee emp = null;
 		
+		User selectedUser = null;
 		try {
 			if(iwc.isParameterSet(EMPLOYEE_ID_PARAMETER)) {
 				String employeeId = iwc.getParameter(EMPLOYEE_ID_PARAMETER);
@@ -545,23 +539,34 @@ public class CompanyEmployeeManager extends CompanyBlock {
 			} else if(iwc.isParameterSet(USER_ID_PARAMETER)){
 				String userId = iwc.getParameter(USER_ID_PARAMETER);
 				emp = getEmployeeHome().create();
-				User selectedUser = getUserBusiness(iwc).getUser(Integer.parseInt(userId));
+				selectedUser = getUserBusiness(iwc).getUser(Integer.parseInt(userId));
 				emp.setUser(selectedUser);
 			} else {
 				throw new RuntimeException("No employee to update or create");
 			}
 			
-			Collection<EmployeeField> fields;
-	
-			fields = getEmployeeFieldHome().findByMultiplePrimaryKey(Arrays.asList(rvkFields));
-			emp.setFieldsInRvk(fields);
-			
-			Collection<Application> apps = getApplicationHome().findByPrimaryKeyCollection(Arrays.asList(services));
-			emp.setServices(apps);
+			Collection<EmployeeField> fields = ArrayUtil.isEmpty(rvkFields) ? null : getEmployeeFieldHome().findByMultiplePrimaryKey(Arrays.asList(rvkFields));
+			if (ListUtil.isEmpty(fields)) {
+				//	TODO: remove existing fields
+			}
+			else {
+				emp.setFieldsInRvk(fields);
+			}
+
+			Collection<Application> apps = ArrayUtil.isEmpty(services) ? null : getApplicationHome().findByPrimaryKeyCollection(Arrays.asList(services));
+			if (ListUtil.isEmpty(apps)) {
+				//	TODO: remove existing apps
+			}
+			else {
+				emp.setServices(apps);
+			}
 			
 			emp.setCompanyAdministrator(isAdmin);
 			
 			emp.store();
+		
+			boolean result = isAdmin ? getCompanyBusiness().makeUserCommonEmployee(selectedUser, getGroup()) :
+				getCompanyBusiness().makeUserCommonEmployee(selectedUser, getGroup());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (FinderException e) {
@@ -571,7 +576,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		}	
 	}
 	
-	private void RemoveEmployee(IWContext iwc) {
+	private void removeEmployee(IWContext iwc) {
 		
 	}
 	
