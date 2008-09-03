@@ -76,18 +76,22 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	private static final String TX_LOCALIZED_TEXT_ID = "TX_LOCALIZED_TEXT_ID";
 	private static final String IC_LOCALE_ID = "IC_LOCALE_ID";
 
+	@Override
 	public String getCaseCodeDescription() {
 		return "Application for company access";
 	}
 
+	@Override
 	public String getCaseCodeKey() {
 		return FSKConstants.CASE_CODE_KEY;
 	}
 
+	@Override
 	public String getEntityName() {
 		return ENTITY_NAME;
 	}
 
+	@Override
 	public void initializeAttributes() {
 		addGeneralCaseRelation();
 
@@ -176,10 +180,12 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		return (ApplicationCategory) getColumnValue(CATEGORY);
 	}
 
+	@Override
 	public void setCaseCode(CaseCode caseCode) {
 		setColumn(CASE_CODE, caseCode);
 	}
 
+	@Override
 	public CaseCode getCaseCode() {
 		return (CaseCode) getColumnValue(CASE_CODE);
 	}

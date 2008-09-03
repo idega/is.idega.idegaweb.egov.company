@@ -126,3 +126,35 @@ td.applicationApproveBody {
 td.applicationRejectBody {
 	text-align: center !important;
 }
+
+/* Employee editor */
+
+table.employeeTable tbody tr td, table.employeeTable thead tr th {
+	padding: 5px 8px;
+	empty-cells: show;
+	text-align: left;
+	white-space: nowrap;
+}
+
+
+table.employeeTable thead tr th {
+	border-top: 1px #ccc solid;
+	border-bottom: 1px #ccc solid;
+}
+
+table.employeeTable tbody tr td {
+	border-bottom: 1px #ccc solid;
+}
+
+table.employeeTable tbody tr.ruled {
+	background: #dfdfdf;
+}
+
+.Clear{
+	clear: both;
+	border-top: 1px solid #fff;
+	height: 0;
+	font-size: 0;
+	line-height: 0;
+	visibility: hidden;
+}
