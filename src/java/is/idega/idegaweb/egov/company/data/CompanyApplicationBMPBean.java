@@ -52,6 +52,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	private static final String COLUMN_COMPANY = "company_id";
 
 	private static final String COLUMN_ADMIN_USER = "admin_user";
+	private static final String COLUMN_APPLICANT_USER = "applicant_user";
 	
 	private static final String NAME = "application_name";
 	private static final String CATEGORY = "application_category_id";
@@ -97,6 +98,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 
 		addManyToOneRelationship(COLUMN_TYPE, CompanyType.class);
 		addManyToOneRelationship(COLUMN_ADMIN_USER, User.class);
+		addManyToOneRelationship(COLUMN_APPLICANT_USER, User.class);
 		addManyToOneRelationship(COLUMN_COMPANY, Company.class);
 		addManyToOneRelationship(CATEGORY, ApplicationCategory.class);
 		addManyToOneRelationship(CASE_CODE, CaseCode.class);
@@ -110,6 +112,10 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	public User getAdminUser() {
 		return (User) getColumnValue(COLUMN_ADMIN_USER);
 	}
+	
+	public User getApplicantUser() {
+		return (User) getColumnValue(COLUMN_APPLICANT_USER);
+	}
 
 	public Company getCompany() {
 		return (Company) getColumnValue(COLUMN_COMPANY);
@@ -122,6 +128,10 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 
 	public void setAdminUser(User user) {
 		setColumn(COLUMN_ADMIN_USER, user);
+	}
+	
+	public void setApplicantUser(User user) {
+		setColumn(COLUMN_APPLICANT_USER, user);
 	}
 
 	public void setCompany(Company company) {
