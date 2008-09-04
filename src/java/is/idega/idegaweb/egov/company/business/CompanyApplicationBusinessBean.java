@@ -6,6 +6,8 @@ import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.data.CompanyApplication;
 import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
+import is.idega.idegaweb.egov.company.data.CompanyEmployee;
+import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
 import com.idega.core.data.ICTreeNode;
 import com.idega.data.IDOLookup;
+import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
@@ -649,7 +652,27 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	}
 
 	public Collection<Application> getUserApplications(IWContext iwc, User user) {
-		return null;	//	TODO
+		CompanyEmployeeHome compEmplHome = null;
+		try {
+			compEmplHome = (CompanyEmployeeHome) IDOLookup.getHome(CompanyEmployee.class);
+		} catch (IDOLookupException e) {
+			e.printStackTrace();
+		}
+		if (compEmplHome == null) {
+			return null;
+		}
+		
+		CompanyEmployee compEmployee = null;
+		try {
+			compEmployee = compEmplHome.findByUser(user);
+		} catch (FinderException e) {
+			e.printStackTrace();
+		}
+		if (compEmployee == null) {
+			return null;
+		}
+		
+		return compEmployee.getServices();
 	}
 	
 }

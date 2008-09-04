@@ -49,7 +49,7 @@ public class CompanyServicesViewer extends CompanyBlock {
 		}
 
 		User user = iwc.getCurrentUser();
-		Collection<Application> userApplicationList = getCompanyBusiness().getAvailableApplicationsForUser(iwc, user);
+		Collection<Application> userApplicationList = getCompanyBusiness().getUserApplications(iwc, user);
 		Collection<Application> applicationsForSelectedGroup = new ArrayList<Application>();
 		for (Application application : userApplicationList) {
 			if (application.getGroups().contains(getGroup())) {
