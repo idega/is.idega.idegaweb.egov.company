@@ -76,7 +76,6 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	private static final String SERVICES_INPUT = "services";
 	private static final String RVK_FIELDS_INPUT = "fields";
 	private static final String ADMIN_BOX_INPUT = "admin";
-	private static final String ADMIN_BOX_INPUT_VALUE = "checked";
 	
 	public static final String EMPLOYEE_ID_PARAMETER = "prm_employee_id";
 	public static final String USER_ID_PARAMETER = "prm_user_id";
@@ -124,13 +123,6 @@ public class CompanyEmployeeManager extends CompanyBlock {
 				return;
 			} else if (action.equals(PARAMETER_DELETE_COMPANY_EMPLOYEE)) {
 				removeEmployee(iwc);
-//				try {
-//					CompanyEmployee emp = getEmployeeHome().findByPrimaryKey(new Integer(employeeId));
-//					emp.remove();
-//				}
-//				catch (FinderException f) {
-//					f.printStackTrace();
-//				}
 				
 				showCompanyUserList(iwc);
 				return;
@@ -555,7 +547,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 				emp.setFieldsInRvk(fields);
 			}
 
-			Collection<Application> apps = ArrayUtil.isEmpty(services) ? null : getApplicationHome().findByPrimaryKeyCollection(Arrays.asList(services));
+			Collection<Application> apps = ArrayUtil.isEmpty(services) ? null : getApplicationHome().findByMultiplePrimaryKey(Arrays.asList(services));
 			if (ListUtil.isEmpty(apps)) {
 				emp.removeAllServices();
 			}
