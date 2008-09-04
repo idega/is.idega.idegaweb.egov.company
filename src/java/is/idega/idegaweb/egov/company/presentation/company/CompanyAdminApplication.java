@@ -3,15 +3,16 @@ package is.idega.idegaweb.egov.company.presentation.company;
 import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
+import is.idega.idegaweb.egov.fsk.FSKConstants;
 import is.idega.idegaweb.egov.fsk.business.AdminUser;
 import is.idega.idegaweb.egov.fsk.business.ApplicationSession;
 import is.idega.idegaweb.egov.fsk.business.CompanyDWR;
 import is.idega.idegaweb.egov.fsk.business.FSKBusiness;
-import is.idega.idegaweb.egov.fsk.presentation.CompanyApplication;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +56,7 @@ import com.idega.util.CoreConstants;
 import com.idega.util.EmailValidator;
 import com.idega.util.FileUtil;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.PresentationUtil;
 import com.idega.util.text.Name;
 import com.idega.util.text.SocialSecurityNumber;
 
@@ -140,12 +142,12 @@ public class CompanyAdminApplication extends ApplicationForm {
 		Form form = createForm(ACTION_PHASE_1);
 		addErrors(iwc, form);
 		
-		super.getParentPage().addJavascriptURL("/dwr/interface/FSKDWRUtil.js");
-		super.getParentPage().addJavascriptURL(CoreConstants.DWR_ENGINE_SCRIPT);
-		super.getParentPage().addJavascriptURL("/dwr/util.js");
-		
-		//TODO remove hardcoded bundle virtual path
-		super.getParentPage().addJavascriptURL(CompanyApplication.BUNDLE_VIRTUAL_PATH + "/js/application.js");
+		List<String> scripts = new ArrayList<String>();
+		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
+		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
+		scripts.add("/dwr/interface/FSKDWRUtil.js");
+		scripts.add(iwc.getIWMainApplication().getBundle(FSKConstants.IW_BUNDLE_IDENTIFIER).getVirtualPathWithFileNameString("js/application.js"));
+		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 
 		form.add(getPhasesHeader(this.iwrb.getLocalizedString("application.company_information", "Company information"), ACTION_PHASE_1, iNumberOfPhases));
 
