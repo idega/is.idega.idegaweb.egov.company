@@ -559,7 +559,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 			
 			emp.store();
 		
-			boolean result = isAdmin ? getCompanyBusiness().makeUserCommonEmployee(iwc, selectedUser, getGroup()) :
+			boolean result = isAdmin ? getCompanyBusiness().makeUserCompanyAdmin(iwc, selectedUser, getGroup()) :
 				getCompanyBusiness().makeUserCommonEmployee(iwc, selectedUser, getGroup());
 		} catch (RemoteException e) {
 			e.printStackTrace();
