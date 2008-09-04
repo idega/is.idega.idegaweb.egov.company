@@ -652,6 +652,15 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	}
 
 	public Collection<Application> getUserApplications(IWContext iwc, User user) {
+		if (isCompanyAdministrator(iwc)) {
+			try {
+				return getAvailableApplicationsForUser(iwc, user);
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+		
 		CompanyEmployeeHome compEmplHome = null;
 		try {
 			compEmplHome = (CompanyEmployeeHome) IDOLookup.getHome(CompanyEmployee.class);
