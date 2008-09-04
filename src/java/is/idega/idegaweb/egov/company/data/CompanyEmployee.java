@@ -24,22 +24,21 @@ public interface CompanyEmployee extends IDOEntity {
 	
 	public Collection<EmployeeField> getFieldsInRvk();
 	
-	public Collection<String> getFieldsInRvkPKs();
+	public Collection<Integer> getFieldsInRvkPKs();
 	
 	public void setFieldsInRvk(Collection<EmployeeField> fields);
 	
 	public Collection<Application> getServices();
 	
-	public Collection<String> getServicesPKs();
+	public Collection<Integer> getServicesPKs();
 	
 	public void setServices(Collection<Application> fields);
-	
-	public void addFieldInRvk(EmployeeField field);
-	
-	public void addService(Application app);
 	
 	public boolean isCompanyAdministrator();
 	
 	public void setCompanyAdministrator(boolean companyAdmin);
 	
+	public void removeAllFields();
+	
+	public void removeAllServices();	
 }

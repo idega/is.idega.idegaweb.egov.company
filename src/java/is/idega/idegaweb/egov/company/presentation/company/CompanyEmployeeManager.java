@@ -16,7 +16,9 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.ejb.CreateException;
+import javax.ejb.EJBException;
 import javax.ejb.FinderException;
+import javax.ejb.RemoveException;
 import javax.faces.component.html.HtmlMessages;
 
 import com.idega.business.IBOLookup;
@@ -312,7 +314,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 					edit.addParameter(USER_ID_PARAMETER, usr.getPrimaryKey().toString());
 				
 				Link delete = new Link(this.iwb.getImage("images/delete.png", this.iwrb.getLocalizedString("remove", "Remove")));
-				delete.addParameter(PARAMETER_DELETE_COMPANY_EMPLOYEE, "true");
+				delete.addParameter(ACTION, PARAMETER_DELETE_COMPANY_EMPLOYEE);
 				if(emp != null)
 					delete.addParameter(EMPLOYEE_ID_PARAMETER, emp.getPrimaryKey().toString());
 				
@@ -381,7 +383,6 @@ public class CompanyEmployeeManager extends CompanyBlock {
 			throw new RuntimeException(CompanyEmployee.class + " or " + User.class + " are expected");
 		}
 		
-		
 		TextInput userPersonalId = new TextInput("personalId");
 		userPersonalId.setId(PERSONAL_ID_INPUT);
 		userPersonalId.setValue(user.getPersonalID());
@@ -436,8 +437,8 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		CheckBox adminCheckBox = new CheckBox(ADMIN_BOX_INPUT, "true");
 		
 		if(employee != null) {
-			fieldsSelect.setSelectedElements((String[])employee.getFieldsInRvkPKs().toArray());
-			applicationSelect.setSelectedElements((String[])employee.getServicesPKs().toArray());
+			fieldsSelect.setSelectedElements(CollectionToStringArray(employee.getFieldsInRvkPKs()));
+			applicationSelect.setSelectedElements(CollectionToStringArray(employee.getServicesPKs()));
 			adminCheckBox.setChecked(employee.isCompanyAdministrator());
 		}
 		
@@ -541,13 +542,14 @@ public class CompanyEmployeeManager extends CompanyBlock {
 				emp = getEmployeeHome().create();
 				selectedUser = getUserBusiness(iwc).getUser(Integer.parseInt(userId));
 				emp.setUser(selectedUser);
+				emp.store();
 			} else {
 				throw new RuntimeException("No employee to update or create");
 			}
 			
 			Collection<EmployeeField> fields = ArrayUtil.isEmpty(rvkFields) ? null : getEmployeeFieldHome().findByMultiplePrimaryKey(Arrays.asList(rvkFields));
 			if (ListUtil.isEmpty(fields)) {
-				//	TODO: remove existing fields
+				emp.removeAllFields();
 			}
 			else {
 				emp.setFieldsInRvk(fields);
@@ -555,7 +557,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 
 			Collection<Application> apps = ArrayUtil.isEmpty(services) ? null : getApplicationHome().findByPrimaryKeyCollection(Arrays.asList(services));
 			if (ListUtil.isEmpty(apps)) {
-				//	TODO: remove existing apps
+				emp.removeAllServices();
 			}
 			else {
 				emp.setServices(apps);
@@ -577,7 +579,19 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	}
 	
 	private void removeEmployee(IWContext iwc) {
-		
+		String employeeId = iwc.getParameter(EMPLOYEE_ID_PARAMETER);
+		try {
+			CompanyEmployee emp = getEmployeeHome().findByPrimaryKey(employeeId);
+			emp.remove();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (FinderException e) {
+			e.printStackTrace();
+		} catch (EJBException e) {
+			e.printStackTrace();
+		} catch (RemoveException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private Layer getLink(String message, String parameterNameToMaintain, String parameterValueToMaintain) {
@@ -610,5 +624,15 @@ public class CompanyEmployeeManager extends CompanyBlock {
 
 	public void setGroup(Group group) {
 		this.group = group;
+	}
+	
+	private String[] CollectionToStringArray(Collection<Integer> collection) {
+		String[] array = new String[collection.size()];
+		int i = 0;
+		for(Integer num : collection) {
+			array[i++] = num.toString();
+		}
+		
+		return array;
 	}
 }

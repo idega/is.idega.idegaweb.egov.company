@@ -9,6 +9,7 @@ import javax.ejb.FinderException;
 import com.idega.data.GenericEntity;
 import com.idega.data.IDOAddRelationshipException;
 import com.idega.data.IDORelationshipException;
+import com.idega.data.IDORemoveRelationshipException;
 import com.idega.data.query.Column;
 import com.idega.data.query.MatchCriteria;
 import com.idega.data.query.SelectQuery;
@@ -24,7 +25,7 @@ import com.idega.util.ListUtil;
  * @author <a href="anton@idega.com">Anton Makarov</a>
  * @version Revision: 1.0 
  *
- * Last modified: Aug 27, 2008 by Author: Anton 
+ * Last modified: Sep 03, 2008 by Author: Anton 
  *
  */
 
@@ -63,9 +64,9 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		}
 	}
 	
-	public Collection<String> getFieldsInRvkPKs() {
+	public Collection<Integer> getFieldsInRvkPKs() {
 		try {
-		    Collection<String> fieldPKs = super.idoGetRelatedEntityPKs(EmployeeField.class);
+		    Collection<Integer> fieldPKs = super.idoGetRelatedEntityPKs(EmployeeField.class);
 		    
 		   return fieldPKs;
 		}
@@ -76,6 +77,10 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 	}
 	
 	public void setFieldsInRvk(Collection<EmployeeField> fields) {
+		if(getFieldsInRvk().size() > 0) {
+			removeAllFields();
+		}
+		
 		if (ListUtil.isEmpty(fields)) {
 			return;
 		}
@@ -84,7 +89,7 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		}
 	}
 	
-	public void addFieldInRvk(EmployeeField field) {
+	private void addFieldInRvk(EmployeeField field) {
 		try {
 			this.idoAddTo(field);
 		} catch (IDOAddRelationshipException e) {
@@ -104,9 +109,9 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		}
 	}
 	
-	public Collection<String> getServicesPKs() {
+	public Collection<Integer> getServicesPKs() {
 		try {
-		    Collection<String> servicePKs = super.idoGetRelatedEntityPKs(Application.class);
+		    Collection<Integer> servicePKs = super.idoGetRelatedEntityPKs(Application.class);
 		    
 		   return servicePKs;
 		}
@@ -117,6 +122,10 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 	}
 	
 	public void setServices(Collection<Application> services) {
+		if(getServices().size() > 0) {
+			removeAllServices();
+		}
+		
 		if (ListUtil.isEmpty(services)) {
 			return;
 		}
@@ -126,7 +135,7 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		}
 	}
 	
-	public void addService(Application app) {
+	private void addService(Application app) {
 		try {
 			this.idoAddTo(app);
 		} catch (IDOAddRelationshipException e) {
@@ -186,5 +195,23 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		query.addColumn(new Column(table, getIDColumnName()));
 		query.addOrder(table, EMPLOYEE_USER, true);
 		return this.idoFindPKsByQuery(query);
+	}
+
+	public void removeAllFields() {
+		try {
+			this.idoRemoveFrom(EmployeeField.class);
+		} catch (IDORemoveRelationshipException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	public void removeAllServices() {
+		try {
+			this.idoRemoveFrom(Application.class);
+		} catch (IDORemoveRelationshipException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }
