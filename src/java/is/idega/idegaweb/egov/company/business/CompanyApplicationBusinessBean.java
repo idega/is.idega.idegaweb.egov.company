@@ -14,6 +14,8 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ejb.CreateException;
+import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 import javax.mail.MessagingException;
 
@@ -26,6 +28,7 @@ import com.idega.core.accesscontrol.business.LoginDBHandler;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
+import com.idega.core.data.ICTreeNode;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
@@ -34,15 +37,22 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
+import com.idega.user.business.GroupBusiness;
+import com.idega.user.business.GroupHelper;
+import com.idega.user.business.NoEmailFoundException;
+import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
+import com.idega.util.EncryptionType;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.SendMail;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 
 public class CompanyApplicationBusinessBean extends ApplicationBusinessBean implements CompanyApplicationBusiness {
 
@@ -86,28 +96,248 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return IWMainApplication.getDefaultIWMainApplication().getBundle(EgovCompanyConstants.IW_BUNDLE_IDENTIFIER);
 	}
 
-	public boolean approveApplication(String applicationId) {
+	public String approveApplication(IWContext iwc, String applicationId) {
 		if (!setStatusToCompanyApplication(applicationId, getCaseStatusGranted().getStatus())) {
-			return false;
+			return null;
 		}
 
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {
-			return false;
+			return null;
 		}
 
 		IWResourceBundle iwrb = getResourceBundle();
 		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
 		subject.append(iwrb.getLocalizedString("application_approved_mail_subject", "application was approved"));
-		String text = iwrb.getLocalizedString("application_approved_mail_text", "Application was approved.");
+		String text = iwrb.getLocalizedString("application_successfully_approved", "Application was successfully approved!");
 
-		// TODO: Make account for company, send email with "random" password,
-		// make new user from applicant's user contacts and set new admin for company application
-
-		return sendMail(compApp, subject.toString(), text);
+		String adminPassword = makeAccountsForCompanyAdmins(iwc, compApp);
+		if (StringUtil.isEmpty(adminPassword)) {
+			return null;
+		}
+		
+		compApp.setAdminUser(compApp.getAdminUser());
+		compApp.store();
+		
+		if (adminPassword.equals(CoreConstants.MINUS)) {
+			return text;	//	Company admin already exists
+		}
+		
+		Email email = null;
+		try {
+			email = getUserBusiness(iwc).getUsersMainEmail(compApp.getAdminUser());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		if (email == null) {
+			return null;
+		}
+		
+		LoginTable login = LoginDBHandler.getUserLogin(compApp.getAdminUser());
+		text = new StringBuilder(text).append("\n\r").append(getLoginCreatedInfo(iwc, login.getUserLogin(), adminPassword)).toString();
+		
+		sendMail(email, subject.toString(), text);
+		
+		return text;
+	}
+	
+	public String getLoginCreatedInfo(IWContext iwc, String login, String password) {
+		String portNumber = new StringBuilder(":").append(String.valueOf(iwc.getServerPort())).toString();
+		String serverLink = StringHandler.replace(iwc.getServerURL(), portNumber, CoreConstants.EMPTY);
+		
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+		
+		return new StringBuilder(iwrb.getLocalizedString("login_here", "Login here")).append(": ").append(serverLink).append("\n\r")
+			.append(iwrb.getLocalizedString("your_user_name", "Your user name")).append(": ").append(login).append(", ")
+			.append(iwrb.getLocalizedString("your_password", "your password")).append(": ").append(password).append(". ")
+			.append(iwrb.getLocalizedString("we_recommend_to_change_password_after_login", "We recommend to change password after login!"))
+		.toString();
+	}
+	
+	private String makeAccountsForCompanyAdmins(IWApplicationContext iwac, CompanyApplication compApp) {
+		Company company = compApp.getCompany();
+		if (company == null) {
+			return null;
+		}
+		
+		User companyAdmin = compApp.getAdminUser();
+		if (companyAdmin != null) {
+			logger.log(Level.INFO, "Application " + compApp.getName() + " already has admin: " + companyAdmin.getName());
+			return CoreConstants.MINUS;
+		}
+		
+		Collection<Group> companies = compApp.getGroups();
+		if (ListUtil.isEmpty(companies)) {
+			return null;
+		}
+		
+		Group rootGroupForCompanies = getRootGroupForCompanies(companies.iterator().next());
+		if (rootGroupForCompanies == null) {
+			return null;
+		}
+		
+		UserBusiness userBusiness = null;
+		try {
+			userBusiness = getUserBusiness(IWMainApplication.getDefaultIWApplicationContext());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		if (userBusiness == null) {
+			return null;
+		}
+		
+		String personalId = company.getPersonalID();
+		try {
+			companyAdmin = userBusiness.getUser(personalId);
+		} catch (RemoteException e) {
+		} catch (FinderException e) {
+		}
+		String name = company.getName();
+		String password = LoginDBHandler.getGeneratedPasswordForUser();
+		if (companyAdmin == null) {
+			try {
+				companyAdmin = userBusiness.createUserWithLogin(name, null, null, personalId, name, null, null, null,
+						Integer.valueOf(rootGroupForCompanies.getId()), personalId, password, true, null, -1, null, true, true, EncryptionType.MD5);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (CreateException e) {
+				e.printStackTrace();
+			}
+			if (companyAdmin == null) {
+				return null;
+			}
+			
+			User applicant = compApp.getApplicantUser();
+			if (applicant == null) {
+				logger.log(Level.SEVERE, "Unkown contact person for company: " + name);
+				return null;
+			}
+			
+			//	Copying email
+			try {
+				userBusiness.updateUserMail(companyAdmin, userBusiness.getUsersMainEmail(applicant).getEmailAddress());
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (CreateException e) {
+				e.printStackTrace();
+			} catch (NoEmailFoundException e) {
+				e.printStackTrace();
+			}
+			//	Copying mobile phone
+			try {
+				userBusiness.updateUserMobilePhone(companyAdmin, userBusiness.getUsersMobilePhone(applicant).getNumber());
+			} catch (EJBException e) {
+				e.printStackTrace();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (NoPhoneFoundException e) {
+				e.printStackTrace();
+			}
+			//	Copying work phone
+			try {
+				userBusiness.updateUserWorkPhone(companyAdmin, userBusiness.getUsersWorkPhone(applicant).getNumber());
+			} catch (EJBException e) {
+				e.printStackTrace();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (NoPhoneFoundException e) {
+				e.printStackTrace();
+			}
+			companyAdmin.store();
+		}
+		else {
+			LoginTable login = LoginDBHandler.getUserLogin(companyAdmin);
+			if (login == null) {
+				try {
+					login = LoginDBHandler.createLogin(companyAdmin, personalId, password, true, null, -1, null, true, true, EncryptionType.MD5);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				if (login == null) {
+					return null;
+				}
+			}
+		}
+		
+		compApp.setAdminUser(companyAdmin);
+		compApp.store();
+		
+		for (Group companyGroup: companies) {
+			makeUserCompanyAdmin(iwac, companyAdmin, companyGroup);
+		}
+		
+		return password;
+	}
+	
+	private boolean isGroupCompanyType(Group group) {
+		return group == null ? false : CompanyConstants.GROUP_TYPE_COMPANY.equals(group.getGroupType());
+	}
+	
+	public Group getRootGroupForCompanies(Group company) {
+		if (company == null) {
+			return null;
+		}
+		
+		ICTreeNode parentNode = company.getParentNode();
+		if (parentNode == null && isGroupCompanyType(company)) {
+			return company;	//	Provided group is ROOT group
+		}
+		
+		GroupBusiness groupBusiness = null;
+		try {
+			groupBusiness = getGroupBusiness(IWMainApplication.getDefaultIWApplicationContext());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		if (groupBusiness == null) {
+			return null;
+		}
+		
+		ICTreeNode rootNode = null;
+		while (parentNode != null) {
+			parentNode = parentNode.getParentNode();
+			if (parentNode != null) {
+				rootNode = parentNode;
+			}
+		}
+		if (rootNode == null) {
+			return null;
+		}
+		
+		Group topGroup = null;
+		try {
+			topGroup = groupBusiness.getGroupByGroupID(Integer.valueOf(rootNode.getId()));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (FinderException e) {
+			e.printStackTrace();
+		}
+	
+		return isGroupCompanyType(topGroup) ? topGroup : null;
+	}
+	
+	public Group getRootGroupForCompanies(IWContext iwc) {
+		GroupHelper groupHelper = ELUtil.getInstance().getBean(GroupHelper.class);
+		Collection<Group> topGroups = groupHelper.getTopGroupsFromDomain(iwc);
+		if (ListUtil.isEmpty(topGroups)) {
+			return null;
+		}
+		
+		Group topGroupForCompany = null;
+		for (Group group: topGroups) {
+			topGroupForCompany = getRootGroupForCompanies(group);
+			if (topGroupForCompany != null) {
+				return topGroupForCompany;
+			}
+		}
+		return null;
 	}
 
-	public boolean rejectApplication(String applicationId, String explanationText) {
+	public boolean rejectApplication(IWApplicationContext iwac, String applicationId, String explanationText) {
 		if (!setStatusToCompanyApplication(applicationId, getCaseStatusDenied().getStatus())) {
 			return false;
 		}
@@ -117,10 +347,20 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return false;
 		}
 
+		Email email = null;
+		try {
+			email = getUserBusiness(iwac).getUsersMainEmail(compApp.getAdminUser());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		if (email == null) {
+			return false;
+		}
+		
 		IWResourceBundle iwrb = getResourceBundle();
 		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
 		subject.append(iwrb.getLocalizedString("application_rejected_mail_subject", "application was rejected"));
-		return sendMail(compApp, subject.toString(), explanationText);
+		return sendMail(email, subject.toString(), explanationText);
 	}
 
 	private boolean setStatusToCompanyApplication(String applicationId, String status) {
@@ -157,17 +397,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return true;
 	}
 
-	private boolean sendMail(CompanyApplication compApp, String subject, String text) {
-		if (compApp == null || StringUtil.isEmpty(text)) {
-			return false;
-		}
-
-		Company company = compApp.getCompany();
-		if (company == null) {
-			return false;
-		}
-		Email email = company.getEmail();
-		if (email == null) {
+	private boolean sendMail(Email email, String subject, String text) {
+		if (email == null || StringUtil.isEmpty(text)) {
 			return false;
 		}
 
@@ -175,7 +406,11 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	}
 
 	private IWResourceBundle getResourceBundle() {
-		return getBundle().getResourceBundle(CoreUtil.getIWContext());
+		return getResourceBundle(null);
+	}
+	
+	private IWResourceBundle getResourceBundle(IWContext iwc) {
+		return getBundle().getResourceBundle(iwc == null ? CoreUtil.getIWContext() : iwc);
 	}
 
 	private String getMailSubjectStart(CompanyApplication compApp) {
@@ -232,27 +467,43 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 	}
 	
-	public boolean makeUserCompanyAdmin(User user, Group company) {
-		if (user == null || company == null) {
-			return false;
-		}
-		//	TODO:	implement
-		return true;
-	}
-	
-	public boolean makeUserCommonEmployee(User user, Group company) {
-		if (user == null || company == null) {
+	public boolean makeUserCompanyAdmin(IWApplicationContext iwac, User companyAdmin, Group company) {
+		if (companyAdmin == null || company == null) {
 			return false;
 		}
 		
-		//	TODO:	implement
+		User oldAdmin = company.getModerator();
+		if (oldAdmin != null) {
+			
+		}
+		company.setModerator(companyAdmin);
+		company.store();
+		
+		AccessController accessController = iwac.getIWMainApplication().getAccessController();
+		accessController.addRoleToGroup(EgovCompanyConstants.COMPANY_ADMIN_ROLE, companyAdmin, iwac);
+		
+		return true;
+	}
+	
+	public boolean makeUserCommonEmployee(IWApplicationContext iwac, User companyAdmin, Group company) {
+		if (company == null) {
+			return false;
+		}
+		company.setModerator(null);
+		company.store();
+		
+		AccessController accessController = iwac.getIWMainApplication().getAccessController();
+		accessController.removeRoleFromGroup(EgovCompanyConstants.COMPANY_ADMIN_ROLE, companyAdmin, iwac);
+		
 		return true;
 	}
 
 	/**
-	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness#createLogginForUser(com.idega.presentation.IWContext, com.idega.user.data.User, java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean)
+	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness#createLogginForUser(com.idega.presentation.IWContext, com.idega.user.data.User,
+	 *  java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean)
 	 */
-	public boolean createLogginForUser(IWContext iwc, User user, String phoneHome, String phoneWork, String email, String roleKey, boolean addToRootCitizenGroup) throws LoginCreateException {
+	public boolean createLogginForUser(IWContext iwc, User user, String phoneHome, String phoneWork, String email, String roleKey, boolean addToRootCitizenGroup)
+					throws LoginCreateException {
 		String password = null;
 		LoginTable loginTable = null;
 		try {
@@ -293,32 +544,46 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			}
 		}
 
-		sendEmail(email, getBundle().getLocalizedString("account_details", "Account details"), getBundle().getLocalizedString("user_name", "User name") + ": " + loginTable.getUserLogin() + "\n" + getBundle().getLocalizedString("password", "Password") + ": " + password);
+		sendEmail(email, getBundle().getLocalizedString("account_details", "Account details"), getBundle().getLocalizedString("user_name", "User name") + ": " +
+				loginTable.getUserLogin() + "\n" + getBundle().getLocalizedString("password", "Password") + ": " + password);
 		return true;
 	}
 
 	/**
-	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness#getUserApplications(com.idega.presentation.IWContext, com.idega.user.data.User)
+	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness
+	 * #getAvailableApplicationsForUser(com.idega.presentation.IWContext, com.idega.user.data.User)
 	 */
-	public Collection<Application> getUserApplications(IWContext iwc, User user) throws FinderException {
+	public Collection<Application> getAvailableApplicationsForUser(IWContext iwc, User user) throws FinderException {
 		@SuppressWarnings("unchecked")
 		Collection<Application> allApplications = getApplicationHome().findAll();
 
+		Group rootGroupForCompanies = getRootGroupForCompanies(iwc);
+		boolean companyAdmin = isCompanyAdministrator(iwc);
+		boolean superAdmin = iwc.isSuperAdmin();
 		Collection<Application> userApplicationList = new ArrayList<Application>();
+		Collection<Group> appGroups = null;
 		for (Application app : allApplications) {
 			boolean appAdded = false;
-			for (Group group : app.getGroups()) {
-				try {
-					if (!appAdded && (getUserBusiness(iwc).isMemberOfGroup(Integer.valueOf(group.getId()), user) || iwc.isSuperAdmin())) {
-						userApplicationList.add(app);
-						appAdded = true;
+			appGroups = app.getGroups();
+			appGroups = ListUtil.isEmpty(appGroups) ? null : new ArrayList<Group>(appGroups);
+			if (ListUtil.isEmpty(appGroups)) {
+				logger.log(Level.INFO, "Application " + app.getName() + " has no groups!");
+			}
+			else {
+				if (rootGroupForCompanies != null) {
+					appGroups.add(rootGroupForCompanies);
+				}
+				for (Group group : appGroups) {
+					try {
+						if (!appAdded && (superAdmin || companyAdmin || getUserBusiness(iwc).isMemberOfGroup(Integer.valueOf(group.getId()), user))) {
+							userApplicationList.add(app);
+							appAdded = true;
+						}
+					} catch (NumberFormatException e) {
+						logger.log(Level.SEVERE, "Error getting applications for userID: " + user.getId(), e);
+					} catch (RemoteException e) {
+						logger.log(Level.SEVERE, "Error getting applications for userID: " + user.getId(), e);
 					}
-				} catch (NumberFormatException e) {
-					logger.log(Level.SEVERE, "Error getting applications for userID: " + user.getId(), e);
-					return null;
-				} catch (RemoteException e) {
-					logger.log(Level.SEVERE, "Error getting applications for userID: " + user.getId(), e);
-					return null;
 				}
 			}
 		}
@@ -327,6 +592,10 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 	protected UserBusiness getUserBusiness(IWApplicationContext iwac) throws RemoteException {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
+	}
+	
+	protected GroupBusiness getGroupBusiness(IWApplicationContext iwac) throws RemoteException {
+		return (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 	}
 
 	protected CitizenBusiness getCitizenBusiness() throws RemoteException {
@@ -378,4 +647,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 		return null;
 	}
+
+	public Collection<Application> getUserApplications(IWContext iwc, User user) {
+		return null;	//	TODO
+	}
+	
 }

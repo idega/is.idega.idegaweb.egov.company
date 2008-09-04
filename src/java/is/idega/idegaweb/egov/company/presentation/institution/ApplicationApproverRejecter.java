@@ -3,6 +3,7 @@ package is.idega.idegaweb.egov.company.presentation.institution;
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
+import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 
@@ -50,6 +51,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	private static final String REJECTION_EXPLANATION_TEXT = "application_rejection_explanation_text";
 	
 	private String caseCode;
+	private Integer applicationType;
 	
 	private String applicationHandlingResultMessage;
 	
@@ -82,21 +84,29 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	}
 	
 	private void viewApplication(IWContext iwc) {
+		Layer container = new Layer();
+		add(container);
+		
 		ServicesRegister servicesRegister = new ServicesRegister();
-		add(servicesRegister);
+		container.add(servicesRegister);
 		servicesRegister.setAddSaveButton(false);
+		servicesRegister.setAddBackButton(false);
+	
+//		TODO: add management buttons: close/open account for company (admin)
+		Layer buttons = new Layer();
+		container.add(buttons);
 	}
 	
 	private void approveApplication(IWContext iwc) {
-		boolean result = false;
 		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
 		try {
-			result = compAppBusiness.approveApplication(iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER));
+			applicationHandlingResultMessage = compAppBusiness.approveApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_approved", "Application was successfully approved!") :
-			iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred.");
+		if (StringUtil.isEmpty(applicationHandlingResultMessage)) {
+			applicationHandlingResultMessage = iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred.");
+		}
 	}
 	
 	private void showRejectionForm(IWContext iwc) {
@@ -160,7 +170,8 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		boolean result = false;
 		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
 		try {
-			result = compAppBusiness.rejectApplication(iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER), iwc.getParameter(REJECTION_EXPLANATION_TEXT));
+			result = compAppBusiness.rejectApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER),
+					iwc.getParameter(REJECTION_EXPLANATION_TEXT));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -189,6 +200,9 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			container.add(new Heading3(iwrb.getLocalizedString("case_codes_property_missing", "Set case codes property firstly!")));
 			return;
 		}
+		if (applicationType == null) {
+			container.add(new Heading4(iwrb.getLocalizedString("we_recommend_select_application_type_first", "We recommond select application type firstly.")));
+		}
 		
 		Form form = new Form();
 		container.add(form);
@@ -198,14 +212,21 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		String[] caseCodes = new String[] {caseCode};
 		ApplicationBusiness appBusiness = getApplicationBusiness(iwc);
 		
-		form.add(getApplicationsSection(iwrb.getLocalizedString("unhandled_applications", "Unhandled applications") + ":", "unhandledApplicationsStyle",
+		boolean showAllApplications = applicationType == null;
+		if (showAllApplications || EgovCompanyConstants.APPLICATION_TYPE_UNHANDLED.equals(applicationType)) {
+			form.add(getApplicationsSection(iwrb.getLocalizedString("unhandled_applications", "Unhandled applications") + ":", "unhandledApplicationsStyle",
 				appBusiness.getUnhandledApplications(caseCodes), locale, true));
+		}
 		
-		form.add(getApplicationsSection(iwrb.getLocalizedString("approved_applications", "Approved applications") + ":", "approvedApplicationsStyle",
+		if (showAllApplications || EgovCompanyConstants.APPLICATION_TYPE_APPROVED.equals(applicationType)) {
+			form.add(getApplicationsSection(iwrb.getLocalizedString("approved_applications", "Approved applications") + ":", "approvedApplicationsStyle",
 				appBusiness.getApprovedApplications(caseCodes), locale, false));
+		}
 		
-		form.add(getApplicationsSection(iwrb.getLocalizedString("rejected_applications", "Rejected applications") + ":", "rejectedApplicationsStyle",
+		if (showAllApplications || EgovCompanyConstants.APPLICATION_TYPE_REJECTED.equals(applicationType)) {
+			form.add(getApplicationsSection(iwrb.getLocalizedString("rejected_applications", "Rejected applications") + ":", "rejectedApplicationsStyle",
 				appBusiness.getRejectedApplications(caseCodes), locale, false));
+		}
 	}
 	
 	private Layer getApplicationsSection(String label, String styleName, Collection<Application> applications, Locale locale, boolean canDoActions) {
@@ -337,6 +358,14 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 
 	public void setCaseCode(String caseCode) {
 		this.caseCode = caseCode;
+	}
+
+	public Integer getApplicationType() {
+		return applicationType;
+	}
+
+	public void setApplicationType(Integer applicationType) {
+		this.applicationType = applicationType;
 	}
 	
 }

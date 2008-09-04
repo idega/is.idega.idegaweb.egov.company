@@ -8,11 +8,11 @@ import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-
 import javax.ejb.FinderException;
 
 import com.idega.company.data.Company;
 import com.idega.core.accesscontrol.business.LoginCreateException;
+import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
 import com.idega.user.data.Group;
@@ -39,13 +39,13 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#approveApplication
 	 */
-	public boolean approveApplication(String applicationId)
+	public String approveApplication(IWContext iwc, String applicationId)
 			throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#rejectApplication
 	 */
-	public boolean rejectApplication(String applicationId,
+	public boolean rejectApplication(IWApplicationContext iwac, String applicationId,
 			String explanationText) throws RemoteException;
 
 	/**
@@ -94,7 +94,7 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getUserApplications
 	 */
-	public Collection<Application> getUserApplications(IWContext iwc, User user)
+	public Collection<Application> getAvailableApplicationsForUser(IWContext iwc, User user)
 			throws FinderException, RemoteException;
 
 	/**
@@ -103,7 +103,11 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public Group getUserCompany(IWContext iwc, User user)
 			throws RemoteException;
 	
-	public boolean makeUserCompanyAdmin(User user, Group company);
+	public boolean makeUserCompanyAdmin(IWApplicationContext iwac, User companyAdmin, Group company);
 	
-	public boolean makeUserCommonEmployee(User user, Group company);
+	public boolean makeUserCommonEmployee(IWApplicationContext iwac, User companyAdmin, Group company);
+	
+	public String getLoginCreatedInfo(IWContext iwc, String login, String password);
+	
+	public Collection<Application> getUserApplications(IWContext iwc, User user);
 }
