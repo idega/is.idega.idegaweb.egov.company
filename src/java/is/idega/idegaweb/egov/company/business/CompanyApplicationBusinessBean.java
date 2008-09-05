@@ -8,6 +8,7 @@ import is.idega.idegaweb.egov.company.data.CompanyApplication;
 import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
 import is.idega.idegaweb.egov.company.data.CompanyEmployee;
 import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
+import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -682,6 +683,10 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		
 		return compEmployee.getServices();
+	}
+
+	public CommuneMessageBusiness getMessageBusiness() throws RemoteException {
+		return (CommuneMessageBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CommuneMessageBusiness.class);
 	}
 	
 }

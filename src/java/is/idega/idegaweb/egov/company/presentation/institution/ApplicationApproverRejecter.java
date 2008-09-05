@@ -6,6 +6,7 @@ import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
+import is.idega.idegaweb.egov.company.presentation.company.CompanyApplicationViewer;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -87,14 +88,13 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		Layer container = new Layer();
 		add(container);
 		
-		ServicesRegister servicesRegister = new ServicesRegister();
-		container.add(servicesRegister);
-		servicesRegister.setAddSaveButton(false);
-		servicesRegister.setAddBackButton(false);
-	
-//		TODO: add management buttons: close/open account for company (admin)
-		Layer buttons = new Layer();
-		container.add(buttons);
+		CompanyApplicationViewer appViewer = new CompanyApplicationViewer();
+		container.add(appViewer);
+		
+//		ServicesRegister servicesRegister = new ServicesRegister();
+//		container.add(servicesRegister);
+//		servicesRegister.setAddSaveButton(false);
+//		servicesRegister.setAddBackButton(false);
 	}
 	
 	private void approveApplication(IWContext iwc) {
@@ -285,7 +285,8 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			cell = getRowCell(row, null, canDoActions ? "applicationViewBody" : "lastColumn applicationViewBody", false);
 			parameters = new ArrayList<AdvancedProperty>();
 			parameters.add(new AdvancedProperty(VIEW_APPLICATION_PARAMETER, Boolean.TRUE.toString()));
-			parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, ApplicationCreator.EDIT_ACTION));
+//			parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, ApplicationCreator.EDIT_ACTION));
+			parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(CompanyApplicationViewer.ACTION_VIEW)));
 			cell.add(getLink(viewImageUri, viewImageTooltip, applicationId, parameters));
 			
 			if (canDoActions) {

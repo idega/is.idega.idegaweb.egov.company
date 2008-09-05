@@ -5,6 +5,7 @@ import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.company.data.CompanyApplication;
 import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
+import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -110,4 +111,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public String getLoginCreatedInfo(IWContext iwc, String login, String password);
 	
 	public Collection<Application> getUserApplications(IWContext iwc, User user);
+	
+	public CommuneMessageBusiness getMessageBusiness() throws RemoteException;
 }

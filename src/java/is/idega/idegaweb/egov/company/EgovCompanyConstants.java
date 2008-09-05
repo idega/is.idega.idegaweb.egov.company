@@ -23,6 +23,8 @@ public class EgovCompanyConstants {
 	
 	public static final String CASE_CODE_KEY = "COMPADMAPP";
 
+	public static final String CONTENT_CODE_REQUEST_INFORMATION = "prm_company_code_request_information";
+	
 	public static final Integer APPLICATION_TYPE_APPROVED = 0;
 	public static final Integer APPLICATION_TYPE_REJECTED = 1;
 	public static final Integer APPLICATION_TYPE_UNHANDLED = 2;
