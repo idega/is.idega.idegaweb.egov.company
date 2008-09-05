@@ -528,7 +528,8 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		try {
 			if(iwc.isParameterSet(EMPLOYEE_ID_PARAMETER)) {
 				String employeeId = iwc.getParameter(EMPLOYEE_ID_PARAMETER);
-				emp = getEmployeeHome().findByPrimaryKey(employeeId);			
+				emp = getEmployeeHome().findByPrimaryKey(employeeId);
+				selectedUser = emp.getUser();
 			} else if(iwc.isParameterSet(USER_ID_PARAMETER)){
 				String userId = iwc.getParameter(USER_ID_PARAMETER);
 				emp = getEmployeeHome().create();
@@ -559,7 +560,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 			
 			emp.store();
 		
-			boolean result = isAdmin ? getCompanyBusiness().makeUserCompanyAdmin(iwc, selectedUser, getGroup()) :
+		boolean result = isAdmin ? getCompanyBusiness().makeUserCompanyAdmin(iwc, selectedUser, getGroup()) :
 				getCompanyBusiness().makeUserCommonEmployee(iwc, selectedUser, getGroup());
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -603,7 +604,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	}
 	
 	protected ApplicationHome getApplicationHome() throws RemoteException {
-		return (ApplicationHome) IDOLookup.getHome(ApplicationHome.class);
+		return (ApplicationHome) IDOLookup.getHome(Application.class);
 	}
 	
 	protected UserBusiness getUserService(IWApplicationContext iwac) throws RemoteException {

@@ -152,7 +152,12 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 	}
 
 	public boolean isCompanyAdministrator() {
-		return (Boolean) getColumnValue(COMPANY_ADMINISTRATOR);
+		Boolean value = (Boolean) getColumnValue(COMPANY_ADMINISTRATOR);
+		if(value == null) {
+			return false;
+		} else {
+			return value;
+		}
 	}
 
 	public void setCompanyAdministrator(boolean companyAdmin) {
