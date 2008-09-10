@@ -113,4 +113,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public Collection<Application> getUserApplications(IWContext iwc, User user);
 	
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException;
+	
+	public Collection<Group> getAllUserCompanies(IWContext iwc, User user) throws RemoteException;
 }

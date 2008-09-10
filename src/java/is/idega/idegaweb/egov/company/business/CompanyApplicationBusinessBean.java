@@ -684,6 +684,19 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 		return compEmployee.getServices();
 	}
+	
+	public Collection<Group> getAllUserCompanies(IWContext iwc, User user) throws RemoteException {
+		@SuppressWarnings("unchecked")
+		Collection<Group> allGroups = getUserBusiness(iwc).getGroupBusiness().getAllGroups();
+		Collection<Group> userCompanies = new ArrayList<Group>();
+
+		for (Group group : allGroups) {
+			if (group.getGroupType().equals(CompanyConstants.GROUP_TYPE_COMPANY) && getUserBusiness(iwc).isMemberOfGroup(Integer.parseInt(group.getId()), user)) {
+				userCompanies.add(group);
+			}
+		}
+		return userCompanies;
+	}
 
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException {
 		return (CommuneMessageBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CommuneMessageBusiness.class);
