@@ -71,11 +71,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 		Object primaryKey = applicationId;
 		Application app = null;
-		try {
-			app = getApplication(primaryKey);
-		} catch (FinderException e) {
-			logger.log(Level.SEVERE, "Error getting application by ID: " + applicationId, e);
-		}
+		app = getApplication(primaryKey);
+
 		if (!(app instanceof CompanyApplication)) {
 			logger.log(Level.SEVERE, "Application " + app + " is not company application!");
 			return null;
@@ -84,6 +81,18 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return (CompanyApplication) app;
 	}
 
+	@Override
+	public CompanyApplication getApplication(Object primaryKey) {
+		CompanyApplication app;
+		try {
+			app = getCompanyApplicationHome().findByPrimaryKey(primaryKey);
+		} catch (FinderException e) {
+			e.printStackTrace();
+			return null;
+		}
+		return app;
+	}
+	
 	public CompanyApplication getApplication(Company company) {
 		CompanyApplication app;
 		try {
