@@ -62,13 +62,7 @@ import com.idega.util.StringUtil;
  */
 
 public class CompanyEmployeeManager extends CompanyBlock {
-	
-	private static final String PARAMETER_LIST_COMPANY_EMPLOYEES = "prm_list_company_employees";
-	private static final String PARAMETER_MANAGE_COMPANY_EMPLOYEE_USER = "prm_manage_company_employees_user";
-	private static final String PARAMETER_EDIT_COMPANY_EMPLOYEE = "prm_edit_company_employee";
-	private static final String PARAMETER_DELETE_COMPANY_EMPLOYEE = "prm_delete_company_employee";
-	private static final String PARAMETER_SAVE_COMPANY_EMPLOYEE = "prm_save_company_employee";
-	
+
 	private static final String NAME_INPUT = "name";
 	private static final String SURNAME_INPUT = "surname";
 	private static final String PERSONAL_ID_INPUT = "personalId";
@@ -80,7 +74,13 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	public static final String EMPLOYEE_ID_PARAMETER = "prm_employee_id";
 	public static final String USER_ID_PARAMETER = "prm_user_id";
 	
-	public static final String ACTION = "prm_action";
+	protected static final String PARAMETER_ACTION = "prm_action";
+	private static final int ACTION_VIEW = 1;
+	private static final int ACTION_EDIT = 2;
+	private static final int ACTION_USER_VIEW = 3;
+	private static final int ACTION_SAVE = 4;
+	private static final int ACTION_DELETE = 5;
+
 	
 	private Group group;	
 	private IWBundle iwb;
@@ -100,50 +100,57 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		
 		String employeeId = iwc.getParameter(EMPLOYEE_ID_PARAMETER);
 		String userId = iwc.getParameter(USER_ID_PARAMETER);
-		String action = iwc.getParameter(ACTION);
 		
-		if(!StringUtil.isEmpty(action)) {
-			if (action.equals(PARAMETER_MANAGE_COMPANY_EMPLOYEE_USER)) {
-				showUserForm(iwc);
-				return;
-			} else if (action.equals(PARAMETER_LIST_COMPANY_EMPLOYEES)) {
+		switch (parseAction(iwc)) {
+		case ACTION_VIEW:
+			showCompanyUserList(iwc);
+			break;
+			
+		case ACTION_USER_VIEW:
+			showUserForm(iwc);
+			break;
+
+		case ACTION_EDIT:
+			if(!StringUtil.isEmpty(employeeId)) {
+				showCompanyEmployeeEditForm(iwc, employeeId);
+				break;
+			} else {
+				showCompanyEmployeeCreateForm(iwc, userId);
+				break;
+			}
+
+		case ACTION_SAVE:
+			saveEmployee(iwc);
+			showCompanyUserList(iwc);
+			break;
+
+		case ACTION_DELETE:
+			removeEmployee(iwc);
+			showCompanyUserList(iwc);
+			break;
+			
+		default:
+			if(getGroup() != null) {
 				showCompanyUserList(iwc);
-				return;
-			} else if (action.equals(PARAMETER_EDIT_COMPANY_EMPLOYEE)) {
-				if(!StringUtil.isEmpty(employeeId)) {
-					showCompanyEmployeeEditForm(iwc, employeeId);
-					return;
-				} else {
-					showCompanyEmployeeCreateForm(iwc, userId);
-					return;
-				}
-			} else if(action.equals(PARAMETER_SAVE_COMPANY_EMPLOYEE)) {
-				saveEmployee(iwc);
-				showCompanyUserList(iwc);
-				return;
-			} else if (action.equals(PARAMETER_DELETE_COMPANY_EMPLOYEE)) {
-				removeEmployee(iwc);
-				
-				showCompanyUserList(iwc);
-				return;
+			} else {
+				showMessage(iwrb.getLocalizedString("no_user_group_selected",
+				"There's no user group selected"));
 			}
 		}
-		
-			
-		//	By default showing company employees 
-		if(getGroup() != null) {
-			showCompanyUserList(iwc);
-		} else {
-			showMessage(iwrb.getLocalizedString("no_user_group_selected",
-			"There's no user group selected"));
-		}
-		return;
 	}
+	
+	private int parseAction(IWContext iwc) {
+		if (iwc.isParameterSet(PARAMETER_ACTION)) {
+			return Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+		}
+		return ACTION_VIEW;
+	}
+
 	
 	private void showCompanyUserList(IWContext iwc) {
 		Layer container = new Layer();
 		add(container);
-		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), ACTION, PARAMETER_MANAGE_COMPANY_EMPLOYEE_USER));
+		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), PARAMETER_ACTION, ACTION_USER_VIEW + ""));
 		
 		Layer accountsManagerInContainer = listExistingCompanyGroupUsers(iwc);
 		container.add(accountsManagerInContainer);
@@ -152,7 +159,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	private void showUserForm(IWContext iwc) {
 		Layer container = new Layer();
 		add(container);
-		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), ACTION, PARAMETER_LIST_COMPANY_EMPLOYEES));
+		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), PARAMETER_ACTION, ACTION_VIEW + ""));
 		
 		Layer employeeUserForm = getEmployeeAccountManager(iwc, 
 				                                           ListUtil.convertListOfStringsToCommaseparatedString(Arrays.asList(new String [] {
@@ -168,8 +175,8 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	private void showCompanyEmployeeEditForm(IWContext iwc, String employeeId) {
 		Layer container = new Layer();
 		add(container);
-		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), ACTION, PARAMETER_MANAGE_COMPANY_EMPLOYEE_USER));
-		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), ACTION, PARAMETER_LIST_COMPANY_EMPLOYEES));
+		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), PARAMETER_ACTION, ACTION_USER_VIEW + ""));
+		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), PARAMETER_ACTION, ACTION_VIEW + ""));
 		
 		CompanyEmployee employee = null;
 		try {
@@ -185,8 +192,8 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	private void showCompanyEmployeeCreateForm(IWContext iwc, String userId) {
 		Layer container = new Layer();
 		add(container);
-		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), ACTION, PARAMETER_MANAGE_COMPANY_EMPLOYEE_USER));
-		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), ACTION, PARAMETER_LIST_COMPANY_EMPLOYEES));
+		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), PARAMETER_ACTION, ACTION_USER_VIEW + ""));
+		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), PARAMETER_ACTION, ACTION_VIEW + ""));
 		
 		User user = null;
 		try {
@@ -299,14 +306,14 @@ public class CompanyEmployeeManager extends CompanyBlock {
 				row = table.createRow();
 				
 				Link edit = new Link(this.iwb.getImage("images/edit.png", this.iwrb.getLocalizedString("edit", "Edit")));
-				edit.addParameter(ACTION, PARAMETER_EDIT_COMPANY_EMPLOYEE);
+				edit.addParameter(PARAMETER_ACTION, ACTION_EDIT);
 				if(emp != null)
 					edit.addParameter(EMPLOYEE_ID_PARAMETER, emp.getPrimaryKey().toString());
 				else 
 					edit.addParameter(USER_ID_PARAMETER, usr.getPrimaryKey().toString());
 				
 				Link delete = new Link(this.iwb.getImage("images/delete.png", this.iwrb.getLocalizedString("remove", "Remove")));
-				delete.addParameter(ACTION, PARAMETER_DELETE_COMPANY_EMPLOYEE);
+				delete.addParameter(PARAMETER_ACTION, ACTION_DELETE);
 				if(emp != null)
 					delete.addParameter(EMPLOYEE_ID_PARAMETER, emp.getPrimaryKey().toString());
 				
@@ -505,10 +512,10 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		buttonLayer.setStyleClass("buttonLayer");
 		form.add(buttonLayer);
 		
-		SubmitButton back = new SubmitButton(this.iwrb.getLocalizedString("back", "Back"), ACTION, PARAMETER_MANAGE_COMPANY_EMPLOYEE_USER);
+		SubmitButton back = new SubmitButton(this.iwrb.getLocalizedString("back", "Back"), PARAMETER_ACTION, ACTION_USER_VIEW + "");
 		buttonLayer.add(back);
 		
-		SubmitButton save = new SubmitButton(this.iwrb.getLocalizedString("save", "Save"), ACTION, PARAMETER_SAVE_COMPANY_EMPLOYEE);
+		SubmitButton save = new SubmitButton(this.iwrb.getLocalizedString("save", "Save"), PARAMETER_ACTION, ACTION_SAVE + "");
 		buttonLayer.add(save);
 		
 		add(form);

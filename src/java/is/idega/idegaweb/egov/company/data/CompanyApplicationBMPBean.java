@@ -1,7 +1,7 @@
 package is.idega.idegaweb.egov.company.data;
 
 import is.idega.idegaweb.egov.application.data.ApplicationCategory;
-import is.idega.idegaweb.egov.fsk.FSKConstants;
+import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,7 +12,6 @@ import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.AbstractCaseBMPBean;
-import com.idega.block.process.data.CaseCode;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.block.text.data.LocalizedTextBMPBean;
 import com.idega.block.text.data.LocalizedTextHome;
@@ -52,7 +51,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	private static final String COLUMN_COMPANY = "company_id";
 
 	private static final String COLUMN_ADMIN_USER = "admin_user";
-	private static final String COLUMN_APPLICANT_USER = "admin_user";
+	private static final String COLUMN_APPLICANT_USER = "applicant_user";
 	
 	private static final String NAME = "application_name";
 	private static final String CATEGORY = "application_category_id";
@@ -79,12 +78,12 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 
 	@Override
 	public String getCaseCodeDescription() {
-		return "Application for company access";
+		return "Application for company portal";
 	}
 
 	@Override
 	public String getCaseCodeKey() {
-		return FSKConstants.CASE_CODE_KEY;
+		return EgovCompanyConstants.CASE_CODE_KEY;
 	}
 
 	@Override
@@ -101,7 +100,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		addManyToOneRelationship(COLUMN_APPLICANT_USER, User.class);
 		addManyToOneRelationship(COLUMN_COMPANY, Company.class);
 		addManyToOneRelationship(CATEGORY, ApplicationCategory.class);
-		addManyToOneRelationship(CASE_CODE, CaseCode.class);
+//		addManyToOneRelationship(CASE_CODE, CaseCode.class);
 	}
 	
 	// Getters
@@ -190,15 +189,15 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		return (ApplicationCategory) getColumnValue(CATEGORY);
 	}
 
-	@Override
-	public void setCaseCode(CaseCode caseCode) {
-		setColumn(CASE_CODE, caseCode);
-	}
-
-	@Override
-	public CaseCode getCaseCode() {
-		return (CaseCode) getColumnValue(CASE_CODE);
-	}
+//	@Override
+//	public void setCaseCode(CaseCode caseCode) {
+//		setColumn(CASE_CODE, caseCode);
+//	}
+//
+//	@Override
+//	public CaseCode getCaseCode() {
+//		return (CaseCode) getColumnValue(CASE_CODE);
+//	}
 
 	public void setElectronic(boolean isElectronic) {
 		setColumn(ELECTRONIC, isElectronic);

@@ -10,6 +10,8 @@ import is.idega.idegaweb.egov.company.data.CompanyEmployee;
 import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,9 +24,13 @@ import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 import javax.mail.MessagingException;
 
+import com.idega.block.pdf.business.PrintingContext;
+import com.idega.block.pdf.business.PrintingService;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBORuntimeException;
 import com.idega.company.CompanyConstants;
 import com.idega.company.data.Company;
+import com.idega.company.data.CompanyType;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.core.accesscontrol.business.LoginDBHandler;
@@ -32,6 +38,8 @@ import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
 import com.idega.core.data.ICTreeNode;
+import com.idega.core.file.data.ICFile;
+import com.idega.core.file.data.ICFileHome;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWApplicationContext;
@@ -40,6 +48,9 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
+import com.idega.io.MemoryFileBuffer;
+import com.idega.io.MemoryInputStream;
+import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.GroupHelper;
@@ -129,7 +140,12 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return null;
 		}
 		
-		compApp.setAdminUser(compApp.getAdminUser());
+		Company company = compApp.getCompany();
+		company.setValid(true);
+		company.setOpen(true);
+		company.store();
+		
+		compApp.setCompany(company);
 		compApp.store();
 		
 		if (adminPassword.equals(CoreConstants.MINUS)) {
@@ -284,6 +300,45 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return password;
 	}
 	
+	private ICFile createContract(PrintingContext pcx, Application application, Locale locale) throws CreateException {
+		try {
+			MemoryFileBuffer buffer = new MemoryFileBuffer();
+			OutputStream mos = new MemoryOutputStream(buffer);
+			InputStream mis = new MemoryInputStream(buffer);
+
+			pcx.setDocumentStream(mos);
+
+			getPrintingService().printDocument(pcx);
+
+			return createFile(pcx.getFileName() != null ? pcx.getFileName() : "contract", mis, buffer.length());
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re);
+		}
+	}
+
+	private ICFile createFile(String fileName, InputStream is, int length) throws CreateException {
+		try {
+			ICFileHome home = (ICFileHome) getIDOHome(ICFile.class);
+			ICFile file = home.create();
+
+			if (!fileName.endsWith(".pdf") && !fileName.endsWith(".PDF")) {
+				fileName += ".pdf";
+			}
+
+			file.setFileValue(is);
+			file.setMimeType("application/x-pdf");
+
+			file.setName(fileName);
+			file.setFileSize(length);
+			file.store();
+			return file;
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re);
+		}
+	}
+	
 	private boolean isGroupCompanyType(Group group) {
 		return group == null ? false : CompanyConstants.GROUP_TYPE_COMPANY.equals(group.getGroupType());
 	}
@@ -362,7 +417,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 		Email email = null;
 		try {
-			email = getUserBusiness(iwac).getUsersMainEmail(compApp.getAdminUser());
+			email = getUserBusiness(iwac).getUsersMainEmail(compApp.getApplicantUser());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -372,7 +427,55 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 		IWResourceBundle iwrb = getResourceBundle();
 		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
-		subject.append(iwrb.getLocalizedString("application_rejected_mail_subject", "application was rejected"));
+		subject.append(iwrb.getLocalizedString("application.rejected_message_subject", "application was rejected"));
+		return sendMail(email, subject.toString(), explanationText);
+	}
+	
+	public boolean reactivateApplication(IWApplicationContext iwac, String applicationId, String explanationText) {
+		if (!setStatusToCompanyApplication(applicationId, getCaseStatusOpen().getStatus())) {
+			return false;
+		}
+		
+		CompanyApplication compApp = getApplication(applicationId);
+		if (compApp == null) {
+			return false;
+		}
+
+		Email email = null;
+		try {
+			email = getUserBusiness(iwac).getUsersMainEmail(compApp.getApplicantUser());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		if (email == null) {
+			return false;
+		}
+		
+		IWResourceBundle iwrb = getResourceBundle();
+		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
+		subject.append(iwrb.getLocalizedString("application.reactivated_message_subject", "application was reactivated"));
+		return sendMail(email, subject.toString(), explanationText);
+	}
+	
+	public boolean requestInformation(IWApplicationContext iwac, String applicationId, String explanationText) {
+		CompanyApplication compApp = getApplication(applicationId);
+		if (compApp == null) {
+			return false;
+		}
+
+		Email email = null;
+		try {
+			email = getUserBusiness(iwac).getUsersMainEmail(compApp.getApplicantUser());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		if (email == null) {
+			return false;
+		}
+		
+		IWResourceBundle iwrb = getResourceBundle();
+		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
+		subject.append(iwrb.getLocalizedString("application.request_info_message_subject", "Further information requested"));
 		return sendMail(email, subject.toString(), explanationText);
 	}
 
@@ -602,6 +705,15 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		return userApplicationList;
 	}
+		
+	private PrintingService getPrintingService() {
+		try {
+			return (PrintingService) getServiceInstance(PrintingService.class);
+		}
+		catch (RemoteException e) {
+			throw new IBORuntimeException(e.getMessage());
+		}
+	}
 
 	protected UserBusiness getUserBusiness(IWApplicationContext iwac) throws RemoteException {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
@@ -710,5 +822,25 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException {
 		return (CommuneMessageBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CommuneMessageBusiness.class);
 	}
-	
+
+	public Application storeApplication(User admin, CompanyType companyType, Company company, User performer) throws CreateException, RemoteException {
+		try {
+			CompanyApplication application = getCompanyApplicationHome().create();
+			
+			application.setApplicantUser(admin);
+			application.setCompany(company);
+			application.setType(companyType);
+			
+			//TODO maybe set data from Application interface
+			
+			application.store();
+			
+			changeCaseStatus(application, getCaseStatusOpen(), performer);
+			
+			return application;
+		} catch (CreateException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

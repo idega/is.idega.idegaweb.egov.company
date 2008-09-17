@@ -9,9 +9,12 @@ import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+
+import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
 import com.idega.company.data.Company;
+import com.idega.company.data.CompanyType;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
@@ -36,6 +39,11 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getBundle
 	 */
 	public IWBundle getBundle() throws RemoteException;
+	
+	/**
+	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#storeApplication
+	 */
+	public Application storeApplication(User admin, CompanyType companyType, Company company, User currentUser) throws CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#approveApplication
@@ -47,6 +55,18 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#rejectApplication
 	 */
 	public boolean rejectApplication(IWApplicationContext iwac, String applicationId,
+			String explanationText) throws RemoteException;
+	
+	/**
+	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#reactivateApplication
+	 */
+	public boolean reactivateApplication(IWApplicationContext iwac, String applicationId,
+			String explanationText) throws RemoteException;
+
+	/**
+	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#reactivateApplication
+	 */
+	public boolean requestInformation(IWApplicationContext iwac, String applicationId,
 			String explanationText) throws RemoteException;
 
 	/**

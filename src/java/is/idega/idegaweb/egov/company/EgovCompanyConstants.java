@@ -21,7 +21,7 @@ public class EgovCompanyConstants {
 	public static final String GROUP_TYPE_COMPANY_SUB_GROUP = "iw_company_sub_group";
 	public static final String GROUP_TYPE_COMPANY_COURSE = "iw_company_course";
 	
-	public static final String CASE_CODE_KEY = "COMPADMAPP";
+	public static final String CASE_CODE_KEY = "COMPORT";
 
 	public static final String CONTENT_CODE_REQUEST_INFORMATION = "prm_company_code_request_information";
 	

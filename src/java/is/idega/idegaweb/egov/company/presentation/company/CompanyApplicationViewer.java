@@ -23,6 +23,7 @@ import javax.ejb.FinderException;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.message.data.Message;
+import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.contact.data.Email;
@@ -47,19 +48,6 @@ import com.idega.util.text.Name;
 public class CompanyApplicationViewer extends CompanyBlock {
 	private static final String PARAMETER_ACTION = "prm_action";
 	private static final String PARAMETER_MESSAGE = "prm_message";
-//	private static final String PARAMETER_PHONE = "prm_phone";
-//	private static final String PARAMETER_FAX = "prm_fax";
-//	private static final String PARAMETER_WEB_PAGE = "prm_web_page";
-//	private static final String PARAMETER_EMAIL = "prm_email";
-//	private static final String PARAMETER_BANK_ACCOUNT = "prm_bank_account";
-//	private static final String BANK_ACCOUNT_DEFAULT = "0000-00-000000";
-
-//	private static final String PARAMETER_ADMIN_PK = "prm_admin_pk";
-//	private static final String PARAMETER_ADMIN_PERSONAL_ID = "prm_admin_personal_id";
-//	private static final String PARAMETER_ADMIN_NAME = "prm_admin_name";
-//	private static final String PARAMETER_WORK_PHONE = "prm_work_phone";
-//	private static final String PARAMETER_MOBILE_PHONE = "prm_mobile_phone";
-//	private static final String PARAMETER_ADMIN_EMAIL = "prm_admin_email";
 
 	public static final int ACTION_VIEW = 1;
 	private static final int ACTION_APPROVE = 2;
@@ -72,6 +60,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 	private static final int ACTION_CLOSING_FORM = 9;
 	private static final int ACTION_CLOSE = 10;
 	private static final int ACTION_EDIT_FORM = 11;
+	private static final int ACTION_CONTRACT = 12;
 //	private static final int ACTION_STORE = 12;
 
 	private ICPage backPage;
@@ -127,7 +116,13 @@ public class CompanyApplicationViewer extends CompanyBlock {
 			case ACTION_CLOSE:
 				close(iwc, application);
 				break;
-			/*case ACTION_EDIT_FORM:
+//TODO		finish contract pdf
+//			case ACTION_CONTRACT:
+//				close(iwc, application);
+//				break;
+			
+				
+		  /*case ACTION_EDIT_FORM:
 				getEditForm(iwc, application);
 				break;
 			case ACTION_STORE:
@@ -211,78 +206,6 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		span = new Span(new Text(application.getName()));
 		formItem.add(span);
 		section.add(formItem);
-
-		/*formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("address", "Address"));
-		formItem.add(label);
-		span = new Span(new Text(application.getAddress()));
-		formItem.add(span);
-		section.add(formItem);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("postal_code", "Postal code"));
-		formItem.add(label);
-		span = new Span(new Text(application.getPostalCode()));
-		formItem.add(span);
-		section.add(formItem);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("city", "City"));
-		formItem.add(label);
-		span = new Span(new Text(application.getCity()));
-		formItem.add(span);
-		section.add(formItem);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("phone", "Phone"));
-		formItem.add(label);
-		span = new Span(new Text(application.getPhoneNumber()));
-		formItem.add(span);
-		section.add(formItem);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("fax", "Fax"));
-		formItem.add(label);
-		span = new Span(new Text(application.getFaxNumber() != null ? application.getFaxNumber() : Text.NON_BREAKING_SPACE));
-		formItem.add(span);
-		section.add(formItem);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("web_page", "Web page"));
-		formItem.add(label);
-		span = new Span(new Text(application.getWebPage() != null ? application.getWebPage() : Text.NON_BREAKING_SPACE));
-		formItem.add(span);
-		section.add(formItem);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("email", "E-mail"));
-		formItem.add(label);
-		span = new Span(new Text(application.getEmail()));
-		formItem.add(span);
-		section.add(formItem);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
-		label.setLabel(iwrb.getLocalizedString("bank_account", "Bank account"));
-		formItem.add(label);
-		span = new Span(new Text(application.getBankAccount()));
-		formItem.add(span);
-		section.add(formItem);*/
 
 		section.add(clearLayer);
 
@@ -368,104 +291,6 @@ public class CompanyApplicationViewer extends CompanyBlock {
 			section.add(clearLayer);
 		}
 
-		/*try {
-			Collection postalCodes = application.getPostalCodes();
-
-			heading = new Heading1(iwrb.getLocalizedString("application.postal_information_overview", "Postal information"));
-			heading.setStyleClass("subHeader");
-			form.add(heading);
-
-			section = new Layer(Layer.DIV);
-			section.setStyleClass("formSection");
-			form.add(section);
-
-			Lists list = new Lists();
-			list.setStyleClass("postalCodes");
-			section.add(list);
-
-			if (postalCodes != null) {
-				Iterator iterator = postalCodes.iterator();
-				while (iterator.hasNext()) {
-					PostalCode code = (PostalCode) iterator.next();
-
-					ListItem item = new ListItem();
-					item.add(new Text(code.getPostalAddress()));
-					list.add(item);
-				}
-			}
-
-			section.add(clearLayer);
-		}
-		catch (IDORelationshipException e) {
-			e.printStackTrace();
-		}
-
-		Collection files = application.getFiles();
-		if (!files.isEmpty()) {
-			heading = new Heading1(iwrb.getLocalizedString("application.uploaded_attachments_info", "Uploaded attachments information"));
-			heading.setStyleClass("subHeader");
-			form.add(heading);
-
-			section = new Layer(Layer.DIV);
-			section.setStyleClass("formSection");
-			form.add(section);
-
-			Iterator iterator = files.iterator();
-			while (iterator.hasNext()) {
-				ApplicationFiles applicationFile = (ApplicationFiles) iterator.next();
-				ICFile file = applicationFile.getFile();
-				String fileType = applicationFile.getType();
-				IWTimestamp created = new IWTimestamp(file.getCreationDate());
-				Season season = applicationFile.getSeason();
-
-				Link link = new Link(file.getName());
-				link.setFile(file);
-				link.setTarget(Link.TARGET_BLANK_WINDOW);
-
-				formItem = new Layer(Layer.DIV);
-				formItem.setStyleClass("formItem");
-				label = new Label();
-				label.add(iwrb.getLocalizedString("file_type_info." + fileType, fileType));
-				if (season != null) {
-					label.add(" (" + season.getName() + ")");
-				}
-				else {
-					label.add(" ()");
-				}
-				formItem.add(label);
-				section.add(formItem);
-
-				span = new Span();
-				span.add(link);
-				span.add(Text.getNonBrakingSpace());
-				span.add("(" + created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT) + ")");
-				formItem.add(span);
-			}
-
-			section.add(clearLayer);
-		}
-
-		String comments = application.getComments();
-		if (comments != null) {
-			heading = new Heading1(iwrb.getLocalizedString("application.comments_info", "Comments information"));
-			heading.setStyleClass("subHeader");
-			form.add(heading);
-
-			section = new Layer(Layer.DIV);
-			section.setStyleClass("formSection");
-			form.add(section);
-
-			formItem = new Layer(Layer.DIV);
-			formItem.setStyleClass("formItem");
-			label = new Label();
-			label.setLabel(iwrb.getLocalizedString("comments", "Comments"));
-			formItem.add(label);
-			span = new Span(new Text(comments));
-			formItem.add(span);
-			section.add(formItem);
-
-			section.add(clearLayer);
-		}*/
 
 			Iterator iter = application.getChildrenIterator();
 			if (iter != null) {
@@ -601,6 +426,11 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		edit.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
 		edit.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_EDIT_FORM));
 		bottom.add(edit);
+		
+		Link contract = getButtonLink(iwrb.getLocalizedString("contract.file_name", "Contract"));
+		edit.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
+		edit.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_CONTRACT));
+		bottom.add(contract);
 	}
 
 	private void getRejectionForm(IWContext iwc, CompanyApplication application) throws RemoteException {
@@ -1034,32 +864,27 @@ public class CompanyApplicationViewer extends CompanyBlock {
 	}*/
 
 	private void approve(IWContext iwc, CompanyApplication application) throws RemoteException {
-//		try {
-//			getCompanyBusiness().approveApplication(application, iwc.getCurrentUser(), iwc.getCurrentLocale());
-//
-//			Company company = application.getCompany();
-//			Object[] arguments = { company.getName(), PersonalIDFormatter.format(company.getPersonalID(), iwc.getCurrentLocale()) };
-//
-//			showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.accepted_heading", "Application accepted"), MessageFormat.format(iwrb.getLocalizedString("application.accepted_text", "Your application for company account has been accepted."), arguments));
-//		}
-//		catch (CreateException e) {
-//			e.printStackTrace();
-//		}
+		getCompanyBusiness().approveApplication(iwc, application.getId());
+
+		Company company = application.getCompany();
+		Object[] arguments = { company.getName(), PersonalIDFormatter.format(company.getPersonalID(), iwc.getCurrentLocale()) };
+
+		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.accepted_heading", "Application accepted"), MessageFormat.format(iwrb.getLocalizedString("application.accepted_text", "Your application for company account has been accepted."), arguments));
 	}
 
 	private void reject(IWContext iwc, CompanyApplication application) throws RemoteException {
-//		getCompanyBusiness().rejectApplication(application, iwc.getCurrentUser(), iwc.getCurrentLocale(), iwc.getParameter(PARAMETER_MESSAGE));
-//		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.rejected_heading", "Application rejected"), iwrb.getLocalizedString("application.rejected_text", "Your application for company account has been rejected."));
+		getCompanyBusiness().rejectApplication(iwc, application.getId(), iwc.getParameter(PARAMETER_MESSAGE));
+		showReceipt(iwc, application, iwrb.getLocalizedString("application.rejected_text", "Your application for company account has been rejected"), iwrb.getLocalizedString("application.rejected_heading", "Application rejected"), iwrb.getLocalizedString("application.rejected_text", "Your application for company account has been rejected."));
 	}
 
 	private void requestInfo(IWContext iwc, CompanyApplication application) throws RemoteException {
-//		getCompanyBusiness().requestInformation(application, iwc.getCurrentUser(), iwc.getCurrentLocale(), iwc.getParameter(PARAMETER_MESSAGE));
-//		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.request_info_heading", "Request for further info sent"), iwrb.getLocalizedString("application.request_info_text", "A request for further information has been sent to the application's owner."));
+		getCompanyBusiness().requestInformation(iwc, application.getId(), iwc.getParameter(PARAMETER_MESSAGE));
+		showReceipt(iwc, application, iwrb.getLocalizedString("application.request_info", "Request further info"), iwrb.getLocalizedString("application.request_info_heading", "Request for further info sent"), iwrb.getLocalizedString("application.request_info_text", "A request for further information has been sent to the application's owner."));
 	}
 
 	private void reactivate(IWContext iwc, CompanyApplication application) throws RemoteException {
-//		getCompanyBusiness().reactivateApplication(application, iwc.getCurrentUser(), iwc.getCurrentLocale());
-//		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.reactivated_heading", "Application reactivate"), iwrb.getLocalizedString("application.reactivated_text", "Application has been reactivated."));
+		getCompanyBusiness().reactivateApplication(iwc, application.getId(), iwc.getParameter(PARAMETER_MESSAGE));
+		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.reactivated_heading", "Application reactivate"), iwrb.getLocalizedString("application.reactivated_text", "Application has been reactivated."));
 	}
 
 	private void reopen(IWContext iwc, CompanyApplication application) throws RemoteException {
@@ -1183,5 +1008,4 @@ public class CompanyApplicationViewer extends CompanyBlock {
 	public void setBackPage(ICPage backPage) {
 		this.backPage = backPage;
 	}
-
 }

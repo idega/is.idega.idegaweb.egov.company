@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE document
+	PUBLIC "-//UJAC.org//Print Document//EN" 
+	"http://ujac.sourceforge.net/ujac-print-document.dtd">
+
+<document size="A4" margin-left="70" margin-right="70" margin-top="70" margin-bottom="70">
+	
+	<font-def name="normal" family="Helvetica" size="10" style="normal"/>
+	<font-def name="normalBold" family="Helvetica" size="10" style="bold"/>
+	<font-def name="small" family="Helvetica" size="8" style="normal"/>
+	<font-def name="big" family="Helvetica" size="14" style="normal"/>
+	<font-def name="heading" family="Helvetica" size="18" style="bold"/>
+	<font-def name="extraBig" family="Helvetica" size="22" style="bold"/>
+	
+	<header>
+		<header-part><image source="rvk.jpg" width="148" height="33" /></header-part>
+    </header>
+
+	<footer font="small">
+		<footer-part>
+		Reykjavíkurborg, Ráðhúsi Reykjavíkur Tjarnargötu 11, 101 Reykjavík. Sími: 4 11 1000, Bréfsími: 562 1799</footer-part>
+	</footer>
+	
+	<paragraph halign="center" font="extraBig" spacing-after="24">
+		Fyrirtækjagátt Reykjavíkurborgar
+	</paragraph>
+
+	<paragraph halign="center" font="heading" spacing-after="24">
+		Samningur um aðgang að styrkjakerfi fyrirtækjagátt Reykjavíkurborgar
+	</paragraph>
+
+	<paragraph font="big" spacing-after="18.0">
+		Íþrótta- og tómstundasvið Reykjavíkur, hér eftir í samningi þessum nefnt ÍTR, kt. 521286-1569 og félagið ${name} kt. ${personalID} gera með sér eftirfarandi samstarfssamning vegna aðgangs að fyrirtækjagátt Reykjavíkurborgar á Rafrænni Reykjavík</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		1. gr. MARKMIÐ OG TILGANGUR
+	</paragraph>
+
+	<paragraph font="normal" spacing-after="18.0">
+		Samningur þessi kveður á um samstarf Reykjavíkurborgar og fyrirtækisins ${name} um ...</paragraph>
+ 
+	<paragraph font="normal" spacing-after="18.0">
+		Markmið samningsins er m.a. að skapa fyrirtækinu sem bestar aðstæður til að nálgast gögn þess hjá Reykjavíkurborg og efla þjónustu við það.</paragraph>
+ 
+	<paragraph font="normalBold" spacing-after="18.0">
+		2. gr. ÁBYRGÐ REYKJAVÍKURBORGAR
+	</paragraph>
+
+	<paragraph font="normal">
+		VANTAR TEXTA EÐA SLEPPA	</paragraph>
+
+	<paragraph font="normalBold" spacing-after="18.0">
+		3. gr. ÁBYRGÐ FÉLAGS
+	</paragraph>
+
+	<paragraph font="normal">
+	Prókúruhafi fyrirtækisins fer með réttindi og skyldur samkvæmt samningi þessum fyrir hönd fyrirtækisins.
+	</paragraph>
+
+	<paragraph halign="center" font="normal">
+		_____________________________________________
+	</paragraph>
+
+	<paragraph halign="center" font="normal" spacing-after="24">
+		Staður, dagsetning
+	</paragraph>
+
+	<table font="small" padding="0" columns="3" width="100" widths="42,16,42" halign="center" border-style="none">
+		<cell height="24">_____________________________________________</cell>
+		<cell height="24"></cell>
+		<cell height="24">_____________________________________________</cell>
+		<cell>Nafn fyrir hönd fyrirtækis</cell>
+		<cell></cell>
+		<cell>Nafn fyrir hönd Reykjavíkurborgar</cell>
+	</table>
+
+</document>

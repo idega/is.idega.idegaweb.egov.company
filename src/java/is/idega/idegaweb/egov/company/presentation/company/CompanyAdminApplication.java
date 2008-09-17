@@ -8,6 +8,7 @@ import is.idega.idegaweb.egov.fsk.business.AdminUser;
 import is.idega.idegaweb.egov.fsk.business.ApplicationSession;
 import is.idega.idegaweb.egov.fsk.business.CompanyDWR;
 import is.idega.idegaweb.egov.fsk.business.FSKBusiness;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
@@ -794,62 +795,6 @@ public class CompanyAdminApplication extends ApplicationForm {
 
 		section.add(clearLayer);
 
-//		Map files = getSession(iwc).getFiles();
-//		if (!files.isEmpty()) {
-//			heading = new Heading1(this.iwrb.getLocalizedString("application.uploaded_attachments_info", "Uploaded attachments information"));
-//			heading.setStyleClass("subHeader");
-//			form.add(heading);
-//
-//			section = new Layer(Layer.DIV);
-//			section.setStyleClass("formSection");
-//			form.add(section);
-//
-//			Iterator iterator = files.keySet().iterator();
-//			while (iterator.hasNext()) {
-//				ICFile file = (ICFile) iterator.next();
-//				String fileType = (String) files.get(file);
-//
-//				Link link = new Link(file.getName());
-//				link.setFile(file);
-//				link.setTarget(Link.TARGET_BLANK_WINDOW);
-//
-//				formItem = new Layer(Layer.DIV);
-//				formItem.setStyleClass("formItem");
-//				label = new Label();
-//				label.add(iwrb.getLocalizedString("file_type_info." + fileType, fileType));
-//				formItem.add(label);
-//				section.add(formItem);
-//
-//				span = new Span();
-//				span.add(link);
-//				formItem.add(span);
-//			}
-//
-//			section.add(clearLayer);
-//		}
-
-//		String comments = iwc.isParameterSet(PARAMETER_COMMENTS) ? iwc.getParameter(PARAMETER_COMMENTS) : null;
-//		if (comments != null) {
-//			heading = new Heading1(this.iwrb.getLocalizedString("application.comments_info", "Comments information"));
-//			heading.setStyleClass("subHeader");
-//			form.add(heading);
-//
-//			section = new Layer(Layer.DIV);
-//			section.setStyleClass("formSection");
-//			form.add(section);
-//
-//			formItem = new Layer(Layer.DIV);
-//			formItem.setStyleClass("formItem");
-//			label = new Label();
-//			label.setLabel(iwrb.getLocalizedString("comments", "Comments"));
-//			formItem.add(label);
-//			span = new Span(new Text(comments));
-//			formItem.add(span);
-//			section.add(formItem);
-//
-//			section.add(clearLayer);
-//		}
-
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
@@ -923,21 +868,10 @@ public class CompanyAdminApplication extends ApplicationForm {
 			company.setWebPage(companyWebPage);
 			company.setBankAccount(companyBankAccount);
 			company.store();
-
+			
 			try {
-				is.idega.idegaweb.egov.company.data.CompanyApplication application = getCompanyApplicationBusiness().getCompanyApplicationHome().create();
-				
-				application.setApplicantUser(admin);
-				application.setCompany(company);
-				application.setType(companyType);
-				
-				//TODO maybe set data from Application interface
-				
-				application.store();
-				
-				
+				getCompanyApplicationBusiness().storeApplication(admin, companyType, company, iwc.getCurrentUser());
 			} catch (CreateException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -950,9 +884,7 @@ public class CompanyAdminApplication extends ApplicationForm {
 		} catch (FinderException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-
-
+		} 
 
 		Layer clearLayer = new Layer(Layer.DIV);
 		clearLayer.setStyleClass("Clear");

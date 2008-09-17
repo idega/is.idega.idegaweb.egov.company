@@ -21,7 +21,7 @@ public interface CompanyApplication extends Case, Application {
 	
 	public void setApplicantUser(User user);
 	
-	public String getAppType();
+//	public String getAppType();
 	
 	public CompanyType getType();
 	
