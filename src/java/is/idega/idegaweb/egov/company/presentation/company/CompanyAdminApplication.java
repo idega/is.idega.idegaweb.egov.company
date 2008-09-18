@@ -870,7 +870,7 @@ public class CompanyAdminApplication extends ApplicationForm {
 			company.store();
 			
 			try {
-				getCompanyApplicationBusiness().storeApplication(admin, companyType, company, iwc.getCurrentUser());
+				getCompanyApplicationBusiness().storeApplication(iwc, admin, companyType, company, iwc.getCurrentUser());
 			} catch (CreateException e) {
 				e.printStackTrace();
 			}

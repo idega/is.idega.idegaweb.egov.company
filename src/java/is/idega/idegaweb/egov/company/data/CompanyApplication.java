@@ -26,4 +26,7 @@ public interface CompanyApplication extends Case, Application {
 	public CompanyType getType();
 	
 	public void setType(CompanyType type);
+	
+	public String getCaseCodeKey();
+	
 }

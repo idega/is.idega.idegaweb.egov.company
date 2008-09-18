@@ -43,7 +43,7 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#storeApplication
 	 */
-	public Application storeApplication(User admin, CompanyType companyType, Company company, User currentUser) throws CreateException, RemoteException;
+	public Application storeApplication(IWContext iwc, User admin, CompanyType companyType, Company company, User currentUser) throws CreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#approveApplication

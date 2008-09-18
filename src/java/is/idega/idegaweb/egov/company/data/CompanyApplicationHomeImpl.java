@@ -1,5 +1,9 @@
 package is.idega.idegaweb.egov.company.data;
 
+import is.idega.idegaweb.egov.application.data.Application;
+
+import java.util.Collection;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
@@ -43,5 +47,12 @@ public class CompanyApplicationHomeImpl extends com.idega.data.IDOFactory implem
 		Object pk = ((CompanyApplicationBMPBean) entity).ejbFindByCompany(company);
 		this.idoCheckInPooledEntity(entity);
 		return this.findByPrimaryKey(pk);
+	}
+	
+	public Collection<Application> findAllByCaseCodesAndStatuses(String[] caseCodes, String[] statuses) throws FinderException {
+		com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
+		java.util.Collection ids = ((CompanyApplicationBMPBean) entity).ejbFindAllByCaseCodesAndStatuses(caseCodes, statuses);
+		this.idoCheckInPooledEntity(entity);
+		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 }

@@ -210,7 +210,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		
 		Locale locale = iwc.getCurrentLocale();
 		String[] caseCodes = new String[] {caseCode};
-		ApplicationBusiness appBusiness = getApplicationBusiness(iwc);
+		ApplicationBusiness appBusiness = getCompanyBusiness();
 		
 		boolean showAllApplications = applicationType == null;
 		if (showAllApplications || EgovCompanyConstants.APPLICATION_TYPE_UNHANDLED.equals(applicationType)) {

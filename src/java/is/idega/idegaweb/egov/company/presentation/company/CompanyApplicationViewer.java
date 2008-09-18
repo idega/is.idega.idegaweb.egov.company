@@ -203,7 +203,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		label = new Label();
 		label.setLabel(iwrb.getLocalizedString("name", "Name"));
 		formItem.add(label);
-		span = new Span(new Text(application.getName()));
+		span = new Span(new Text(application.getCompany().getName()));
 		formItem.add(span);
 		section.add(formItem);
 

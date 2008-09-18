@@ -1,6 +1,7 @@
 package is.idega.idegaweb.egov.company.business;
 
 import is.idega.idegaweb.egov.accounting.business.CitizenBusiness;
+import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
@@ -27,6 +28,7 @@ import javax.mail.MessagingException;
 import com.idega.block.pdf.business.PrintingContext;
 import com.idega.block.pdf.business.PrintingService;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.company.CompanyConstants;
 import com.idega.company.data.Company;
@@ -823,13 +825,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return (CommuneMessageBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CommuneMessageBusiness.class);
 	}
 
-	public Application storeApplication(User admin, CompanyType companyType, Company company, User performer) throws CreateException, RemoteException {
+	public Application storeApplication(IWContext iwc, User admin, CompanyType companyType, Company company, User performer) throws CreateException, RemoteException {
 		try {
 			CompanyApplication application = getCompanyApplicationHome().create();
 			
 			application.setApplicantUser(admin);
 			application.setCompany(company);
 			application.setType(companyType);
+			application.setCaseCode(getApplicationBusiness(iwc).getCaseCode(application.getCaseCodeKey()));
 			
 			//TODO maybe set data from Application interface
 			
@@ -840,6 +843,60 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return application;
 		} catch (CreateException e) {
 			e.printStackTrace();
+			return null;
+		} catch (FinderException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	protected ApplicationBusiness getApplicationBusiness(IWContext iwc) {
+		try {
+			return (ApplicationBusiness) IBOLookup.getServiceInstance(iwc, ApplicationBusiness.class);
+		}
+		catch (IBOLookupException e) {
+			throw new IBORuntimeException(e);
+		}
+	}
+	
+	@Override
+	public Collection<Application> getUnhandledApplications(String[] caseCodes) {
+		try {
+			return getCompanyApplicationHome().findAllByCaseCodesAndStatuses(caseCodes, getStatusesForOpenCases());
+		} catch (FinderException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@Override
+	public Collection<Application> getApprovedApplications(String[] caseCodes) {
+		try {
+			return getCompanyApplicationHome().findAllByCaseCodesAndStatuses(caseCodes, getStatusesForApprovedCases());
+		}
+		catch (FinderException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public Collection<Application> getRejectedApplications(String[] caseCodes) {
+		try {
+			return getCompanyApplicationHome().findAllByCaseCodesAndStatuses(caseCodes, getStatusesForRejectedCases());
+		}
+		catch (FinderException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	@Override
+	public String getApplicationName(Application app, Locale locale) {
+		Company comp = ((CompanyApplication)app).getCompany();
+		if(comp != null) {
+			return comp.getName();
+		} else {
 			return null;
 		}
 	}
