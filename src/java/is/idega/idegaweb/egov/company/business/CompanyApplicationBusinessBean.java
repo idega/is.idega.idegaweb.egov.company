@@ -459,6 +459,32 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return sendMail(email, subject.toString(), explanationText);
 	}
 	
+	public boolean closeApplication(IWApplicationContext iwac, String applicationId, String explanationText) {
+		if (!setStatusToCompanyApplication(applicationId, getCaseStatusCancelled().getStatus())) {
+			return false;
+		}
+		
+		CompanyApplication compApp = getApplication(applicationId);
+		if (compApp == null) {
+			return false;
+		}
+
+		Email email = null;
+		try {
+			email = getUserBusiness(iwac).getUsersMainEmail(compApp.getApplicantUser());
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		if (email == null) {
+			return false;
+		}
+		
+		IWResourceBundle iwrb = getResourceBundle();
+		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
+		subject.append(iwrb.getLocalizedString("application.reactivated_message_subject", "application was canceled"));
+		return sendMail(email, subject.toString(), explanationText);
+	}
+	
 	public boolean requestInformation(IWApplicationContext iwac, String applicationId, String explanationText) {
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {

@@ -79,6 +79,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	private static final String TX_LOCALIZED_TEXT = "TX_LOCALIZED_TEXT";
 	private static final String TX_LOCALIZED_TEXT_ID = "TX_LOCALIZED_TEXT_ID";
 	private static final String IC_LOCALE_ID = "IC_LOCALE_ID";
+	private static final String EGOV_APPLICATION_GROUP = "EGOV_APPLICATION_GROUP";
 
 	@Override
 	public String getCaseCodeDescription() {
@@ -105,6 +106,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		addManyToOneRelationship(COLUMN_COMPANY, Company.class);
 		addManyToOneRelationship(CATEGORY, ApplicationCategory.class);
 		addManyToOneRelationship(CASE_CODE, CaseCode.class);
+		addManyToManyRelationShip(Group.class, EGOV_APPLICATION_GROUP);
 	}
 	
 	// Getters
@@ -141,6 +143,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		setColumn(COLUMN_COMPANY, company);
 	}	
 
+	//TODO do we need it here?
 	public void addGroup(Group group) throws IDOAddRelationshipException {
 		this.idoAddTo(group);
 	}
@@ -160,7 +163,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	public Integer getPriority() {
 		return (Integer) getColumnValue(PRIORITY);
 	}
-
+	//TODO remove unnecessary methods
 	public void setAgeFrom(int age) {
 		setColumn(AGE_FROM, age);
 	}
@@ -325,7 +328,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	@SuppressWarnings("unchecked")
 	public Collection<Group> getGroups() {
 		try {
-			return super.idoGetRelatedEntities(Group.class);
+			return idoGetRelatedEntities(Group.class);
 		} catch (IDORelationshipException e) {
 			e.printStackTrace();
 		}

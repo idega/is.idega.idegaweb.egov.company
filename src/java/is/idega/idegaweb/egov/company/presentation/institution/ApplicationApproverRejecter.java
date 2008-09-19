@@ -20,6 +20,7 @@ import javax.ejb.FinderException;
 import javax.faces.component.UIComponent;
 
 import com.idega.builder.bean.AdvancedProperty;
+import com.idega.core.builder.data.ICPage;
 import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -44,17 +45,35 @@ import com.idega.util.StringUtil;
 
 public class ApplicationApproverRejecter extends CompanyBlock {
 
-	private static final String VIEW_APPLICATION_PARAMETER = "prm_view_application_in_applications_approver";
-	private static final String APPROVE_APPLICATION_PARAMETER = "prm_approve_application";
-	private static final String REJECT_APPLICATION_PARAMETER = "prm_reject_application";
-	private static final String SEND_EXPLANATION_AND_REJECT_APPLICATION_PARAMETER = "prm_send_explanation_and_reject_application";
+//	private static final String VIEW_APPLICATION_PARAMETER = "prm_view_application_in_applications_approver";
+//	private static final String APPROVE_APPLICATION_PARAMETER = "prm_approve_application";
+//	private static final String REJECT_APPLICATION_PARAMETER = "prm_reject_application";
+//	private static final String SEND_EXPLANATION_AND_REJECT_APPLICATION_PARAMETER = "prm_send_explanation_and_reject_application";
 	
 	private static final String REJECTION_EXPLANATION_TEXT = "application_rejection_explanation_text";
+	private static final String REACTIVATION_EXPLANATION_TEXT = "application_reactivation_explanation_text";
+	
+	public static final int ACTION_VIEW = 1;
+	public static final int ACTION_APPROVE = 2;
+	public static final int ACTION_REJECTION_FORM = 3;
+	public static final int ACTION_REJECT = 4;
+	public static final int ACTION_REQUEST_FORM = 5;
+	public static final int ACTION_REQUEST_INFO = 6;
+	public static final int ACTION_REACTIVATE_FORM = 7;
+	public static final int ACTION_REACTIVATE = 8;
+	public static final int ACTION_OPEN = 9;
+	public static final int ACTION_CLOSING_FORM = 10;
+	public static final int ACTION_CLOSE = 11;
+	public static final int ACTION_EDIT_FORM = 12;
+	public static final int ACTION_CONTRACT = 13;
+	public static final int ACTION_LIST = 14;
 	
 	private String caseCode;
 	private Integer applicationType;
 	
 	private String applicationHandlingResultMessage;
+	
+	private ICPage backPage;
 	
 	@Override
 	protected void present(IWContext iwc) throws Exception {
@@ -66,22 +85,68 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			return;
 		}
 		
-		if (iwc.isParameterSet(VIEW_APPLICATION_PARAMETER)) {
-			viewApplication(iwc);
-			return;
-		}
-		if (iwc.isParameterSet(APPROVE_APPLICATION_PARAMETER)) {
-			approveApplication(iwc);
-		}
-		else if (iwc.isParameterSet(REJECT_APPLICATION_PARAMETER)) {
-			showRejectionForm(iwc);
-			return;
-		}
-		else if (iwc.isParameterSet(SEND_EXPLANATION_AND_REJECT_APPLICATION_PARAMETER)) {
-			rejectApplication(iwc);
-		}
+//		if (iwc.isParameterSet(VIEW_APPLICATION_PARAMETER)) {
+//			viewApplication(iwc);
+//			return;
+//		}
+//		if (iwc.isParameterSet(APPROVE_APPLICATION_PARAMETER)) {
+//			approveApplication(iwc);
+//		}
+//		else if (iwc.isParameterSet(REJECT_APPLICATION_PARAMETER)) {
+//			showRejectionForm(iwc);
+//			return;
+//		}
+//		else if (iwc.isParameterSet(SEND_EXPLANATION_AND_REJECT_APPLICATION_PARAMETER)) {
+//			rejectApplication(iwc);
+//		}
 		
-		listApplications(iwc);
+		switch (parseAction(iwc)) {
+			case ACTION_VIEW:
+				viewApplication(iwc);
+				break;
+			case ACTION_APPROVE:
+				approveApplication(iwc);
+				break;
+			case ACTION_REJECTION_FORM:
+				showRejectionForm(iwc);
+				break;
+			case ACTION_REJECT:
+				rejectApplication(iwc);
+				break;
+//			case ACTION_REQUEST_FORM:
+//				getRequestForm(iwc, application);
+//				break;
+//			case ACTION_REQUEST_INFO:
+//				requestInfo(iwc, application);
+//				break;
+			case ACTION_REACTIVATE_FORM:
+				showReactivationForm(iwc);
+				break;
+			case ACTION_REACTIVATE:
+				reactivateApplication(iwc);
+				break;
+//			case ACTION_OPEN:
+//				reopen(iwc, application);
+//				break;
+			case ACTION_CLOSING_FORM:
+				showClosingForm(iwc);
+				break;
+			case ACTION_CLOSE:
+				closeApplication(iwc);
+				break;
+			case ACTION_LIST:
+				listApplications(iwc);
+				break;
+			default:
+				listApplications(iwc);
+		}
+	}
+	
+	protected int parseAction(IWContext iwc) {
+		if (iwc.isParameterSet(ApplicationCreator.ACTION)) {
+			return Integer.parseInt(iwc.getParameter(ApplicationCreator.ACTION));
+		}
+		return ACTION_LIST;
 	}
 	
 	private void viewApplication(IWContext iwc) {
@@ -90,11 +155,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		
 		CompanyApplicationViewer appViewer = new CompanyApplicationViewer();
 		container.add(appViewer);
-		
-//		ServicesRegister servicesRegister = new ServicesRegister();
-//		container.add(servicesRegister);
-//		servicesRegister.setAddSaveButton(false);
-//		servicesRegister.setAddBackButton(false);
 	}
 	
 	private void approveApplication(IWContext iwc) {
@@ -107,6 +167,79 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		if (StringUtil.isEmpty(applicationHandlingResultMessage)) {
 			applicationHandlingResultMessage = iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred.");
 		}
+		
+		listApplications(iwc);
+	}
+	
+	private void showReactivationForm(IWContext iwc) {
+		Form form = new Form();
+		add(form);
+		form.setStyleClass("adminForm");
+		form.add(getComponentLabel());
+		
+		if (!iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
+			form.add(getNoApplicationSelectedLabel());
+		}
+		else {
+			Object primaryKey = iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
+			Application app = null;
+			try {
+				app = getCompanyBusiness().getApplication(primaryKey);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}
+			if (app == null) {
+				form.add(getNoApplicationSelectedLabel());
+			}
+			else {
+				form.add(new Heading3(iwrb.getLocalizedString("reactivation_of", "Reactivation of:") + " " + getApplicationName(app, iwc.getCurrentLocale())));
+				
+				Map<String, List<UIComponent>> formSectionItems = new HashMap<String, List<UIComponent>>();
+				List<UIComponent> explanationTextSection = new ArrayList<UIComponent>();
+				TextArea explanationText = new TextArea(REJECTION_EXPLANATION_TEXT);
+				explanationTextSection.add(new Label(iwrb.getLocalizedString("explanation_text", "Explanation"), explanationText));
+				explanationTextSection.add(explanationText);
+				formSectionItems.put("REACTIVATION_EXPLANATION_TEXT", explanationTextSection);
+				Layer formSection = getFormSection(iwrb.getLocalizedString("reason_to_reactivate", "Discribe reason of reactivation"), formSectionItems);
+				form.add(formSection);
+			}
+		}
+		
+		Layer buttonLayer = new Layer();
+		buttonLayer.setStyleClass("buttonLayer");
+		form.add(buttonLayer);
+		SubmitButton backButton = new SubmitButton(iwrb.getLocalizedString("back", "Back"));
+		buttonLayer.add(backButton);
+		backButton.setToolTip(iwrb.getLocalizedString("back_to_applications_list", "Do not reactivate and go back to applications list"));
+		
+		if (iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
+			form.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER));
+			
+			SubmitButton rejectButton = new SubmitButton(iwrb.getLocalizedString("reactivate", "Reactivate"), ApplicationCreator.ACTION, ACTION_REACTIVATE + "");
+			
+			buttonLayer.add(rejectButton);
+			rejectButton.setToolTip(iwrb.getLocalizedString("send_explanation_and_reactivate", "Send explanation and reactivate application"));
+			StringBuilder action = new StringBuilder("if (!window.confirm('").append(iwrb.getLocalizedString("are_you_sure", "Are you sure?"));
+			action.append("')) {return false;}");
+			rejectButton.setOnClick(action.toString());
+		}
+	}
+	
+	private void reactivateApplication(IWContext iwc) {
+		boolean result = false;
+		
+		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
+		try {
+			result = compAppBusiness.reactivateApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER), iwc.getParameter(REACTIVATION_EXPLANATION_TEXT));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully reactivated!") :
+			iwrb.getLocalizedString("application_was_not_rejected", "Application was not reactivated! Some error occurred.");
+				
+		listApplications(iwc);
 	}
 	
 	private void showRejectionForm(IWContext iwc) {
@@ -122,7 +255,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			Object primaryKey = iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
 			Application app = null;
 			try {
-				app = getApplicationBusiness(iwc).getApplication(primaryKey);
+				app = getCompanyBusiness().getApplication(primaryKey);
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			} catch (FinderException e) {
@@ -155,8 +288,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		if (iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
 			form.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER));
 			
-			SubmitButton rejectButton = new SubmitButton(iwrb.getLocalizedString("reject", "Reject"), SEND_EXPLANATION_AND_REJECT_APPLICATION_PARAMETER,
-					Boolean.TRUE.toString());
+			SubmitButton rejectButton = new SubmitButton(iwrb.getLocalizedString("reject", "Reject"), ApplicationCreator.ACTION, ACTION_REJECT + "");
 			
 			buttonLayer.add(rejectButton);
 			rejectButton.setToolTip(iwrb.getLocalizedString("send_explanation_and_reject", "Send explanation and reject application"));
@@ -177,6 +309,79 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		}
 		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully rejected!") :
 			iwrb.getLocalizedString("application_was_not_rejected", "Application was not rejected! Some error occurred.");
+		
+		listApplications(iwc);
+	}
+	
+	private void showClosingForm(IWContext iwc) {
+		Form form = new Form();
+		add(form);
+		form.setStyleClass("adminForm");
+		form.add(getComponentLabel());
+		
+		if (!iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
+			form.add(getNoApplicationSelectedLabel());
+		}
+		else {
+			Object primaryKey = iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
+			Application app = null;
+			try {
+				app = getCompanyBusiness().getApplication(primaryKey);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}
+			if (app == null) {
+				form.add(getNoApplicationSelectedLabel());
+			}
+			else {
+				form.add(new Heading3(iwrb.getLocalizedString("closure_of", "Closure of:") + " " + getApplicationName(app, iwc.getCurrentLocale())));
+				
+				Map<String, List<UIComponent>> formSectionItems = new HashMap<String, List<UIComponent>>();
+				List<UIComponent> explanationTextSection = new ArrayList<UIComponent>();
+				TextArea explanationText = new TextArea(REJECTION_EXPLANATION_TEXT);
+				explanationTextSection.add(new Label(iwrb.getLocalizedString("explanation_text", "Explanation"), explanationText));
+				explanationTextSection.add(explanationText);
+				formSectionItems.put("explanationTextSection", explanationTextSection);
+				Layer formSection = getFormSection(iwrb.getLocalizedString("reason_to_close", "Discribe reason of closure"), formSectionItems);
+				form.add(formSection);
+			}
+		}
+		
+		Layer buttonLayer = new Layer();
+		buttonLayer.setStyleClass("buttonLayer");
+		form.add(buttonLayer);
+		SubmitButton backButton = new SubmitButton(iwrb.getLocalizedString("back", "Back"));
+		buttonLayer.add(backButton);
+		backButton.setToolTip(iwrb.getLocalizedString("back_to_applications_list", "Do not close and go back to applications list"));
+		
+		if (iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
+			form.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER));
+			
+			SubmitButton rejectButton = new SubmitButton(iwrb.getLocalizedString("close", "Close"), ApplicationCreator.ACTION, ACTION_CLOSE + "");
+			
+			buttonLayer.add(rejectButton);
+			rejectButton.setToolTip(iwrb.getLocalizedString("send_explanation_and_close", "Send explanation and close application"));
+			StringBuilder action = new StringBuilder("if (!window.confirm('").append(iwrb.getLocalizedString("are_you_sure", "Are you sure?"));
+			action.append("')) {return false;}");
+			rejectButton.setOnClick(action.toString());
+		}
+	}
+	
+	private void closeApplication(IWContext iwc) {
+		boolean result = false;
+		
+		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
+		try {
+			result = compAppBusiness.closeApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER), iwc.getParameter(REJECTION_EXPLANATION_TEXT));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully reactivated!") :
+			iwrb.getLocalizedString("application_was_not_rejected", "Application was not reactivated! Some error occurred.");
+				
+		listApplications(iwc);
 	}
 	
 	private Heading3 getNoApplicationSelectedLabel() {
@@ -201,7 +406,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			return;
 		}
 		if (applicationType == null) {
-			container.add(new Heading4(iwrb.getLocalizedString("we_recommend_select_application_type_first", "We recommond select application type firstly.")));
+			container.add(new Heading4(iwrb.getLocalizedString("we_recommend_select_application_type_first", "We recommend select application type firstly.")));
 		}
 		
 		Form form = new Form();
@@ -217,7 +422,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			form.add(getApplicationsSection(iwrb.getLocalizedString("unhandled_applications", "Unhandled applications") + ":", "unhandledApplicationsStyle",
 				appBusiness.getUnhandledApplications(caseCodes), locale, true));
 		}
-		
+		//TODO fix possible error
 		if (showAllApplications || EgovCompanyConstants.APPLICATION_TYPE_APPROVED.equals(applicationType)) {
 			form.add(getApplicationsSection(iwrb.getLocalizedString("approved_applications", "Approved applications") + ":", "approvedApplicationsStyle",
 				appBusiness.getApprovedApplications(caseCodes), locale, false));
@@ -284,20 +489,19 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			
 			cell = getRowCell(row, null, canDoActions ? "applicationViewBody" : "lastColumn applicationViewBody", false);
 			parameters = new ArrayList<AdvancedProperty>();
-			parameters.add(new AdvancedProperty(VIEW_APPLICATION_PARAMETER, Boolean.TRUE.toString()));
-//			parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, ApplicationCreator.EDIT_ACTION));
-			parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(CompanyApplicationViewer.ACTION_VIEW)));
+			parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_VIEW)));
+			parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_VIEW)));
 			cell.add(getLink(viewImageUri, viewImageTooltip, applicationId, parameters));
 			
 			if (canDoActions) {
 				cell = getRowCell(row, null, "applicationApproveBody", false);
 				parameters = new ArrayList<AdvancedProperty>();
-				parameters.add(new AdvancedProperty(APPROVE_APPLICATION_PARAMETER, Boolean.TRUE.toString()));
+				parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_APPROVE)));
 				cell.add(getLink(approveImageUri, approveImageTooltip, applicationId, parameters));
 				
 				cell = getRowCell(row, null, "lastColumn applicationRejectBody", false);
 				parameters = new ArrayList<AdvancedProperty>();
-				parameters.add(new AdvancedProperty(REJECT_APPLICATION_PARAMETER, Boolean.TRUE.toString()));
+				parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_REJECTION_FORM)));
 				cell.add(getLink(rejectImageUri, rejectImageTooltip, applicationId, parameters));
 			}
 			
@@ -369,4 +573,11 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		this.applicationType = applicationType;
 	}
 	
+	public ICPage getBackPage() {
+		return backPage;
+	}
+
+	public void setBackPage(ICPage backPage) {
+		this.backPage = backPage;
+	}	
 }

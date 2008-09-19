@@ -11,9 +11,9 @@ import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.data.CompanyApplication;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
+import is.idega.idegaweb.egov.company.presentation.institution.ApplicationApproverRejecter;
 
 import java.rmi.RemoteException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -23,7 +23,6 @@ import javax.ejb.FinderException;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.message.data.Message;
-import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.contact.data.Email;
@@ -33,11 +32,9 @@ import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
-import com.idega.presentation.text.Paragraph;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
-import com.idega.presentation.ui.TextArea;
 import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.data.User;
@@ -46,22 +43,22 @@ import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.Name;
 
 public class CompanyApplicationViewer extends CompanyBlock {
-	private static final String PARAMETER_ACTION = "prm_action";
-	private static final String PARAMETER_MESSAGE = "prm_message";
+//	private static final String PARAMETER_MESSAGE = "prm_message";
 
-	public static final int ACTION_VIEW = 1;
-	private static final int ACTION_APPROVE = 2;
-	private static final int ACTION_REJECTION_FORM = 3;
-	private static final int ACTION_REJECT = 4;
-	private static final int ACTION_REQUEST_FORM = 5;
-	private static final int ACTION_REQUEST_INFO = 6;
-	private static final int ACTION_REACTIVATE = 7;
-	private static final int ACTION_OPEN = 8;
-	private static final int ACTION_CLOSING_FORM = 9;
-	private static final int ACTION_CLOSE = 10;
-	private static final int ACTION_EDIT_FORM = 11;
-	private static final int ACTION_CONTRACT = 12;
-//	private static final int ACTION_STORE = 12;
+//	private static final int ACTION_VIEW = 1;
+//	private static final int ACTION_APPROVE = 2;
+//	private static final int ACTION_REJECTION_FORM = 3;
+//	private static final int ACTION_REJECT = 4;
+//	private static final int ACTION_REQUEST_FORM = 5;
+//	private static final int ACTION_REQUEST_INFO = 6;
+//	private static final int ACTION_REACTIVATE_FORM = 7;
+//	private static final int ACTION_REACTIVATE = 8;
+//	private static final int ACTION_OPEN = 9;
+//	private static final int ACTION_CLOSING_FORM = 10;
+//	private static final int ACTION_CLOSE = 11;
+//	private static final int ACTION_EDIT_FORM = 12;
+//	private static final int ACTION_CONTRACT = 13;
+//	private static final int ACTION_LIST = 14;
 
 	private ICPage backPage;
 	
@@ -86,57 +83,57 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		}
 
 		switch (parseAction(iwc)) {
-			case ACTION_VIEW:
+			case ApplicationApproverRejecter.ACTION_VIEW:
 				getViewerForm(iwc, application);
 				break;
-			case ACTION_APPROVE:
-				approve(iwc, application);
-				break;
-			case ACTION_REJECTION_FORM:
-				getRejectionForm(iwc, application);
-				break;
-			case ACTION_REJECT:
-				reject(iwc, application);
-				break;
-			case ACTION_REQUEST_FORM:
-				getRequestForm(iwc, application);
-				break;
-			case ACTION_REQUEST_INFO:
-				requestInfo(iwc, application);
-				break;
-			case ACTION_REACTIVATE:
-				reactivate(iwc, application);
-				break;
-			case ACTION_OPEN:
-				reopen(iwc, application);
-				break;
-			case ACTION_CLOSING_FORM:
-				getClosingForm(iwc, application);
-				break;
-			case ACTION_CLOSE:
-				close(iwc, application);
-				break;
-//TODO		finish contract pdf
-//			case ACTION_CONTRACT:
+//			case ACTION_APPROVE:
+//				approve(iwc, application);
+//				break;
+//			case ACTION_REJECTION_FORM:
+//				getRejectionForm(iwc, application);
+//				break;
+//			case ACTION_REJECT:
+//				reject(iwc, application);
+//				break;
+//			case ACTION_REQUEST_FORM:
+//				getRequestForm(iwc, application);
+//				break;
+//			case ACTION_REQUEST_INFO:
+//				requestInfo(iwc, application);
+//				break;
+//			case ACTION_REACTIVATE:
+//				reactivate(iwc, application);
+//				break;
+//			case ACTION_OPEN:
+//				reopen(iwc, application);
+//				break;
+//			case ACTION_CLOSING_FORM:
+//				getClosingForm(iwc, application);
+//				break;
+//			case ACTION_CLOSE:
 //				close(iwc, application);
 //				break;
-			
-				
-		  /*case ACTION_EDIT_FORM:
-				getEditForm(iwc, application);
-				break;
-			case ACTION_STORE:
-				if (!store(iwc, application)) {
-					getEditForm(iwc, application);
-				}
-				break;*/
+////TODO		finish contract pdf
+////			case ACTION_CONTRACT:
+////				close(iwc, application);
+////				break;
+//			
+//				
+//		  /*case ACTION_EDIT_FORM:
+//				getEditForm(iwc, application);
+//				break;
+//			case ACTION_STORE:
+//				if (!store(iwc, application)) {
+//					getEditForm(iwc, application);
+//				}
+//				break;*/
 		}
 	}
 
 	private int parseAction(IWContext iwc) {
-		int action = ACTION_VIEW;
-		if (iwc.isParameterSet(PARAMETER_ACTION)) {
-			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+		int action = ApplicationApproverRejecter.ACTION_VIEW;
+		if (iwc.isParameterSet(ApplicationCreator.ACTION)) {
+			action = Integer.parseInt(iwc.getParameter(ApplicationCreator.ACTION));
 		}
 
 		return action;
@@ -144,7 +141,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 
 	private void getViewerForm(IWContext iwc, CompanyApplication application) throws RemoteException {
 		Form form = new Form();
-		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		form.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_VIEW));
 		form.maintainParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
 		add(form);
 
@@ -388,230 +385,230 @@ public class CompanyApplicationViewer extends CompanyBlock {
 			if (status.equals(getCompanyBusiness().getCaseStatusOpen()) || status.equals(getCompanyBusiness().getCaseStatusReview())) {
 				Link approve = getButtonLink(iwrb.getLocalizedString("approve", "Approve"));
 				approve.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
-				approve.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_APPROVE));
+				approve.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_APPROVE));
 				approve.setClickConfirmation(iwrb.getLocalizedString("application.approve_confirmation", "Are you sure you want to approve this application?"));
 				bottom.add(approve);
 
 				Link reject = getButtonLink(iwrb.getLocalizedString("reject", "Reject"));
-				reject.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_REJECTION_FORM));
+				reject.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REJECTION_FORM));
 				reject.setToFormSubmit(form);
 				bottom.add(reject);
 
-				Link requestInfo = getButtonLink(iwrb.getLocalizedString("request_info", "Request info"));
-				requestInfo.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_REQUEST_FORM));
-				requestInfo.setToFormSubmit(form);
-				bottom.add(requestInfo);
+//				Link requestInfo = getButtonLink(iwrb.getLocalizedString("request_info", "Request info"));
+//				requestInfo.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ACTION_REQUEST_FORM));
+//				requestInfo.setToFormSubmit(form);
+//				bottom.add(requestInfo);
 			}
 			else if (status.equals(getCompanyBusiness().getCaseStatusDenied())) {
 				Link reactivate = getButtonLink(iwrb.getLocalizedString("reactivate", "Reactivate"));
-				reactivate.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_REACTIVATE));
+				reactivate.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REACTIVATE));
 				reactivate.setToFormSubmit(form);
 				bottom.add(reactivate);
 			}
 			else if (status.equals(getCompanyBusiness().getCaseStatusGranted())) {
 				Link close = getButtonLink(iwrb.getLocalizedString("close_account", "Close account"));
-				close.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_CLOSING_FORM));
+				close.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_CLOSING_FORM));
 				close.setToFormSubmit(form);
 				bottom.add(close);
 			}
-			else if (status.equals(getCompanyBusiness().getCaseStatusCancelled())) {
-				Link open = getButtonLink(iwrb.getLocalizedString("open_account", "Open account"));
-				open.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
-				open.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_OPEN));
-				open.setClickConfirmation(iwrb.getLocalizedString("application.open_confirmation", "Are you sure you want to reopen this application?"));
-				bottom.add(open);
-			}
+//			else if (status.equals(getCompanyBusiness().getCaseStatusCancelled())) {
+//				Link open = getButtonLink(iwrb.getLocalizedString("open_account", "Open account"));
+//				open.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
+//				open.addParameter(ApplicationCreator.ACTION, String.valueOf(ACTION_OPEN));
+//				open.setClickConfirmation(iwrb.getLocalizedString("application.open_confirmation", "Are you sure you want to reopen this application?"));
+//				bottom.add(open);
+//			}
 
-		Link edit = getButtonLink(iwrb.getLocalizedString("edit", "Edit"));
-		edit.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
-		edit.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_EDIT_FORM));
-		bottom.add(edit);
+//		Link edit = getButtonLink(iwrb.getLocalizedString("edit", "Edit"));
+//		edit.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
+//		edit.addParameter(ApplicationCreator.ACTION, String.valueOf(ACTION_EDIT_FORM));
+//		bottom.add(edit);
 		
 		Link contract = getButtonLink(iwrb.getLocalizedString("contract.file_name", "Contract"));
-		edit.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
-		edit.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_CONTRACT));
+		contract.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
+		contract.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_CONTRACT));
 		bottom.add(contract);
 	}
 
-	private void getRejectionForm(IWContext iwc, CompanyApplication application) throws RemoteException {
-		Form form = new Form();
-		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_REJECTION_FORM));
-		form.maintainParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
-		add(form);
-
-		Layer header = new Layer(Layer.DIV);
-		header.setStyleClass("header");
-		form.add(header);
-
-		Heading1 heading = new Heading1(iwrb.getLocalizedString("application.overview", "Application overview"));
-		header.add(heading);
-
-		form.add(getCompanyInfo(iwc, application.getCompany()));
-
-		heading = new Heading1(iwrb.getLocalizedString("application.rejection_info", "Rejection info"));
-		heading.setStyleClass("subHeader");
-		heading.setStyleClass("topSubHeader");
-		form.add(heading);
-
-		Layer section = new Layer(Layer.DIV);
-		section.setStyleClass("formSection");
-		form.add(section);
-
-		Layer helpLayer = new Layer(Layer.DIV);
-		helpLayer.setStyleClass("helperText");
-		helpLayer.add(new Text(iwrb.getLocalizedString("application.rejection_help", "Please enter a message that will be sent to the sender of the application about the rejection.")));
-		section.add(helpLayer);
-
-		Object[] arguments = { application.getName(), application.getCompany().getPersonalID() };
-
-		TextArea message = new TextArea(PARAMETER_MESSAGE);
-		message.setStyleClass("messageArea");
-		message.setContent(MessageFormat.format(iwrb.getLocalizedString("application.rejected_message_body", "Your application for company account for {0}, {1} has been rejected."), arguments));
-
-		Layer formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		Label label = new Label(iwrb.getLocalizedString("application.rejection_message", "Rejection message"), message);
-		formItem.add(label);
-		formItem.add(message);
-		section.add(formItem);
-
-		Layer clearLayer = new Layer(Layer.DIV);
-		clearLayer.setStyleClass("Clear");
-		section.add(clearLayer);
-
-		Layer bottom = new Layer(Layer.DIV);
-		bottom.setStyleClass("bottom");
-		form.add(bottom);
-
-		Link send = getButtonLink(iwrb.getLocalizedString("send", "Send"));
-		send.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_REJECT));
-		send.setToFormSubmit(form);
-		bottom.add(send);
-
-		Link back = getButtonLink(iwrb.getLocalizedString("back", "Back"));
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
-		back.setToFormSubmit(form);
-		bottom.add(back);
-	}
-
-	private void getRequestForm(IWContext iwc, CompanyApplication application) throws RemoteException {
-		Form form = new Form();
-		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_REQUEST_FORM));
-		form.maintainParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
-		add(form);
-
-		Layer header = new Layer(Layer.DIV);
-		header.setStyleClass("header");
-		form.add(header);
-
-		Heading1 heading = new Heading1(iwrb.getLocalizedString("application.overview", "Application overview"));
-		header.add(heading);
-
-		form.add(getCompanyInfo(iwc, application.getCompany()));
-
-		heading = new Heading1(iwrb.getLocalizedString("application.request_info", "Request further info"));
-		heading.setStyleClass("subHeader");
-		heading.setStyleClass("topSubHeader");
-		form.add(heading);
-
-		Layer section = new Layer(Layer.DIV);
-		section.setStyleClass("formSection");
-		form.add(section);
-
-		Layer helpLayer = new Layer(Layer.DIV);
-		helpLayer.setStyleClass("helperText");
-		helpLayer.add(new Text(iwrb.getLocalizedString("application.request_info_help", "Please enter a message that will be sent to the sender of the application stating what is required.")));
-		section.add(helpLayer);
-
-		TextArea message = new TextArea(PARAMETER_MESSAGE);
-		message.setStyleClass("messageArea");
-
-		Layer formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		Label label = new Label(iwrb.getLocalizedString("application.request_info_message", "Request info message"), message);
-		formItem.add(label);
-		formItem.add(message);
-		section.add(formItem);
-
-		Layer clearLayer = new Layer(Layer.DIV);
-		clearLayer.setStyleClass("Clear");
-		section.add(clearLayer);
-
-		Layer bottom = new Layer(Layer.DIV);
-		bottom.setStyleClass("bottom");
-		form.add(bottom);
-
-		Link send = getButtonLink(iwrb.getLocalizedString("send", "Send"));
-		send.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_REQUEST_INFO));
-		send.setToFormSubmit(form);
-		bottom.add(send);
-
-		Link back = getButtonLink(iwrb.getLocalizedString("back", "Back"));
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
-		back.setToFormSubmit(form);
-		bottom.add(back);
-	}
-
-	private void getClosingForm(IWContext iwc, CompanyApplication application) throws RemoteException {
-		Form form = new Form();
-		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_CLOSING_FORM));
-		form.maintainParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
-		add(form);
-
-		Layer header = new Layer(Layer.DIV);
-		header.setStyleClass("header");
-		form.add(header);
-
-		Heading1 heading = new Heading1(iwrb.getLocalizedString("application.overview", "Application overview"));
-		header.add(heading);
-
-		form.add(getCompanyInfo(iwc, application.getCompany()));
-
-		heading = new Heading1(iwrb.getLocalizedString("application.closing_info", "Closing info"));
-		heading.setStyleClass("subHeader");
-		heading.setStyleClass("topSubHeader");
-		form.add(heading);
-
-		Layer section = new Layer(Layer.DIV);
-		section.setStyleClass("formSection");
-		form.add(section);
-
-		Layer helpLayer = new Layer(Layer.DIV);
-		helpLayer.setStyleClass("helperText");
-		helpLayer.add(new Text(iwrb.getLocalizedString("application.closing_help", "Please enter a message that will be sent to the sender of the application about the closing.")));
-		section.add(helpLayer);
-
-		Object[] arguments = { application.getName(), application.getCompany().getPersonalID() };
-
-		TextArea message = new TextArea(PARAMETER_MESSAGE);
-		message.setStyleClass("messageArea");
-		message.setContent(MessageFormat.format(iwrb.getLocalizedString("application.closing_message_body", "Your application for company account for {0}, {1} has been closed."), arguments));
-
-		Layer formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		Label label = new Label(iwrb.getLocalizedString("application.closing_message", "Closing message"), message);
-		formItem.add(label);
-		formItem.add(message);
-		section.add(formItem);
-
-		Layer clearLayer = new Layer(Layer.DIV);
-		clearLayer.setStyleClass("Clear");
-		section.add(clearLayer);
-
-		Layer bottom = new Layer(Layer.DIV);
-		bottom.setStyleClass("bottom");
-		form.add(bottom);
-
-		Link send = getButtonLink(iwrb.getLocalizedString("send", "Send"));
-		send.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_CLOSE));
-		send.setToFormSubmit(form);
-		bottom.add(send);
-
-		Link back = getButtonLink(iwrb.getLocalizedString("back", "Back"));
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
-		back.setToFormSubmit(form);
-		bottom.add(back);
-	}
+//	private void getRejectionForm(IWContext iwc, CompanyApplication application) throws RemoteException {
+//		Form form = new Form();
+//		form.addParameter(ApplicationCreator.ACTION, String.valueOf(ACTION_REJECTION_FORM));
+//		form.maintainParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
+//		add(form);
+//
+//		Layer header = new Layer(Layer.DIV);
+//		header.setStyleClass("header");
+//		form.add(header);
+//
+//		Heading1 heading = new Heading1(iwrb.getLocalizedString("application.overview", "Application overview"));
+//		header.add(heading);
+//
+//		form.add(getCompanyInfo(iwc, application.getCompany()));
+//
+//		heading = new Heading1(iwrb.getLocalizedString("application.rejection_info", "Rejection info"));
+//		heading.setStyleClass("subHeader");
+//		heading.setStyleClass("topSubHeader");
+//		form.add(heading);
+//
+//		Layer section = new Layer(Layer.DIV);
+//		section.setStyleClass("formSection");
+//		form.add(section);
+//
+//		Layer helpLayer = new Layer(Layer.DIV);
+//		helpLayer.setStyleClass("helperText");
+//		helpLayer.add(new Text(iwrb.getLocalizedString("application.rejection_help", "Please enter a message that will be sent to the sender of the application about the rejection.")));
+//		section.add(helpLayer);
+//
+//		Object[] arguments = { application.getName(), application.getCompany().getPersonalID() };
+//
+//		TextArea message = new TextArea(PARAMETER_MESSAGE);
+//		message.setStyleClass("messageArea");
+//		message.setContent(MessageFormat.format(iwrb.getLocalizedString("application.rejected_message_body", "Your application for company account for {0}, {1} has been rejected."), arguments));
+//
+//		Layer formItem = new Layer(Layer.DIV);
+//		formItem.setStyleClass("formItem");
+//		Label label = new Label(iwrb.getLocalizedString("application.rejection_message", "Rejection message"), message);
+//		formItem.add(label);
+//		formItem.add(message);
+//		section.add(formItem);
+//
+//		Layer clearLayer = new Layer(Layer.DIV);
+//		clearLayer.setStyleClass("Clear");
+//		section.add(clearLayer);
+//
+//		Layer bottom = new Layer(Layer.DIV);
+//		bottom.setStyleClass("bottom");
+//		form.add(bottom);
+//
+//		Link send = getButtonLink(iwrb.getLocalizedString("send", "Send"));
+//		send.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ACTION_REJECT));
+//		send.setToFormSubmit(form);
+//		bottom.add(send);
+//
+//		Link back = getButtonLink(iwrb.getLocalizedString("back", "Back"));
+//		back.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ACTION_VIEW));
+//		back.setToFormSubmit(form);
+//		bottom.add(back);
+//	}
+//
+//	public void getRequestForm(IWContext iwc, CompanyApplication application) throws RemoteException {
+//		Form form = new Form();
+//		form.addParameter(ApplicationCreator.ACTION, String.valueOf(ACTION_REQUEST_FORM));
+//		form.maintainParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
+//		add(form);
+//
+//		Layer header = new Layer(Layer.DIV);
+//		header.setStyleClass("header");
+//		form.add(header);
+//
+//		Heading1 heading = new Heading1(iwrb.getLocalizedString("application.overview", "Application overview"));
+//		header.add(heading);
+//
+//		form.add(getCompanyInfo(iwc, application.getCompany()));
+//
+//		heading = new Heading1(iwrb.getLocalizedString("application.request_info", "Request further info"));
+//		heading.setStyleClass("subHeader");
+//		heading.setStyleClass("topSubHeader");
+//		form.add(heading);
+//
+//		Layer section = new Layer(Layer.DIV);
+//		section.setStyleClass("formSection");
+//		form.add(section);
+//
+//		Layer helpLayer = new Layer(Layer.DIV);
+//		helpLayer.setStyleClass("helperText");
+//		helpLayer.add(new Text(iwrb.getLocalizedString("application.request_info_help", "Please enter a message that will be sent to the sender of the application stating what is required.")));
+//		section.add(helpLayer);
+//
+//		TextArea message = new TextArea(PARAMETER_MESSAGE);
+//		message.setStyleClass("messageArea");
+//
+//		Layer formItem = new Layer(Layer.DIV);
+//		formItem.setStyleClass("formItem");
+//		Label label = new Label(iwrb.getLocalizedString("application.request_info_message", "Request info message"), message);
+//		formItem.add(label);
+//		formItem.add(message);
+//		section.add(formItem);
+//
+//		Layer clearLayer = new Layer(Layer.DIV);
+//		clearLayer.setStyleClass("Clear");
+//		section.add(clearLayer);
+//
+//		Layer bottom = new Layer(Layer.DIV);
+//		bottom.setStyleClass("bottom");
+//		form.add(bottom);
+//
+//		Link send = getButtonLink(iwrb.getLocalizedString("send", "Send"));
+//		send.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ACTION_REQUEST_INFO));
+//		send.setToFormSubmit(form);
+//		bottom.add(send);
+//
+//		Link back = getButtonLink(iwrb.getLocalizedString("back", "Back"));
+//		back.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ACTION_VIEW));
+//		back.setToFormSubmit(form);
+//		bottom.add(back);
+//	}
+//
+//	private void getClosingForm(IWContext iwc, CompanyApplication application) throws RemoteException {
+//		Form form = new Form();
+//		form.addParameter(ApplicationCreator.ACTION, String.valueOf(ACTION_CLOSING_FORM));
+//		form.maintainParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
+//		add(form);
+//
+//		Layer header = new Layer(Layer.DIV);
+//		header.setStyleClass("header");
+//		form.add(header);
+//
+//		Heading1 heading = new Heading1(iwrb.getLocalizedString("application.overview", "Application overview"));
+//		header.add(heading);
+//
+//		form.add(getCompanyInfo(iwc, application.getCompany()));
+//
+//		heading = new Heading1(iwrb.getLocalizedString("application.closing_info", "Closing info"));
+//		heading.setStyleClass("subHeader");
+//		heading.setStyleClass("topSubHeader");
+//		form.add(heading);
+//
+//		Layer section = new Layer(Layer.DIV);
+//		section.setStyleClass("formSection");
+//		form.add(section);
+//
+//		Layer helpLayer = new Layer(Layer.DIV);
+//		helpLayer.setStyleClass("helperText");
+//		helpLayer.add(new Text(iwrb.getLocalizedString("application.closing_help", "Please enter a message that will be sent to the sender of the application about the closing.")));
+//		section.add(helpLayer);
+//
+//		Object[] arguments = { application.getName(), application.getCompany().getPersonalID() };
+//
+//		TextArea message = new TextArea(PARAMETER_MESSAGE);
+//		message.setStyleClass("messageArea");
+//		message.setContent(MessageFormat.format(iwrb.getLocalizedString("application.closing_message_body", "Your application for company account for {0}, {1} has been closed."), arguments));
+//
+//		Layer formItem = new Layer(Layer.DIV);
+//		formItem.setStyleClass("formItem");
+//		Label label = new Label(iwrb.getLocalizedString("application.closing_message", "Closing message"), message);
+//		formItem.add(label);
+//		formItem.add(message);
+//		section.add(formItem);
+//
+//		Layer clearLayer = new Layer(Layer.DIV);
+//		clearLayer.setStyleClass("Clear");
+//		section.add(clearLayer);
+//
+//		Layer bottom = new Layer(Layer.DIV);
+//		bottom.setStyleClass("bottom");
+//		form.add(bottom);
+//
+//		Link send = getButtonLink(iwrb.getLocalizedString("send", "Send"));
+//		send.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ACTION_CLOSE));
+//		send.setToFormSubmit(form);
+//		bottom.add(send);
+//
+//		Link back = getButtonLink(iwrb.getLocalizedString("back", "Back"));
+//		back.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ACTION_VIEW));
+//		back.setToFormSubmit(form);
+//		bottom.add(back);
+//	}
 
 	/*private void getEditForm(IWContext iwc, CompanyApplication application) throws RemoteException {
 		super.getParentPage().addJavascriptURL("/dwr/interface/FSKDWRUtil.js");
@@ -620,7 +617,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		super.getParentPage().addJavascriptURL(getBundle(iwc).getResourcesVirtualPath() + "/js/application.js");
 
 		Form form = new Form();
-		form.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_EDIT_FORM));
+		form.addParameter(ApplicationCreator.ACTION, String.valueOf(ACTION_EDIT_FORM));
 		form.maintainParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
 		add(form);
 
@@ -853,49 +850,49 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		form.add(bottom);
 
 		Link send = getButtonLink(iwrb.getLocalizedString("store", "Store"));
-		send.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_STORE));
+		send.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ACTION_STORE));
 		send.setToFormSubmit(form);
 		bottom.add(send);
 
 		Link back = getButtonLink(iwrb.getLocalizedString("back", "Back"));
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
+		back.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ACTION_VIEW));
 		back.setToFormSubmit(form);
 		bottom.add(back);
 	}*/
 
-	private void approve(IWContext iwc, CompanyApplication application) throws RemoteException {
-		getCompanyBusiness().approveApplication(iwc, application.getId());
-
-		Company company = application.getCompany();
-		Object[] arguments = { company.getName(), PersonalIDFormatter.format(company.getPersonalID(), iwc.getCurrentLocale()) };
-
-		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.accepted_heading", "Application accepted"), MessageFormat.format(iwrb.getLocalizedString("application.accepted_text", "Your application for company account has been accepted."), arguments));
-	}
-
-	private void reject(IWContext iwc, CompanyApplication application) throws RemoteException {
-		getCompanyBusiness().rejectApplication(iwc, application.getId(), iwc.getParameter(PARAMETER_MESSAGE));
-		showReceipt(iwc, application, iwrb.getLocalizedString("application.rejected_text", "Your application for company account has been rejected"), iwrb.getLocalizedString("application.rejected_heading", "Application rejected"), iwrb.getLocalizedString("application.rejected_text", "Your application for company account has been rejected."));
-	}
-
-	private void requestInfo(IWContext iwc, CompanyApplication application) throws RemoteException {
-		getCompanyBusiness().requestInformation(iwc, application.getId(), iwc.getParameter(PARAMETER_MESSAGE));
-		showReceipt(iwc, application, iwrb.getLocalizedString("application.request_info", "Request further info"), iwrb.getLocalizedString("application.request_info_heading", "Request for further info sent"), iwrb.getLocalizedString("application.request_info_text", "A request for further information has been sent to the application's owner."));
-	}
-
-	private void reactivate(IWContext iwc, CompanyApplication application) throws RemoteException {
-		getCompanyBusiness().reactivateApplication(iwc, application.getId(), iwc.getParameter(PARAMETER_MESSAGE));
-		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.reactivated_heading", "Application reactivate"), iwrb.getLocalizedString("application.reactivated_text", "Application has been reactivated."));
-	}
-
-	private void reopen(IWContext iwc, CompanyApplication application) throws RemoteException {
-//		getCompanyBusiness().reopenApplication(application, iwc.getCurrentUser(), iwc.getCurrentLocale());
-//		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.reopen_heading", "Application reopened"), iwrb.getLocalizedString("application.reopen_text", "Application has been reopened."));
-	}
-
-	private void close(IWContext iwc, CompanyApplication application) throws RemoteException {
-//		getCompanyBusiness().closeApplication(application, iwc.getCurrentUser(), iwc.getCurrentLocale(), iwc.getParameter(PARAMETER_MESSAGE));
-//		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.closed_heading", "Application closed"), iwrb.getLocalizedString("application.closed_text", "Application has been closed."));
-	}
+//	private void approve(IWContext iwc, CompanyApplication application) throws RemoteException {
+//		getCompanyBusiness().approveApplication(iwc, application.getId());
+//
+//		Company company = application.getCompany();
+//		Object[] arguments = { company.getName(), PersonalIDFormatter.format(company.getPersonalID(), iwc.getCurrentLocale()) };
+//
+//		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.accepted_heading", "Application accepted"), MessageFormat.format(iwrb.getLocalizedString("application.accepted_text", "Your application for company account has been accepted."), arguments));
+//	}
+//
+//	private void reject(IWContext iwc, CompanyApplication application) throws RemoteException {
+//		getCompanyBusiness().rejectApplication(iwc, application.getId(), iwc.getParameter(PARAMETER_MESSAGE));
+//		showReceipt(iwc, application, iwrb.getLocalizedString("application.rejected_text", "Your application for company account has been rejected"), iwrb.getLocalizedString("application.rejected_heading", "Application rejected"), iwrb.getLocalizedString("application.rejected_text", "Your application for company account has been rejected."));
+//	}
+//
+//	private void requestInfo(IWContext iwc, CompanyApplication application) throws RemoteException {
+//		getCompanyBusiness().requestInformation(iwc, application.getId(), iwc.getParameter(PARAMETER_MESSAGE));
+//		showReceipt(iwc, application, iwrb.getLocalizedString("application.request_info", "Request further info"), iwrb.getLocalizedString("application.request_info_heading", "Request for further info sent"), iwrb.getLocalizedString("application.request_info_text", "A request for further information has been sent to the application's owner."));
+//	}
+//
+//	private void reactivate(IWContext iwc, CompanyApplication application) throws RemoteException {
+//		getCompanyBusiness().reactivateApplication(iwc, application.getId(), iwc.getParameter(PARAMETER_MESSAGE));
+//		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.reactivated_heading", "Application reactivate"), iwrb.getLocalizedString("application.reactivated_text", "Application has been reactivated."));
+//	}
+//
+//	private void reopen(IWContext iwc, CompanyApplication application) throws RemoteException {
+////		getCompanyBusiness().reopenApplication(application, iwc.getCurrentUser(), iwc.getCurrentLocale());
+////		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.reopen_heading", "Application reopened"), iwrb.getLocalizedString("application.reopen_text", "Application has been reopened."));
+//	}
+//
+//	private void close(IWContext iwc, CompanyApplication application) throws RemoteException {
+////		getCompanyBusiness().closeApplication(application, iwc.getCurrentUser(), iwc.getCurrentLocale(), iwc.getParameter(PARAMETER_MESSAGE));
+////		showReceipt(iwc, application, iwrb.getLocalizedString("application.overview", "Application overview"), iwrb.getLocalizedString("application.closed_heading", "Application closed"), iwrb.getLocalizedString("application.closed_text", "Application has been closed."));
+//	}
 
 	/*private boolean store(IWContext iwc, CompanyApplication application) throws RemoteException {
 		if (!iwc.isParameterSet(PARAMETER_PHONE)) {
@@ -959,48 +956,48 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		return true;
 	}*/
 
-	private void showReceipt(IWContext iwc, CompanyApplication application, String title, String subject, String body) throws RemoteException {
-		Form form = new Form();
-		add(form);
-
-		Layer header = new Layer(Layer.DIV);
-		header.setStyleClass("header");
-		form.add(header);
-
-		Heading1 heading = new Heading1(title);
-		header.add(heading);
-
-		Layer layer = new Layer(Layer.DIV);
-		layer.setStyleClass("receipt");
-		form.add(layer);
-
-		Layer image = new Layer(Layer.DIV);
-		image.setStyleClass("receiptImage");
-		layer.add(image);
-
-		heading = new Heading1(subject);
-		layer.add(heading);
-
-		Paragraph paragraph = new Paragraph();
-		paragraph.add(new Text(body));
-		layer.add(paragraph);
-
-		Layer bottom = new Layer(Layer.DIV);
-		bottom.setStyleClass("bottom");
-		form.add(bottom);
-
-		Link home = getButtonLink(iwrb.getLocalizedString("back", "Back"));
-		home.setStyleClass("buttonHome");
-		if (getBackPage() != null) {
-			home.setPage(getBackPage());
-		}
-		else {
-			home.addParameter(PARAMETER_ACTION, String.valueOf(ACTION_VIEW));
-			home.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
-		}
-		bottom.add(home);
-	}
-
+//	private void showReceipt(IWContext iwc, CompanyApplication application, String title, String subject, String body) throws RemoteException {
+//		Form form = new Form();
+//		add(form);
+//
+//		Layer header = new Layer(Layer.DIV);
+//		header.setStyleClass("header");
+//		form.add(header);
+//
+//		Heading1 heading = new Heading1(title);
+//		header.add(heading);
+//
+//		Layer layer = new Layer(Layer.DIV);
+//		layer.setStyleClass("receipt");
+//		form.add(layer);
+//
+//		Layer image = new Layer(Layer.DIV);
+//		image.setStyleClass("receiptImage");
+//		layer.add(image);
+//
+//		heading = new Heading1(subject);
+//		layer.add(heading);
+//
+//		Paragraph paragraph = new Paragraph();
+//		paragraph.add(new Text(body));
+//		layer.add(paragraph);
+//
+//		Layer bottom = new Layer(Layer.DIV);
+//		bottom.setStyleClass("bottom");
+//		form.add(bottom);
+//
+//		Link home = getButtonLink(iwrb.getLocalizedString("back", "Back"));
+//		home.setStyleClass("buttonHome");
+//		if (getBackPage() != null) {
+//			home.setPage(getBackPage());
+//		}
+//		else {
+//			home.addParameter(ApplicationCreator.ACTION, String.valueOf(ACTION_VIEW));
+//			home.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
+//		}
+//		bottom.add(home);
+//	}
+//
 	public ICPage getBackPage() {
 		return backPage;
 	}

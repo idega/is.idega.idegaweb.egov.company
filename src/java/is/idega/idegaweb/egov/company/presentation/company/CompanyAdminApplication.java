@@ -9,8 +9,6 @@ import is.idega.idegaweb.egov.fsk.business.ApplicationSession;
 import is.idega.idegaweb.egov.fsk.business.CompanyDWR;
 import is.idega.idegaweb.egov.fsk.business.FSKBusiness;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,14 +28,10 @@ import com.idega.core.builder.data.ICPage;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.contact.data.PhoneTypeBMPBean;
-import com.idega.core.file.data.ICFile;
-import com.idega.core.file.data.ICFileHome;
-import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
-import com.idega.io.UploadFile;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
@@ -55,7 +49,6 @@ import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.EmailValidator;
-import com.idega.util.FileUtil;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.PresentationUtil;
 import com.idega.util.text.Name;
@@ -1005,47 +998,6 @@ public class CompanyAdminApplication extends ApplicationForm {
 	}	
 	
 	protected int parseAction(IWContext iwc) {
-		UploadFile uploadFile = iwc.getUploadedFile();
-		if (uploadFile != null && uploadFile.getName() != null && uploadFile.getName().length() > 0) {
-			try {
-				String fileType = iwc.getParameter(PARAMETER_FILE_TYPE);
-				if (fileType != null) {
-					FileInputStream input = new FileInputStream(uploadFile.getRealPath());
-
-					ICFile attachment = ((ICFileHome) IDOLookup.getHome(ICFile.class)).create();
-					attachment.setName(uploadFile.getName());
-					attachment.setMimeType(uploadFile.getMimeType());
-					attachment.setFileValue(input);
-					attachment.setFileSize((int) uploadFile.getSize());
-					attachment.store();
-
-					getSession(iwc).addFile(attachment, fileType);
-
-					uploadFile.setId(((Integer) attachment.getPrimaryKey()).intValue());
-				}
-				else {
-					setError(PARAMETER_FILE_TYPE, iwrb.getLocalizedString("application_error.must_select_file_type", "You have to select a file type"));
-				}
-
-				try {
-					FileUtil.delete(uploadFile);
-				}
-				catch (Exception ex) {
-					System.err.println("MediaBusiness: deleting the temporary file at " + uploadFile.getRealPath() + " failed.");
-				}
-			}
-			catch (RemoteException e) {
-				e.printStackTrace(System.err);
-				uploadFile.setId(-1);
-			}
-			catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-			catch (CreateException ce) {
-				ce.printStackTrace();
-			}
-		}
-
 		if (iwc.isParameterSet(PARAMETER_ACTION)) {
 			return Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
 		}

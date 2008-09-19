@@ -62,6 +62,12 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 */
 	public boolean reactivateApplication(IWApplicationContext iwac, String applicationId,
 			String explanationText) throws RemoteException;
+	
+	/**
+	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#closeApplication
+	 */
+	public boolean closeApplication(IWApplicationContext iwac, String applicationId,
+			String explanationText) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#reactivateApplication
