@@ -3,7 +3,7 @@
 
 <dwr>
 	<allow>
-		<create creator="jsf" javascript="UserCompanyBusiness" scope="application">
+		<create creator="jsf" javascript="UserCompanyBusiness">
 	    	<param name="managedBeanName" value="userCompanyBusinessBean"/>
 	    	<param name="class" value="is.idega.idegaweb.egov.company.business.UserCompanyBusinessBean"/>
 	    	<include method="setPreferedCompanyForCurrentUser"/>

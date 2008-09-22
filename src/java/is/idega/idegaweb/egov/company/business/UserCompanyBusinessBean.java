@@ -15,7 +15,7 @@ import com.idega.user.data.Group;
 import com.idega.user.data.User;
 
 @Scope("singleton")
-@Service("userCompanyBusinessBean")
+@Service(UserCompanyBusiness.SPRING_BEAN_IDENTIFIER)
 public class UserCompanyBusinessBean implements UserCompanyBusiness {
 
 	public Collection<Group> getUsersCompanies(IWContext iwc, User user) throws RemoteException {
