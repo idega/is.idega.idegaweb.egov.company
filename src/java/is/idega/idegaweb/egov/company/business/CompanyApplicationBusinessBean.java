@@ -11,8 +11,6 @@ import is.idega.idegaweb.egov.company.data.CompanyEmployee;
 import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,8 +23,6 @@ import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 import javax.mail.MessagingException;
 
-import com.idega.block.pdf.business.PrintingContext;
-import com.idega.block.pdf.business.PrintingService;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
@@ -40,8 +36,6 @@ import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
 import com.idega.core.data.ICTreeNode;
-import com.idega.core.file.data.ICFile;
-import com.idega.core.file.data.ICFileHome;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWApplicationContext;
@@ -50,9 +44,6 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
-import com.idega.io.MemoryFileBuffer;
-import com.idega.io.MemoryInputStream;
-import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.GroupHelper;
@@ -300,45 +291,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		
 		return password;
-	}
-	
-	private ICFile createContract(PrintingContext pcx, Application application, Locale locale) throws CreateException {
-		try {
-			MemoryFileBuffer buffer = new MemoryFileBuffer();
-			OutputStream mos = new MemoryOutputStream(buffer);
-			InputStream mis = new MemoryInputStream(buffer);
-
-			pcx.setDocumentStream(mos);
-
-			getPrintingService().printDocument(pcx);
-
-			return createFile(pcx.getFileName() != null ? pcx.getFileName() : "contract", mis, buffer.length());
-		}
-		catch (RemoteException re) {
-			throw new IBORuntimeException(re);
-		}
-	}
-
-	private ICFile createFile(String fileName, InputStream is, int length) throws CreateException {
-		try {
-			ICFileHome home = (ICFileHome) getIDOHome(ICFile.class);
-			ICFile file = home.create();
-
-			if (!fileName.endsWith(".pdf") && !fileName.endsWith(".PDF")) {
-				fileName += ".pdf";
-			}
-
-			file.setFileValue(is);
-			file.setMimeType("application/x-pdf");
-
-			file.setName(fileName);
-			file.setFileSize(length);
-			file.store();
-			return file;
-		}
-		catch (RemoteException re) {
-			throw new IBORuntimeException(re);
-		}
 	}
 	
 	private boolean isGroupCompanyType(Group group) {
@@ -732,15 +684,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			}
 		}
 		return userApplicationList;
-	}
-		
-	private PrintingService getPrintingService() {
-		try {
-			return (PrintingService) getServiceInstance(PrintingService.class);
-		}
-		catch (RemoteException e) {
-			throw new IBORuntimeException(e.getMessage());
-		}
 	}
 
 	protected UserBusiness getUserBusiness(IWApplicationContext iwac) throws RemoteException {
