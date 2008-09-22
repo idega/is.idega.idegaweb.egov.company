@@ -51,7 +51,6 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 		AccessController accessController = iwc.getIWMainApplication().getAccessController();
 
 		DropdownMenu rolesDropdownMenu = new DropdownMenu(ROLES_DROP_DOWN_KEY);
-		@SuppressWarnings("unchecked")
 		Collection<ICRole> allRoles = accessController.getAllRoles();
 		for (ICRole role : allRoles) {
 			rolesDropdownMenu.addMenuElement(role.getRoleKey(), iwc.getIWMainApplication().getBundle(CORE_IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc).getLocalizedString(role.getRoleNameLocalizableKey(), role.getRoleNameLocalizableKey()));

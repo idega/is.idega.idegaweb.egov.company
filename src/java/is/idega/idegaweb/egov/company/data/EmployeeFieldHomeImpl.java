@@ -37,10 +37,10 @@ public class EmployeeFieldHomeImpl extends com.idega.data.IDOFactory implements 
 		return (EmployeeField) super.findByPrimaryKeyIDO(pk);
 	}
 	
-	public Collection<EmployeeField> findByMultiplePrimaryKey(Collection pks) throws javax.ejb.FinderException{
+	public Collection<EmployeeField> findByMultiplePrimaryKey(Collection<String> pks) throws javax.ejb.FinderException{
 		Collection<EmployeeField> fields = new ArrayList<EmployeeField>();
 		
-		for(String pk : (Collection<String>)pks) {
+		for (String pk : pks) {
 			fields.add(findByPrimaryKey(pk));
 		}
 		
@@ -48,10 +48,11 @@ public class EmployeeFieldHomeImpl extends com.idega.data.IDOFactory implements 
 	}	
 
 	@Override
-	protected Class getEntityInterfaceClass() {
+	protected Class<EmployeeField> getEntityInterfaceClass() {
 		return EmployeeField.class;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection<EmployeeField> findAll() throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
 		Collection ids = ((EmployeeFieldBMPBean) entity).ejbFindAll();

@@ -97,6 +97,10 @@ public class CompanyEmployeeManager extends CompanyBlock {
 					"You have insufficient rights to manage accounts!"));
 			return;
 		}
+		if (getGroup() == null) {
+			showMessage(iwrb.getLocalizedString("no_user_group_selected", "There's no user group selected"));
+			return;
+		}
 		
 		String employeeId = iwc.getParameter(EMPLOYEE_ID_PARAMETER);
 		String userId = iwc.getParameter(USER_ID_PARAMETER);
@@ -130,12 +134,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 			break;
 			
 		default:
-			if(getGroup() != null) {
-				showCompanyUserList(iwc);
-			} else {
-				showMessage(iwrb.getLocalizedString("no_user_group_selected",
-				"There's no user group selected"));
-			}
+			showCompanyUserList(iwc);
 		}
 	}
 	
@@ -240,6 +239,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		return roleTypes;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Layer listExistingCompanyGroupUsers(IWContext iwc) {
 		Collection<User> companyUsers;
 		try {
@@ -362,6 +362,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		return container;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Layer getEmployeeEditForm(IWContext iwc, Object employeeInfoObject) {
 		Layer container = new Layer();
 		
@@ -567,8 +568,12 @@ public class CompanyEmployeeManager extends CompanyBlock {
 			
 			emp.store();
 		
-		boolean result = isAdmin ? getCompanyBusiness().makeUserCompanyAdmin(iwc, selectedUser, getGroup()) :
+			if (isAdmin) {
+				getCompanyBusiness().makeUserCompanyAdmin(iwc, selectedUser, getGroup());
+			}
+			else {
 				getCompanyBusiness().makeUserCommonEmployee(iwc, selectedUser, getGroup());
+			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (FinderException e) {

@@ -24,7 +24,7 @@ public class CompanyEmployeeHomeImpl extends com.idega.data.IDOFactory implement
 	private static final long serialVersionUID = -774105305864586052L;
 
 	@Override
-	protected Class getEntityInterfaceClass() {
+	protected Class<CompanyEmployee> getEntityInterfaceClass() {
 		return CompanyEmployee.class;
 	}
 
@@ -43,15 +43,16 @@ public class CompanyEmployeeHomeImpl extends com.idega.data.IDOFactory implement
 		return this.findByPrimaryKey(pk);
 	}
 	
-	public Collection findAll() throws FinderException {
+	@SuppressWarnings("unchecked")
+	public Collection<CompanyEmployee> findAll() throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
 		Collection ids = ((CompanyEmployeeBMPBean) entity).ejbFindAll();
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
 
-	public Collection<CompanyEmployee> findByGroup(Group userGroup)
-			throws FinderException {
+	@SuppressWarnings("unchecked")
+	public Collection<CompanyEmployee> findByGroup(Group userGroup) throws FinderException {
 		IDOEntity entity = this.idoCheckOutPooledEntity();
 		Collection ids = ((CompanyEmployeeBMPBean) entity).ejbFindByGroup(userGroup);
 		this.idoCheckInPooledEntity(entity);

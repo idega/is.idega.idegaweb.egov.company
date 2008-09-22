@@ -22,8 +22,11 @@ import com.idega.user.data.UserBMPBean;
  */
 
 public class CompanyApplicationHomeImpl extends com.idega.data.IDOFactory implements CompanyApplicationHome {
+	
+	private static final long serialVersionUID = -6143365517336649772L;
+
 	@Override
-	protected Class getEntityInterfaceClass(){
+	protected Class<CompanyApplication> getEntityInterfaceClass(){
 		return CompanyApplication.class;
 	}
 	
@@ -49,6 +52,7 @@ public class CompanyApplicationHomeImpl extends com.idega.data.IDOFactory implem
 		return this.findByPrimaryKey(pk);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection<Application> findAllByCaseCodesAndStatuses(String[] caseCodes, String[] statuses) throws FinderException {
 		com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
 		java.util.Collection ids = ((CompanyApplicationBMPBean) entity).ejbFindAllByCaseCodesAndStatuses(caseCodes, statuses);

@@ -16,8 +16,6 @@ import is.idega.idegaweb.egov.company.presentation.institution.ApplicationApprov
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.Case;
@@ -39,6 +37,7 @@ import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
+import com.idega.util.ListUtil;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.Name;
 
@@ -139,6 +138,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		return action;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void getViewerForm(IWContext iwc, CompanyApplication application) throws RemoteException {
 		Form form = new Form();
 		form.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_VIEW));
@@ -288,84 +288,79 @@ public class CompanyApplicationViewer extends CompanyBlock {
 			section.add(clearLayer);
 		}
 
-
-			Iterator iter = application.getChildrenIterator();
-			if (iter != null) {
-				Collection messages = new ArrayList();
-
-				while (iter.hasNext()) {
-					Case theCase = (Case) iter.next();
-					try {
-						Message message = getCompanyBusiness().getMessageBusiness().getMessage(theCase.getPrimaryKey());
-						if (message.getContentCode() != null && message.getContentCode().equals(EgovCompanyConstants.CONTENT_CODE_REQUEST_INFORMATION)) {
-							messages.add(message);
-						}
-					}
-					catch (FinderException e) {
-						e.printStackTrace();
+		Collection<Case> children = application.getChildren();
+		if (!ListUtil.isEmpty(children)) {
+			Collection<Message> messages = new ArrayList<Message>();
+			for (Case theCase: children) {
+				try {
+					Message message = getCompanyBusiness().getMessageBusiness().getMessage(theCase.getPrimaryKey());
+					if (message.getContentCode() != null && message.getContentCode().equals(EgovCompanyConstants.CONTENT_CODE_REQUEST_INFORMATION)) {
+						messages.add(message);
 					}
 				}
-
-				if (!messages.isEmpty()) {
-					Iterator iterator = messages.iterator();
-					while (iterator.hasNext()) {
-						Message message = (Message) iterator.next();
-						User receiver = message.getOwner();
-						User sender = message.getSender();
-						IWTimestamp created = new IWTimestamp(message.getCreated());
-
-						heading = new Heading1(iwrb.getLocalizedString("application.request_information_message", "Request information message"));
-						heading.setStyleClass("subHeader");
-						form.add(heading);
-
-						section = new Layer(Layer.DIV);
-						section.setStyleClass("formSection");
-						form.add(section);
-
-						if (sender != null) {
-							formItem = new Layer(Layer.DIV);
-							formItem.setStyleClass("formItem");
-							label = new Label();
-							label.setLabel(iwrb.getLocalizedString("sender", "Sender"));
-							formItem.add(label);
-							span = new Span(new Text(new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName()).getName(iwc.getCurrentLocale())));
-							formItem.add(span);
-							section.add(formItem);
-						}
-
-						if (receiver != null) {
-							formItem = new Layer(Layer.DIV);
-							formItem.setStyleClass("formItem");
-							label = new Label();
-							label.setLabel(iwrb.getLocalizedString("receiver", "Receiver"));
-							formItem.add(label);
-							span = new Span(new Text(new Name(receiver.getFirstName(), receiver.getMiddleName(), receiver.getLastName()).getName(iwc.getCurrentLocale())));
-							formItem.add(span);
-							section.add(formItem);
-						}
-
-						formItem = new Layer(Layer.DIV);
-						formItem.setStyleClass("formItem");
-						label = new Label();
-						label.setLabel(iwrb.getLocalizedString("sent_date", "Sent date"));
-						formItem.add(label);
-						span = new Span(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
-						formItem.add(span);
-						section.add(formItem);
-
-						formItem = new Layer(Layer.DIV);
-						formItem.setStyleClass("formItem");
-						label = new Label();
-						label.setLabel(iwrb.getLocalizedString("message", "Message"));
-						formItem.add(label);
-						span = new Span(new Text(message.getBody()));
-						formItem.add(span);
-						section.add(formItem);
-
-						section.add(clearLayer);
-					}
+				catch (FinderException e) {
+					e.printStackTrace();
 				}
 			}
+
+			if (!ListUtil.isEmpty(messages)) {
+				for (Message message: messages) {
+					User receiver = message.getOwner();
+					User sender = message.getSender();
+					IWTimestamp created = new IWTimestamp(message.getCreated());
+					
+					heading = new Heading1(iwrb.getLocalizedString("application.request_information_message", "Request information message"));
+					heading.setStyleClass("subHeader");
+					form.add(heading);
+					
+					section = new Layer(Layer.DIV);
+					section.setStyleClass("formSection");
+					form.add(section);
+
+					if (sender != null) {
+						formItem = new Layer(Layer.DIV);
+						formItem.setStyleClass("formItem");
+						label = new Label();
+						label.setLabel(iwrb.getLocalizedString("sender", "Sender"));
+						formItem.add(label);
+						span = new Span(new Text(new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName()).getName(iwc.getCurrentLocale())));
+						formItem.add(span);
+						section.add(formItem);
+					}
+
+					if (receiver != null) {
+						formItem = new Layer(Layer.DIV);
+						formItem.setStyleClass("formItem");
+						label = new Label();
+						label.setLabel(iwrb.getLocalizedString("receiver", "Receiver"));
+						formItem.add(label);
+						span = new Span(new Text(new Name(receiver.getFirstName(), receiver.getMiddleName(), receiver.getLastName()).getName(iwc.getCurrentLocale())));
+						formItem.add(span);
+						section.add(formItem);
+					}
+
+					formItem = new Layer(Layer.DIV);
+					formItem.setStyleClass("formItem");
+					label = new Label();
+					label.setLabel(iwrb.getLocalizedString("sent_date", "Sent date"));
+					formItem.add(label);
+					span = new Span(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
+					formItem.add(span);
+					section.add(formItem);
+
+					formItem = new Layer(Layer.DIV);
+					formItem.setStyleClass("formItem");
+					label = new Label();
+					label.setLabel(iwrb.getLocalizedString("message", "Message"));
+					formItem.add(label);
+					span = new Span(new Text(message.getBody()));
+					formItem.add(span);
+					section.add(formItem);
+
+					section.add(clearLayer);
+				}
+			}
+		}
 
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
