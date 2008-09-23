@@ -9,22 +9,35 @@ package is.idega.idegaweb.egov.company.presentation.company;
 
 import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
+import is.idega.idegaweb.egov.company.business.ContractPrintingContext;
 import is.idega.idegaweb.egov.company.data.CompanyApplication;
+import is.idega.idegaweb.egov.company.data.ContractFileBean;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 import is.idega.idegaweb.egov.company.presentation.institution.ApplicationApproverRejecter;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
+
+import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import com.idega.block.pdf.business.PrintingContext;
 import com.idega.block.process.data.Case;
 import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.message.data.Message;
+import com.idega.business.IBOLookupException;
+import com.idega.business.IBORuntimeException;
 import com.idega.company.data.CompanyType;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
+import com.idega.io.MemoryFileBuffer;
+import com.idega.io.MemoryInputStream;
+import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
@@ -33,6 +46,7 @@ import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
+import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.data.User;
@@ -56,8 +70,9 @@ public class CompanyApplicationViewer extends CompanyBlock {
 //	private static final int ACTION_CLOSING_FORM = 10;
 //	private static final int ACTION_CLOSE = 11;
 //	private static final int ACTION_EDIT_FORM = 12;
-//	private static final int ACTION_CONTRACT = 13;
 //	private static final int ACTION_LIST = 14;
+	
+	private static String CONTRACT_SLIDE_PATH = "/files/public/company_contracts/";
 
 	private ICPage backPage;
 	
@@ -112,10 +127,6 @@ public class CompanyApplicationViewer extends CompanyBlock {
 //			case ACTION_CLOSE:
 //				close(iwc, application);
 //				break;
-////TODO		finish contract pdf
-////			case ACTION_CONTRACT:
-////				close(iwc, application);
-////				break;
 //			
 //				
 //		  /*case ACTION_EDIT_FORM:
@@ -420,8 +431,15 @@ public class CompanyApplicationViewer extends CompanyBlock {
 //		bottom.add(edit);
 		
 		Link contract = getButtonLink(iwrb.getLocalizedString("contract.file_name", "Contract"));
-		contract.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
-		contract.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_CONTRACT));
+		
+		try {
+			ContractFileBean contractBean = createContractStream(application.getId(), new ContractPrintingContext(getIWApplicationContext(), application, iwc.getCurrentLocale()), iwc.getCurrentLocale());
+			contract.setURL(saveToSlide(contractBean, application.getId()));
+		} catch (CreateException e) {
+			e.printStackTrace();
+		}
+
+
 		bottom.add(contract);
 	}
 
@@ -999,5 +1017,63 @@ public class CompanyApplicationViewer extends CompanyBlock {
 
 	public void setBackPage(ICPage backPage) {
 		this.backPage = backPage;
+	}
+	
+	private ContractFileBean createContractStream(String applicationId, PrintingContext pcx, Locale locale) throws CreateException {
+		try {
+			MemoryFileBuffer buffer = new MemoryFileBuffer();
+			OutputStream mos = new MemoryOutputStream(buffer);
+			InputStream mis = new MemoryInputStream(buffer);
+
+			pcx.setDocumentStream(mos);
+
+			getCompanyBusiness().getPrintingService().printDocument(pcx);
+
+			ContractFileBean contract = new ContractFileBean();
+			contract.setContractFileStream(mis);
+			contract.setMimeType("application/x-pdf");
+			contract.setName("contract_" + applicationId + ".pdf");
+			contract.setSize(buffer.length());
+			//return createFileWithoutStore("contract_" + applicationId, mis, buffer.length());
+			
+			return contract;
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re);
+		}
+	}
+	
+//	private ICFile createFileWithoutStore(String fileName, InputStream is, int length) throws CreateException {
+//		ICFile file = getCompanyBusiness().getEmptyICFile();
+//
+//		if (!fileName.endsWith(".pdf") && !fileName.endsWith(".PDF")) {
+//			fileName += ".pdf";
+//		}
+//
+//		file.setFileValue(is);
+//		file.setMimeType("application/x-pdf");
+//
+//		file.setName(fileName);
+//		file.setFileSize(length);
+//		file.store();
+//		return file;
+//	}
+	
+	private String saveToSlide(ContractFileBean contractFile, String applicationId) {
+//		String slideFilePath = null;
+		
+		IWSlideService service_bean;
+		try {
+			service_bean = getCompanyBusiness().getIWSlideService();
+			service_bean.uploadFileAndCreateFoldersFromStringAsRoot(CONTRACT_SLIDE_PATH, contractFile.getName(), contractFile.getContractFileStream(), contractFile.getMimeType(), true);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+			return null;
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return "/content" + CONTRACT_SLIDE_PATH + contractFile.getName();
 	}
 }

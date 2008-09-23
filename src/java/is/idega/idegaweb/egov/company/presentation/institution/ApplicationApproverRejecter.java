@@ -50,6 +50,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 //	private static final String REJECT_APPLICATION_PARAMETER = "prm_reject_application";
 //	private static final String SEND_EXPLANATION_AND_REJECT_APPLICATION_PARAMETER = "prm_send_explanation_and_reject_application";
 	
+	private static final String CLOSURE_TEXT = "application_closure_explanation_text";
 	private static final String REJECTION_EXPLANATION_TEXT = "application_rejection_explanation_text";
 	private static final String REACTIVATION_EXPLANATION_TEXT = "application_reactivation_explanation_text";
 	
@@ -65,7 +66,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	public static final int ACTION_CLOSING_FORM = 10;
 	public static final int ACTION_CLOSE = 11;
 	public static final int ACTION_EDIT_FORM = 12;
-	public static final int ACTION_CONTRACT = 13;
 	public static final int ACTION_LIST = 14;
 	
 	private String caseCode;
@@ -340,7 +340,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 				
 				Map<String, List<UIComponent>> formSectionItems = new HashMap<String, List<UIComponent>>();
 				List<UIComponent> explanationTextSection = new ArrayList<UIComponent>();
-				TextArea explanationText = new TextArea(REJECTION_EXPLANATION_TEXT);
+				TextArea explanationText = new TextArea(CLOSURE_TEXT);
 				explanationTextSection.add(new Label(iwrb.getLocalizedString("explanation_text", "Explanation"), explanationText));
 				explanationTextSection.add(explanationText);
 				formSectionItems.put("explanationTextSection", explanationTextSection);
@@ -374,12 +374,12 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		
 		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
 		try {
-			result = compAppBusiness.closeApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER), iwc.getParameter(REJECTION_EXPLANATION_TEXT));
+			result = compAppBusiness.closeApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER), iwc.getParameter(CLOSURE_TEXT));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully reactivated!") :
-			iwrb.getLocalizedString("application_was_not_rejected", "Application was not reactivated! Some error occurred.");
+		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_closed", "Application was successfully closed!") :
+			iwrb.getLocalizedString("application_was_not_closed", "Application was not closed! Some error occurred.");
 				
 		listApplications(iwc);
 	}
@@ -573,11 +573,11 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		this.applicationType = applicationType;
 	}
 	
-	public ICPage getBackPage() {
-		return backPage;
-	}
-
-	public void setBackPage(ICPage backPage) {
-		this.backPage = backPage;
-	}	
+//	public ICPage getBackPage() {
+//		return backPage;
+//	}
+//
+//	public void setBackPage(ICPage backPage) {
+//		this.backPage = backPage;
+//	}	
 }

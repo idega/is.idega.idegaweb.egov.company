@@ -1,5 +1,5 @@
 /*
- * $Id: ContractPrintingContext.java,v 1.4 2008/09/22 14:19:45 valdas Exp $
+ * $Id: ContractPrintingContext.java,v 1.5 2008/09/23 07:43:31 anton Exp $
  * Created on Jun 14, 2007
  *
  * Copyright (C) 2007 Idega Software hf. All Rights Reserved.
@@ -26,7 +26,6 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.company.data.Company;
-import com.idega.company.data.CompanyType;
 import com.idega.core.location.business.CommuneBusiness;
 import com.idega.core.location.data.Commune;
 import com.idega.idegaweb.IWApplicationContext;
@@ -51,9 +50,9 @@ public class ContractPrintingContext extends PrintingContextImpl {
 	}
 
 	private void init(IWApplicationContext iwac, CompanyApplication application, Locale locale) throws RemoteException {
-		Map<String, Object> props = new HashMap<String, Object>();
+		Map props = new HashMap();
 		Company company = application.getCompany();
-		CompanyType type = company.getType();
+//		CompanyType type = company.getType();
 		Commune commune = company.getWorkingArea();
 		if (commune == null) {
 			commune = getCommuneBusiness(iwac).getDefaultCommune();
@@ -64,8 +63,8 @@ public class ContractPrintingContext extends PrintingContextImpl {
 
 		props.put("name", company.getName());
 		props.put("personalID", company.getPersonalID());
-		props.put("type", iwrb.getLocalizedString("company_type." + type.getLocalizedKey(), type.getName()));
-		props.put("commune", commune.getCommuneName());
+//		props.put("type", iwrb.getLocalizedString("company_type." + type.getLocalizedKey(), type.getName()));
+//		props.put("commune", commune.getCommuneName());
 
 //		StringBuffer buffer = new StringBuffer();
 //		try {

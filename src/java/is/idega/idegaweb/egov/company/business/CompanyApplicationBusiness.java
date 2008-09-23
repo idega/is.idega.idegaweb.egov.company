@@ -13,12 +13,15 @@ import java.util.Collection;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import com.idega.block.pdf.business.PrintingService;
+import com.idega.business.IBOLookupException;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideService;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 
@@ -141,4 +144,8 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException;
 	
 	public Collection<Group> getAllUserCompanies(IWContext iwc, User user) throws RemoteException;
+	
+	public PrintingService getPrintingService();
+	
+	public IWSlideService getIWSlideService() throws IBOLookupException;
 }

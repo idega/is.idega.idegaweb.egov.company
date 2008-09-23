@@ -23,6 +23,7 @@ import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 import javax.mail.MessagingException;
 
+import com.idega.block.pdf.business.PrintingService;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
@@ -45,6 +46,7 @@ import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
+import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.GroupHelper;
 import com.idega.user.business.NoEmailFoundException;
@@ -293,6 +295,45 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return password;
 	}
 	
+//	private ICFile createContract(PrintingContext pcx, Application application, Locale locale) throws CreateException {
+//		try {
+//			MemoryFileBuffer buffer = new MemoryFileBuffer();
+//			OutputStream mos = new MemoryOutputStream(buffer);
+//			InputStream mis = new MemoryInputStream(buffer);
+//
+//			pcx.setDocumentStream(mos);
+//
+//			getPrintingService().printDocument(pcx);
+//
+//			return createFile(pcx.getFileName() != null ? pcx.getFileName() : "contract", mis, buffer.length());
+//		}
+//		catch (RemoteException re) {
+//			throw new IBORuntimeException(re);
+//		}
+//	}
+
+//	private ICFile createFile(String fileName, InputStream is, int length) throws CreateException {
+//		try {
+//			ICFileHome home = (ICFileHome) getIDOHome(ICFile.class);
+//			ICFile file = home.create();
+//
+//			if (!fileName.endsWith(".pdf") && !fileName.endsWith(".PDF")) {
+//				fileName += ".pdf";
+//			}
+//
+//			file.setFileValue(is);
+//			file.setMimeType("application/x-pdf");
+//
+//			file.setName(fileName);
+//			file.setFileSize(length);
+//			file.store();
+//			return file;
+//		}
+//		catch (RemoteException re) {
+//			throw new IBORuntimeException(re);
+//		}
+//	}
+	
 	private boolean isGroupCompanyType(Group group) {
 		return group == null ? false : CompanyConstants.GROUP_TYPE_COMPANY.equals(group.getGroupType());
 	}
@@ -412,7 +453,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	}
 	
 	public boolean closeApplication(IWApplicationContext iwac, String applicationId, String explanationText) {
-		if (!setStatusToCompanyApplication(applicationId, getCaseStatusCancelled().getStatus())) {
+		if (!setStatusToCompanyApplication(applicationId, getCaseStatusDeleted().getStatus())) {
 			return false;
 		}
 		
@@ -433,7 +474,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 		IWResourceBundle iwrb = getResourceBundle();
 		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
-		subject.append(iwrb.getLocalizedString("application.reactivated_message_subject", "application was canceled"));
+		subject.append(iwrb.getLocalizedString("application.closed_message_subject", "application was canceled"));
 		return sendMail(email, subject.toString(), explanationText);
 	}
 	
@@ -685,6 +726,15 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		return userApplicationList;
 	}
+		
+	public PrintingService getPrintingService() {
+		try {
+			return (PrintingService) getServiceInstance(PrintingService.class);
+		}
+		catch (RemoteException e) {
+			throw new IBORuntimeException(e.getMessage());
+		}
+	}
 
 	protected UserBusiness getUserBusiness(IWApplicationContext iwac) throws RemoteException {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
@@ -867,6 +917,15 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return comp.getName();
 		} else {
 			return null;
+		}
+	}
+	
+	public IWSlideService getIWSlideService() throws IBOLookupException {
+		try {
+			return (IWSlideService) IBOLookup.getServiceInstance(getIWApplicationContext(), IWSlideService.class);
+		} catch (IBOLookupException e) {
+			logger.log(Level.SEVERE, "Error getting IWSlideService");
+			throw e;
 		}
 	}
 }
