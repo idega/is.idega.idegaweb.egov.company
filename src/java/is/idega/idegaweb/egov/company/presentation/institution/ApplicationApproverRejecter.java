@@ -140,6 +140,8 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		}
 		if (StringUtil.isEmpty(applicationHandlingResultMessage)) {
 			applicationHandlingResultMessage = iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred.");
+		} else {
+			applicationHandlingResultMessage = "";
 		}
 		
 		listApplications(iwc);

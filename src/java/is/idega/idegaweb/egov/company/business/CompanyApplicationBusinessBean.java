@@ -69,7 +69,6 @@ import com.idega.util.EncryptionType;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.SendMail;
-import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
@@ -178,7 +177,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	
 	public String getLoginCreatedInfo(IWContext iwc, String login, String password) {
 		String portNumber = new StringBuilder(":").append(String.valueOf(iwc.getServerPort())).toString();
-		String serverLink = StringHandler.replace(iwc.getServerURL(), portNumber, CoreConstants.EMPTY);
+		//FIXME now makes inaccessible url running server on localhost
+//		String serverLink = StringHandler.replace(iwc.getServerURL(), portNumber, CoreConstants.EMPTY);
+		String serverLink = iwc.getServerURL();
 		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		
