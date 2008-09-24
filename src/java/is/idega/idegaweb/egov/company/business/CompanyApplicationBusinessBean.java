@@ -200,13 +200,13 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return CoreConstants.MINUS;
 		}
 		
-		Collection<Group> companies = compApp.getGroups();
+		/*Collection<Group> companies = compApp.getGroups();
 		if (ListUtil.isEmpty(companies)) {
 			return null;
-		}
+		}*/
 		
-		Group rootGroupForCompanies = getRootGroupForCompanies(companies.iterator().next());
-		if (rootGroupForCompanies == null) {
+		Group rootGroupForCompany = compApp.getApplicantUser().getPrimaryGroup(); /*getRootGroupForCompanies(companies.iterator().next());*/
+		if (rootGroupForCompany == null) {
 			return null;
 		}
 		
@@ -231,7 +231,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		if (companyAdmin == null) {
 			try {
 				companyAdmin = userBusiness.createUserWithLogin(name, null, null, personalId, name, null, null, null,
-						Integer.valueOf(rootGroupForCompanies.getId()), personalId, password, true, null, -1, null, true, true, EncryptionType.MD5);
+						Integer.valueOf(rootGroupForCompany.getId()), personalId, password, true, null, -1, null, true, true, EncryptionType.MD5);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			} catch (RemoteException e) {
@@ -298,9 +298,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		compApp.setAdminUser(companyAdmin);
 		compApp.store();
 		
-		for (Group companyGroup: companies) {
-			makeUserCompanyAdmin(iwac, companyAdmin, companyGroup);
-		}
+//		for (Group companyGroup: companies) {
+			makeUserCompanyAdmin(iwac, companyAdmin, rootGroupForCompany);
+//		}
 		
 		return password;
 	}
@@ -575,17 +575,17 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 	}
 	
-	public boolean makeUserCompanyAdmin(IWApplicationContext iwac, User companyAdmin, Group company) {
-		if (companyAdmin == null || company == null) {
+	public boolean makeUserCompanyAdmin(IWApplicationContext iwac, User companyAdmin, Group companyGroup) {
+		if (companyAdmin == null || companyGroup == null) {
 			return false;
 		}
 		
-		User oldAdmin = company.getModerator();
-		if (oldAdmin != null) {
-			
-		}
-		company.setModerator(companyAdmin);
-		company.store();
+//		User oldAdmin = companyGroup.getModerator();
+//		if (oldAdmin != null) {
+//			
+//		}
+		companyGroup.setModerator(companyAdmin);
+		companyGroup.store();
 		
 		AccessController accessController = iwac.getIWMainApplication().getAccessController();
 		accessController.addRoleToGroup(EgovCompanyConstants.COMPANY_ADMIN_ROLE, companyAdmin, iwac);
