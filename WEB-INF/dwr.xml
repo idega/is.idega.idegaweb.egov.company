@@ -8,5 +8,10 @@
 	    	<param name="class" value="is.idega.idegaweb.egov.company.business.UserCompanyBusinessBean"/>
 	    	<include method="setPreferedCompanyForCurrentUser"/>
     	</create>
+    	
+    	<create creator="ibo" javascript="CompanyApplicationBusiness" scope="application">
+	      <param name="class" value="is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness"/>
+	      <include method="generateContract" />
+	    </create>
 	</allow>
 </dwr>

@@ -1,5 +1,5 @@
 /*
- * $Id: ContractPrintingContext.java,v 1.5 2008/09/23 07:43:31 anton Exp $
+ * $Id: CompanyContractPrintingContext.java,v 1.1 2008/09/24 10:28:50 anton Exp $
  * Created on Jun 14, 2007
  *
  * Copyright (C) 2007 Idega Software hf. All Rights Reserved.
@@ -9,6 +9,7 @@
  */
 package is.idega.idegaweb.egov.company.business;
 
+import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.data.CompanyApplication;
 
@@ -35,12 +36,12 @@ import com.idega.xml.XMLDocument;
 import com.idega.xml.XMLElement;
 import com.idega.xml.XMLOutput;
 
-public class ContractPrintingContext extends PrintingContextImpl {
+public class CompanyContractPrintingContext extends PrintingContextImpl {
 
 	protected IWBundle iwb;
 	protected IWResourceBundle iwrb;
 
-	public ContractPrintingContext(IWApplicationContext iwac, CompanyApplication application, Locale locale) {
+	public CompanyContractPrintingContext(IWApplicationContext iwac, Application application, Locale locale) {
 		try {
 			init(iwac, application, locale);
 		}
@@ -49,10 +50,9 @@ public class ContractPrintingContext extends PrintingContextImpl {
 		}
 	}
 
-	private void init(IWApplicationContext iwac, CompanyApplication application, Locale locale) throws RemoteException {
+	private void init(IWApplicationContext iwac, Application application, Locale locale) throws RemoteException {
 		Map props = new HashMap();
-		Company company = application.getCompany();
-//		CompanyType type = company.getType();
+		Company company = ((CompanyApplication)application).getCompany();
 		Commune commune = company.getWorkingArea();
 		if (commune == null) {
 			commune = getCommuneBusiness(iwac).getDefaultCommune();
@@ -63,27 +63,8 @@ public class ContractPrintingContext extends PrintingContextImpl {
 
 		props.put("name", company.getName());
 		props.put("personalID", company.getPersonalID());
-//		props.put("type", iwrb.getLocalizedString("company_type." + type.getLocalizedKey(), type.getName()));
-//		props.put("commune", commune.getCommuneName());
 
-//		StringBuffer buffer = new StringBuffer();
-//		try {
-//			Collection codes = application.getPostalCodes();
-//			Iterator iterator = codes.iterator();
-//			while (iterator.hasNext()) {
-//				PostalCode code = (PostalCode) iterator.next();
-//				buffer.append(code.getPostalCode());
-//				if (iterator.hasNext()) {
-//					buffer.append(", ");
-//				}
-//			}
-//		}
-//		catch (IDORelationshipException e1) {
-//			e1.printStackTrace();
-//		}
-//		props.put("postalCodes", buffer.toString());
-
-		setFileName(getResourceBundle(iwac, locale).getLocalizedString("contract.file_name", "contract"));
+		setFileName(getResourceBundle(iwac, locale).getLocalizedString("contract.file_name", "contract") + "_" + String.valueOf(application.getPrimaryKey()));
 		addDocumentProperties(props);
 		setResourceDirectory(new File(getResourcRealPath(getBundle(iwac), locale)));
 		try {

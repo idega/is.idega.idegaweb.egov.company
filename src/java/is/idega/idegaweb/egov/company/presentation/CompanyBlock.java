@@ -44,7 +44,8 @@ public abstract class CompanyBlock extends ApplicationBlock {
 	protected void present(IWContext iwc) throws Exception {
 		bundle = getBundle(iwc);
 		iwrb = bundle.getResourceBundle(iwc);
-		
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/CompanyApplicationBusiness.js");
+		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/engine.js");
 		PresentationUtil.addStyleSheetToHeader(iwc, bundle.getVirtualPathWithFileNameString("style/egov_company.css"));
 	}
 	

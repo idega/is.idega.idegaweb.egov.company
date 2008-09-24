@@ -5,6 +5,7 @@ import is.idega.idegaweb.egov.application.data.Application;
 import com.idega.block.process.data.Case;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
+import com.idega.core.file.data.ICFile;
 import com.idega.user.data.User;
 
 public interface CompanyApplication extends Case, Application {
@@ -21,12 +22,14 @@ public interface CompanyApplication extends Case, Application {
 	
 	public void setApplicantUser(User user);
 	
-//	public String getAppType();
-	
 	public CompanyType getType();
 	
 	public void setType(CompanyType type);
 	
 	public String getCaseCodeKey();
+	
+	public ICFile getContract();
+	
+	public void setContract(ICFile contract);
 	
 }

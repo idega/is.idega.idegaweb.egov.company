@@ -148,4 +148,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public PrintingService getPrintingService();
 	
 	public IWSlideService getIWSlideService() throws IBOLookupException;
+	
+	public String generateContract(String applicationId);
 }

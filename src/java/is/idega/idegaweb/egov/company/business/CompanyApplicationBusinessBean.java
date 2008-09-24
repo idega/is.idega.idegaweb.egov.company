@@ -11,6 +11,8 @@ import is.idega.idegaweb.egov.company.data.CompanyEmployee;
 import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +25,7 @@ import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 import javax.mail.MessagingException;
 
+import com.idega.block.pdf.business.PrintingContext;
 import com.idega.block.pdf.business.PrintingService;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -37,6 +40,8 @@ import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
 import com.idega.core.data.ICTreeNode;
+import com.idega.core.file.data.ICFile;
+import com.idega.core.file.data.ICFileHome;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWApplicationContext;
@@ -45,6 +50,9 @@ import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
+import com.idega.io.MemoryFileBuffer;
+import com.idega.io.MemoryInputStream;
+import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.GroupBusiness;
@@ -68,6 +76,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 	private static final long serialVersionUID = 2473252235079303894L;
 	private static final Logger logger = Logger.getLogger(CompanyApplicationBusinessBean.class.getName());
+	
+	private static String CONTRACT_SLIDE_PATH = "/files/public/company_contracts/";
 
 	@Override
 	public CompanyApplication getApplication(String applicationId) {
@@ -294,45 +304,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 		return password;
 	}
-	
-//	private ICFile createContract(PrintingContext pcx, Application application, Locale locale) throws CreateException {
-//		try {
-//			MemoryFileBuffer buffer = new MemoryFileBuffer();
-//			OutputStream mos = new MemoryOutputStream(buffer);
-//			InputStream mis = new MemoryInputStream(buffer);
-//
-//			pcx.setDocumentStream(mos);
-//
-//			getPrintingService().printDocument(pcx);
-//
-//			return createFile(pcx.getFileName() != null ? pcx.getFileName() : "contract", mis, buffer.length());
-//		}
-//		catch (RemoteException re) {
-//			throw new IBORuntimeException(re);
-//		}
-//	}
-
-//	private ICFile createFile(String fileName, InputStream is, int length) throws CreateException {
-//		try {
-//			ICFileHome home = (ICFileHome) getIDOHome(ICFile.class);
-//			ICFile file = home.create();
-//
-//			if (!fileName.endsWith(".pdf") && !fileName.endsWith(".PDF")) {
-//				fileName += ".pdf";
-//			}
-//
-//			file.setFileValue(is);
-//			file.setMimeType("application/x-pdf");
-//
-//			file.setName(fileName);
-//			file.setFileSize(length);
-//			file.store();
-//			return file;
-//		}
-//		catch (RemoteException re) {
-//			throw new IBORuntimeException(re);
-//		}
-//	}
 	
 	private boolean isGroupCompanyType(Group group) {
 		return group == null ? false : CompanyConstants.GROUP_TYPE_COMPANY.equals(group.getGroupType());
@@ -927,5 +898,86 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			logger.log(Level.SEVERE, "Error getting IWSlideService");
 			throw e;
 		}
+	}
+
+	public String generateContract(String applicationId) {
+		try {
+			IWContext iwc = CoreUtil.getIWContext();
+			Application app = getCompanyApplicationHome().findByPrimaryKey(applicationId);
+			ICFile contract = ((CompanyApplication)app).getContract();
+			
+			if(contract == null) {
+				contract = createContract(new CompanyContractPrintingContext(iwc, app, iwc.getCurrentLocale()), app, iwc.getCurrentLocale());
+				((CompanyApplication)app).setContract(contract);
+				app.store();
+			}
+			
+			return contract.getFileUri();
+		} catch (CreateException e) {
+			e.printStackTrace();
+			return "";
+		} catch (FinderException e) {
+			e.printStackTrace();
+			return "";
+		}
+	}
+	
+	private ICFile createContract(PrintingContext pcx, Application application, Locale locale) throws CreateException {
+		try {
+			MemoryFileBuffer buffer = new MemoryFileBuffer();
+			OutputStream mos = new MemoryOutputStream(buffer);
+			InputStream mis = new MemoryInputStream(buffer);
+
+			pcx.setDocumentStream(mos);
+
+			getPrintingService().printDocument(pcx);
+
+			return createFile(pcx.getFileName() != null ? pcx.getFileName() : "contract", mis, buffer.length(), String.valueOf(application.getPrimaryKey()));
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re);
+		}
+	}
+
+	private ICFile createFile(String fileName, InputStream is, int length, String applicationId) throws CreateException {
+		try {
+			ICFileHome home = (ICFileHome) getIDOHome(ICFile.class);
+			ICFile file = home.create();
+
+			if (!fileName.endsWith(".pdf") && !fileName.endsWith(".PDF")) {
+				fileName += ".pdf";
+			}
+
+			file.setFileValue(null);
+			file.setMimeType("application/x-pdf");
+
+			file.setName(fileName);
+			file.setFileSize(length);
+			
+			String fileSlideUri = saveToSlide(file, is, applicationId);
+			file.setFileUri(fileSlideUri);
+			
+			file.store();
+			return file;
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re);
+		}
+	}
+	
+	private String saveToSlide(ICFile contractFile, InputStream contractIs, String applicationId) {
+		IWSlideService service_bean;
+		try {
+			service_bean = getIWSlideService();
+			service_bean.uploadFileAndCreateFoldersFromStringAsRoot(CONTRACT_SLIDE_PATH, contractFile.getName(), contractIs, contractFile.getMimeType(), true);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+			return null;
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return "/content" + CONTRACT_SLIDE_PATH + contractFile.getName();
 	}
 }
