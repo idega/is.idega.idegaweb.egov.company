@@ -903,7 +903,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	public String generateContract(String applicationId) {
 		try {
 			IWContext iwc = CoreUtil.getIWContext();
-			Application app = getCompanyApplicationHome().findByPrimaryKey(applicationId);
+			Application app = getApplication(applicationId);
 			ICFile contract = ((CompanyApplication)app).getContract();
 			
 			if(contract == null) {
@@ -916,10 +916,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		} catch (CreateException e) {
 			e.printStackTrace();
 			return "";
-		} catch (FinderException e) {
-			e.printStackTrace();
-			return "";
-		}
+		} 
 	}
 	
 	private ICFile createContract(PrintingContext pcx, Application application, Locale locale) throws CreateException {

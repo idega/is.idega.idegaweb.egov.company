@@ -77,6 +77,7 @@ public class ServicesRegister extends ApplicationCreator {
 		super.present(iwc);
 	}
 	
+	@Override
 	public String getBundleIdentifier() {
 		return EgovCompanyConstants.IW_BUNDLE_IDENTIFIER;
 	}
@@ -139,7 +140,7 @@ public class ServicesRegister extends ApplicationCreator {
 			e.printStackTrace();
 		}
 		if (app == null) {
-			throw new CreateException("Cann't set groups for Application: " + appId);
+			throw new CreateException("Can't set groups for Application: " + appId);
 		}
 		
 		List<Group> groupsForApp = getSelectedGroups(iwc, app, selectedGroups);

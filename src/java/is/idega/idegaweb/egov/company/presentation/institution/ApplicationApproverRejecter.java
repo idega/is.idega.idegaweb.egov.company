@@ -44,11 +44,6 @@ import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
 public class ApplicationApproverRejecter extends CompanyBlock {
-
-//	private static final String VIEW_APPLICATION_PARAMETER = "prm_view_application_in_applications_approver";
-//	private static final String APPROVE_APPLICATION_PARAMETER = "prm_approve_application";
-//	private static final String REJECT_APPLICATION_PARAMETER = "prm_reject_application";
-//	private static final String SEND_EXPLANATION_AND_REJECT_APPLICATION_PARAMETER = "prm_send_explanation_and_reject_application";
 	
 	private static final String CLOSURE_TEXT = "application_closure_explanation_text";
 	private static final String REJECTION_EXPLANATION_TEXT = "application_rejection_explanation_text";
@@ -85,21 +80,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			return;
 		}
 		
-//		if (iwc.isParameterSet(VIEW_APPLICATION_PARAMETER)) {
-//			viewApplication(iwc);
-//			return;
-//		}
-//		if (iwc.isParameterSet(APPROVE_APPLICATION_PARAMETER)) {
-//			approveApplication(iwc);
-//		}
-//		else if (iwc.isParameterSet(REJECT_APPLICATION_PARAMETER)) {
-//			showRejectionForm(iwc);
-//			return;
-//		}
-//		else if (iwc.isParameterSet(SEND_EXPLANATION_AND_REJECT_APPLICATION_PARAMETER)) {
-//			rejectApplication(iwc);
-//		}
-		
 		switch (parseAction(iwc)) {
 			case ACTION_VIEW:
 				viewApplication(iwc);
@@ -113,21 +93,12 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			case ACTION_REJECT:
 				rejectApplication(iwc);
 				break;
-//			case ACTION_REQUEST_FORM:
-//				getRequestForm(iwc, application);
-//				break;
-//			case ACTION_REQUEST_INFO:
-//				requestInfo(iwc, application);
-//				break;
 			case ACTION_REACTIVATE_FORM:
 				showReactivationForm(iwc);
 				break;
 			case ACTION_REACTIVATE:
 				reactivateApplication(iwc);
 				break;
-//			case ACTION_OPEN:
-//				reopen(iwc, application);
-//				break;
 			case ACTION_CLOSING_FORM:
 				showClosingForm(iwc);
 				break;
@@ -573,11 +544,11 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		this.applicationType = applicationType;
 	}
 	
-//	public ICPage getBackPage() {
-//		return backPage;
-//	}
-//
-//	public void setBackPage(ICPage backPage) {
-//		this.backPage = backPage;
-//	}	
+	public ICPage getBackPage() {
+		return backPage;
+	}
+
+	public void setBackPage(ICPage backPage) {
+		this.backPage = backPage;
+	}	
 }
