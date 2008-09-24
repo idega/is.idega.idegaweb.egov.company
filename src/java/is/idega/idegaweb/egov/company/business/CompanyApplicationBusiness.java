@@ -46,7 +46,8 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#storeApplication
 	 */
-	public Application storeApplication(IWContext iwc, User admin, CompanyType companyType, Company company, User currentUser) throws CreateException, RemoteException;
+	public Application storeApplication(IWContext iwc, User admin, CompanyType companyType, Company company, User currentUser) throws CreateException,
+		RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#approveApplication
@@ -64,12 +65,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#reactivateApplication
 	 */
 	public boolean reactivateApplication(IWApplicationContext iwac, String applicationId,
-			String explanationText) throws RemoteException;
-	
-	/**
-	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#closeApplication
-	 */
-	public boolean closeApplication(IWApplicationContext iwac, String applicationId,
 			String explanationText) throws RemoteException;
 
 	/**
@@ -148,6 +143,8 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public PrintingService getPrintingService();
 	
 	public IWSlideService getIWSlideService() throws IBOLookupException;
+	
+	public boolean reopenAccount(IWContext iwc, String applicationId);
 	
 	public String generateContract(String applicationId);
 }

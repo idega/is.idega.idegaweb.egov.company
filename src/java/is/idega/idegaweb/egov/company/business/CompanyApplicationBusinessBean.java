@@ -42,6 +42,7 @@ import com.idega.core.contact.data.Email;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
+import com.idega.core.file.util.MimeTypeUtil;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWApplicationContext;
@@ -77,7 +78,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	private static final long serialVersionUID = 2473252235079303894L;
 	private static final Logger logger = Logger.getLogger(CompanyApplicationBusinessBean.class.getName());
 	
-	private static String CONTRACT_SLIDE_PATH = "/files/public/company_contracts/";
+	private static String CONTRACT_SLIDE_PATH = CoreConstants.PUBLIC_PATH + "/company_contracts/";
 
 	@Override
 	public CompanyApplication getApplication(String applicationId) {
@@ -372,15 +373,25 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	}
 
 	public boolean rejectApplication(IWApplicationContext iwac, String applicationId, String explanationText) {
-		if (!setStatusToCompanyApplication(applicationId, getCaseStatusDenied().getStatus())) {
+		if (!setStatusToCompanyApplication(applicationId, getCaseStatusDeleted().getStatus())) {
 			return false;
 		}
-
+		if (!closeAccount(applicationId)) {
+			return false;
+		}
+		
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {
 			return false;
 		}
 
+		Company company = compApp.getCompany();
+		if (company == null) {
+			return false;
+		}
+		company.setOpen(false);
+		company.setValid(false);
+		
 		Email email = null;
 		try {
 			email = getUserBusiness(iwac).getUsersMainEmail(compApp.getApplicantUser());
@@ -393,7 +404,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 		IWResourceBundle iwrb = getResourceBundle();
 		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
-		subject.append(iwrb.getLocalizedString("application.rejected_message_subject", "application was rejected"));
+		subject.append(iwrb.getLocalizedString("application.closed_message_subject", "application was canceled"));
 		return sendMail(email, subject.toString(), explanationText);
 	}
 	
@@ -420,32 +431,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		IWResourceBundle iwrb = getResourceBundle();
 		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
 		subject.append(iwrb.getLocalizedString("application.reactivated_message_subject", "application was reactivated"));
-		return sendMail(email, subject.toString(), explanationText);
-	}
-	
-	public boolean closeApplication(IWApplicationContext iwac, String applicationId, String explanationText) {
-		if (!setStatusToCompanyApplication(applicationId, getCaseStatusDeleted().getStatus())) {
-			return false;
-		}
-		
-		CompanyApplication compApp = getApplication(applicationId);
-		if (compApp == null) {
-			return false;
-		}
-
-		Email email = null;
-		try {
-			email = getUserBusiness(iwac).getUsersMainEmail(compApp.getApplicantUser());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		if (email == null) {
-			return false;
-		}
-		
-		IWResourceBundle iwrb = getResourceBundle();
-		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
-		subject.append(iwrb.getLocalizedString("application.closed_message_subject", "application was canceled"));
 		return sendMail(email, subject.toString(), explanationText);
 	}
 	
@@ -582,7 +567,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 //		User oldAdmin = companyGroup.getModerator();
 //		if (oldAdmin != null) {
-//			
+			//	TODO
 //		}
 		companyGroup.setModerator(companyAdmin);
 		companyGroup.store();
@@ -815,7 +800,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return (CommuneMessageBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CommuneMessageBusiness.class);
 	}
 
-	public Application storeApplication(IWContext iwc, User admin, CompanyType companyType, Company company, User performer) throws CreateException, RemoteException {
+	public Application storeApplication(IWContext iwc, User admin, CompanyType companyType, Company company, User performer) throws CreateException,
+		RemoteException {
 		try {
 			CompanyApplication application = getCompanyApplicationHome().create();
 			
@@ -900,23 +886,47 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 	}
 
+	private boolean closeAccount(String applicationId) {
+		CompanyApplication compApp = getApplication(applicationId);
+		if (compApp == null) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean reopenAccount(IWContext iwc, String applicationId) {
+		CompanyApplication compApp = getApplication(applicationId);
+		if (compApp == null) {
+			return false;
+		}
+		
+		return true;
+	}
+	
 	public String generateContract(String applicationId) {
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return null;
+		}
+		
 		try {
-			IWContext iwc = CoreUtil.getIWContext();
 			Application app = getApplication(applicationId);
 			ICFile contract = ((CompanyApplication)app).getContract();
 			
-			if(contract == null) {
-				contract = createContract(new CompanyContractPrintingContext(iwc, app, iwc.getCurrentLocale()), app, iwc.getCurrentLocale());
+			if (contract == null) {
+				Locale locale = iwc.getCurrentLocale();
+				contract = createContract(new CompanyContractPrintingContext(iwc, app, locale), app, locale);
 				((CompanyApplication)app).setContract(contract);
 				app.store();
 			}
 			
 			return contract.getFileUri();
-		} catch (CreateException e) {
-			e.printStackTrace();
-			return "";
-		} 
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Error generating contract for application: " + applicationId, e);
+		}
+		
+		return getResourceBundle(iwc).getLocalizedString("error_downloading_contract", "Sorry, contract can not be downloaded - some error occurred.");
 	}
 	
 	private ICFile createContract(PrintingContext pcx, Application application, Locale locale) throws CreateException {
@@ -946,7 +956,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			}
 
 			file.setFileValue(null);
-			file.setMimeType("application/x-pdf");
+			file.setMimeType(MimeTypeUtil.MIME_TYPE_PDF_2);
 
 			file.setName(fileName);
 			file.setFileSize(length);
@@ -975,6 +985,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return null;
 		}
 		
-		return "/content" + CONTRACT_SLIDE_PATH + contractFile.getName();
+		return new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(CONTRACT_SLIDE_PATH).append(contractFile.getName()).toString();
 	}
 }

@@ -15,17 +15,19 @@ import is.idega.idegaweb.egov.company.presentation.institution.ApplicationApprov
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.Case;
-import com.idega.block.process.data.CaseStatus;
 import com.idega.block.process.message.data.Message;
 import com.idega.company.data.CompanyType;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
+import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Span;
@@ -84,6 +86,8 @@ public class CompanyApplicationViewer extends CompanyBlock {
 
 	@SuppressWarnings("unchecked")
 	private void getViewerForm(IWContext iwc, CompanyApplication application) throws RemoteException {
+		Locale locale = iwc.getCurrentLocale();
+		
 		Form form = new Form();
 		form.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_VIEW));
 		form.maintainParameter(ApplicationCreator.APPLICATION_ID_PARAMETER);
@@ -99,10 +103,30 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		form.add(getCompanyInfo(iwc, application.getCompany()));
 
 		CompanyType type = application.getType();
+		if (type != null) {
+			heading = new Heading1(iwrb.getLocalizedString("application.type_information_overview", "Type information"));
+			heading.setStyleClass("subHeader");
+			heading.setStyleClass("topSubHeader");
+			form.add(heading);
+	
+			Layer section = new Layer(Layer.DIV);
+			section.setStyleClass("formSection");
+			form.add(section);
+	
+			Layer formItem = new Layer(Layer.DIV);
+			formItem.setStyleClass("formItem");
+			Label label = new Label();
+			label.setLabel(iwrb.getLocalizedString("company_type", "Company type"));
+			formItem.add(label);
+			Span span = new Span(new Text(type.getLocalizedName(iwc, locale)));
+			formItem.add(span);
+			section.add(formItem);
+			
+			section.add(new CSSSpacer());
+		}
 
-		heading = new Heading1(iwrb.getLocalizedString("application.type_information_overview", "Type information"));
+		heading = new Heading1(iwrb.getLocalizedString("application.company_information_overview", "Company information"));
 		heading.setStyleClass("subHeader");
-		heading.setStyleClass("topSubHeader");
 		form.add(heading);
 
 		Layer section = new Layer(Layer.DIV);
@@ -112,30 +136,9 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		Label label = new Label();
-		label.setLabel(iwrb.getLocalizedString("company_type", "Company type"));
-		formItem.add(label);
-		Span span = new Span(new Text(type != null ? type.getLocalizedName(iwc, iwc.getCurrentLocale()) : ""));
-		formItem.add(span);
-		section.add(formItem);
-
-		Layer clearLayer = new Layer(Layer.DIV);
-		clearLayer.setStyleClass("Clear");
-		section.add(clearLayer);
-
-		heading = new Heading1(iwrb.getLocalizedString("application.company_information_overview", "Company information"));
-		heading.setStyleClass("subHeader");
-		form.add(heading);
-
-		section = new Layer(Layer.DIV);
-		section.setStyleClass("formSection");
-		form.add(section);
-
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label();
 		label.setLabel(iwrb.getLocalizedString("personal_id", "Personal ID"));
 		formItem.add(label);
-		span = new Span(new Text(PersonalIDFormatter.format(application.getCompany().getPersonalID(), iwc.getCurrentLocale())));
+		Span span = new Span(new Text(PersonalIDFormatter.format(application.getCompany().getPersonalID(), locale)));
 		formItem.add(span);
 		section.add(formItem);
 
@@ -148,7 +151,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		formItem.add(span);
 		section.add(formItem);
 
-		section.add(clearLayer);
+		section.add(new CSSSpacer());
 
 		User user = application.getApplicantUser();
 		if (user != null) {
@@ -165,7 +168,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 			label = new Label();
 			label.setLabel(iwrb.getLocalizedString("personal_id", "Personal ID"));
 			formItem.add(label);
-			span = new Span(new Text(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())));
+			span = new Span(new Text(PersonalIDFormatter.format(user.getPersonalID(), locale)));
 			formItem.add(span);
 			section.add(formItem);
 
@@ -174,7 +177,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 			label = new Label();
 			label.setLabel(iwrb.getLocalizedString("name", "Name"));
 			formItem.add(label);
-			span = new Span(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(iwc.getCurrentLocale())));
+			span = new Span(new Text(new Name(user.getFirstName(), user.getMiddleName(), user.getLastName()).getName(locale)));
 			formItem.add(span);
 			section.add(formItem);
 
@@ -229,7 +232,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 			formItem.add(span);
 			section.add(formItem);
 
-			section.add(clearLayer);
+			section.add(new CSSSpacer());
 		}
 
 		Collection<Case> children = application.getChildren();
@@ -267,7 +270,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 						label = new Label();
 						label.setLabel(iwrb.getLocalizedString("sender", "Sender"));
 						formItem.add(label);
-						span = new Span(new Text(new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName()).getName(iwc.getCurrentLocale())));
+						span = new Span(new Text(new Name(sender.getFirstName(), sender.getMiddleName(), sender.getLastName()).getName(locale)));
 						formItem.add(span);
 						section.add(formItem);
 					}
@@ -278,7 +281,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 						label = new Label();
 						label.setLabel(iwrb.getLocalizedString("receiver", "Receiver"));
 						formItem.add(label);
-						span = new Span(new Text(new Name(receiver.getFirstName(), receiver.getMiddleName(), receiver.getLastName()).getName(iwc.getCurrentLocale())));
+						span = new Span(new Text(new Name(receiver.getFirstName(), receiver.getMiddleName(), receiver.getLastName()).getName(locale)));
 						formItem.add(span);
 						section.add(formItem);
 					}
@@ -288,7 +291,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 					label = new Label();
 					label.setLabel(iwrb.getLocalizedString("sent_date", "Sent date"));
 					formItem.add(label);
-					span = new Span(new Text(created.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)));
+					span = new Span(new Text(created.getLocaleDateAndTime(locale, IWTimestamp.SHORT, IWTimestamp.SHORT)));
 					formItem.add(span);
 					section.add(formItem);
 
@@ -301,7 +304,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 					formItem.add(span);
 					section.add(formItem);
 
-					section.add(clearLayer);
+					section.add(new CSSSpacer());
 				}
 			}
 		}
@@ -317,41 +320,46 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		}
 		bottom.add(home);
 
-		application.getChildrenIterator();
+		String status = application.getCaseStatus() == null ? null : application.getCaseStatus().getStatus();
+		if (Arrays.asList(getCompanyBusiness().getStatusesForOpenCases()).contains(status)) {
+			Link approve = getButtonLink(iwrb.getLocalizedString("approve", "Approve"));
+			approve.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_APPROVE));
+			approve.setClickConfirmation(iwrb.getLocalizedString("application.approve_confirmation", "Are you sure you want to approve this application?"));
+			bottom.add(approve);
 
-			CaseStatus status = application.getCaseStatus();
-
-			if (status.equals(getCompanyBusiness().getCaseStatusOpen()) || status.equals(getCompanyBusiness().getCaseStatusReview())) {
-				Link approve = getButtonLink(iwrb.getLocalizedString("approve", "Approve"));
-				approve.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, application.getPrimaryKey().toString());
-				approve.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_APPROVE));
-				approve.setClickConfirmation(iwrb.getLocalizedString("application.approve_confirmation", "Are you sure you want to approve this application?"));
-				bottom.add(approve);
-
-				Link reject = getButtonLink(iwrb.getLocalizedString("reject", "Reject"));
-				reject.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REJECTION_FORM));
-				reject.setToFormSubmit(form);
-				bottom.add(reject);
-
-			} else if (status.equals(getCompanyBusiness().getCaseStatusDenied())) {
-				Link reactivate = getButtonLink(iwrb.getLocalizedString("reactivate", "Reactivate"));
-				reactivate.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REACTIVATE));
-				reactivate.setToFormSubmit(form);
-				bottom.add(reactivate);
-			} else if (status.equals(getCompanyBusiness().getCaseStatusGranted())) {
-				Link close = getButtonLink(iwrb.getLocalizedString("close_account", "Close account"));
-				close.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_CLOSING_FORM));
-				close.setToFormSubmit(form);
-				bottom.add(close);
-			}
+			Link reject = getButtonLink(iwrb.getLocalizedString("reject", "Reject"));
+			reject.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REJECTION_FORM));
+			reject.setToFormSubmit(form);
+			bottom.add(reject);
+		}
+		if (Arrays.asList(getCompanyBusiness().getStatusesForRejectedCases()).contains(status)) {
+			Link reactivate = getButtonLink(iwrb.getLocalizedString("reactivate", "Reactivate"));
+			reactivate.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REACTIVATE));
+			reactivate.setToFormSubmit(form);
+			bottom.add(reactivate);
+		}
+		if (status.equals(getCompanyBusiness().getCaseStatusGranted())) {
+			Link close = getButtonLink(iwrb.getLocalizedString("close_account", "Close account"));
+			close.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_CLOSING_FORM));
+			close.setToFormSubmit(form);
+			bottom.add(close);
+		}
+		if (status.equals(getCompanyBusiness().getCaseStatusCancelled())) {
+			Link open = getButtonLink(iwrb.getLocalizedString("open_account", "Open account"));
+			open.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_OPEN));
+			open.setClickConfirmation(iwrb.getLocalizedString("open_account_confirmation", "Are you sure you want to reopen account for this application?"));
+			bottom.add(open);
+		}
 		
-		Link contract = getButtonLink(iwrb.getLocalizedString("contract.file_name", "Contract"));
-		StringBuffer javaScript = new StringBuffer("CompanyApplicationBusiness.generateContract( ")
+		Link contract = getButtonLink(iwrb.getLocalizedString("company_application_contract", "Contract"));
+		StringBuffer javaScript = new StringBuffer("showLoadingMessage('")
+										.append(iwrb.getLocalizedString("downloading", "Downloading..."))
+										.append("'); CompanyApplicationBusiness.generateContract('")
 										.append(String.valueOf(application.getPrimaryKey()))
-										.append(", function(str) { window.location.href = str; } );");
+										.append("', function(linkToPdf) { closeAllLoadingMessages(); if (linkToPdf == null || '' == linkToPdf) { return false; } if (linkToPdf.indexOf('.pdf') != -1) { window.location.href = linkToPdf; } else { alert(linkToPdf); }} );");
 		
 		contract.setOnClick(javaScript.toString());
-		contract.setNoURL();
+		contract.setURL("javascript:void(0)");
 		
 		bottom.add(contract);
 	}

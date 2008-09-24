@@ -99,11 +99,14 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			case ACTION_REACTIVATE:
 				reactivateApplication(iwc);
 				break;
+			case ACTION_OPEN:
+				reopenAccount(iwc);
+				break;
 			case ACTION_CLOSING_FORM:
 				showClosingForm(iwc);
 				break;
 			case ACTION_CLOSE:
-				closeApplication(iwc);
+				rejectApplication(iwc);
 				break;
 			case ACTION_LIST:
 				listApplications(iwc);
@@ -203,13 +206,22 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		
 		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
 		try {
-			result = compAppBusiness.reactivateApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER), iwc.getParameter(REACTIVATION_EXPLANATION_TEXT));
+			result = compAppBusiness.reactivateApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER),
+					iwc.getParameter(REACTIVATION_EXPLANATION_TEXT));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully reactivated!") :
 			iwrb.getLocalizedString("application_was_not_rejected", "Application was not reactivated! Some error occurred.");
 				
+		listApplications(iwc);
+	}
+	
+	private void reopenAccount(IWContext iwc) {
+		applicationHandlingResultMessage = getCompanyBusiness().reopenAccount(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER)) ?
+				iwrb.getLocalizedString("account_for_application_was_opened", "Account for application was successfully opened!") :
+				iwrb.getLocalizedString("account_for_application_was_not_opened", "Account for application was not opened! Some error occurred.");
+		
 		listApplications(iwc);
 	}
 	
@@ -259,7 +271,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		if (iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
 			form.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER));
 			
-			SubmitButton rejectButton = new SubmitButton(iwrb.getLocalizedString("reject", "Reject"), ApplicationCreator.ACTION, ACTION_REJECT + "");
+			SubmitButton rejectButton = new SubmitButton(iwrb.getLocalizedString("reject", "Reject"), ApplicationCreator.ACTION, String.valueOf(ACTION_REJECT));
 			
 			buttonLayer.add(rejectButton);
 			rejectButton.setToolTip(iwrb.getLocalizedString("send_explanation_and_reject", "Send explanation and reject application"));
@@ -330,7 +342,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		if (iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
 			form.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER));
 			
-			SubmitButton rejectButton = new SubmitButton(iwrb.getLocalizedString("close", "Close"), ApplicationCreator.ACTION, ACTION_CLOSE + "");
+			SubmitButton rejectButton = new SubmitButton(iwrb.getLocalizedString("close", "Close"), ApplicationCreator.ACTION, String.valueOf(ACTION_CLOSE));
 			
 			buttonLayer.add(rejectButton);
 			rejectButton.setToolTip(iwrb.getLocalizedString("send_explanation_and_close", "Send explanation and close application"));
@@ -338,21 +350,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			action.append("')) {return false;}");
 			rejectButton.setOnClick(action.toString());
 		}
-	}
-	
-	private void closeApplication(IWContext iwc) {
-		boolean result = false;
-		
-		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
-		try {
-			result = compAppBusiness.closeApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER), iwc.getParameter(CLOSURE_TEXT));
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_closed", "Application was successfully closed!") :
-			iwrb.getLocalizedString("application_was_not_closed", "Application was not closed! Some error occurred.");
-				
-		listApplications(iwc);
 	}
 	
 	private Heading3 getNoApplicationSelectedLabel() {
@@ -550,5 +547,5 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 
 	public void setBackPage(ICPage backPage) {
 		this.backPage = backPage;
-	}	
+	}
 }

@@ -28,7 +28,8 @@ public abstract class CompanyBlock extends ApplicationBlock {
 	
 	protected CompanyApplicationBusiness getCompanyBusiness() {
 		try {
-			return (CompanyApplicationBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CompanyApplicationBusiness.class);
+			return (CompanyApplicationBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),
+					CompanyApplicationBusiness.class);
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 		}
@@ -138,6 +139,7 @@ public abstract class CompanyBlock extends ApplicationBlock {
 
 		Link link = new Link(all);
 		link.setStyleClass("button");
+		link.setToolTip(text);
 
 		return link;
 	}
