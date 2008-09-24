@@ -60,12 +60,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 */
 	public boolean rejectApplication(IWApplicationContext iwac, String applicationId,
 			String explanationText) throws RemoteException;
-	
-	/**
-	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#reactivateApplication
-	 */
-	public boolean reactivateApplication(IWApplicationContext iwac, String applicationId,
-			String explanationText) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#reactivateApplication
@@ -147,4 +141,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public boolean reopenAccount(IWContext iwc, String applicationId);
 	
 	public String generateContract(String applicationId);
+	
+	public boolean isAccountOpen(CompanyApplication application);
 }

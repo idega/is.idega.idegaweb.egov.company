@@ -40,6 +40,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
+import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
@@ -47,7 +48,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	
 	private static final String CLOSURE_TEXT = "application_closure_explanation_text";
 	private static final String REJECTION_EXPLANATION_TEXT = "application_rejection_explanation_text";
-	private static final String REACTIVATION_EXPLANATION_TEXT = "application_reactivation_explanation_text";
 	
 	public static final int ACTION_VIEW = 1;
 	public static final int ACTION_APPROVE = 2;
@@ -97,7 +97,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 				showReactivationForm(iwc);
 				break;
 			case ACTION_REACTIVATE:
-				reactivateApplication(iwc);
+				approveApplication(iwc);
 				break;
 			case ACTION_OPEN:
 				reopenAccount(iwc);
@@ -141,7 +141,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		if (StringUtil.isEmpty(applicationHandlingResultMessage)) {
 			applicationHandlingResultMessage = iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred.");
 		} else {
-			applicationHandlingResultMessage = "";
+			applicationHandlingResultMessage = CoreConstants.EMPTY;
 		}
 		
 		listApplications(iwc);
@@ -203,22 +203,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		}
 	}
 	
-	private void reactivateApplication(IWContext iwc) {
-		boolean result = false;
-		
-		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
-		try {
-			result = compAppBusiness.reactivateApplication(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER),
-					iwc.getParameter(REACTIVATION_EXPLANATION_TEXT));
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully reactivated!") :
-			iwrb.getLocalizedString("application_was_not_rejected", "Application was not reactivated! Some error occurred.");
-				
-		listApplications(iwc);
-	}
-	
 	private void reopenAccount(IWContext iwc) {
 		applicationHandlingResultMessage = getCompanyBusiness().reopenAccount(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER)) ?
 				iwrb.getLocalizedString("account_for_application_was_opened", "Account for application was successfully opened!") :
@@ -277,9 +261,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			
 			buttonLayer.add(rejectButton);
 			rejectButton.setToolTip(iwrb.getLocalizedString("send_explanation_and_reject", "Send explanation and reject application"));
-			StringBuilder action = new StringBuilder("if (!window.confirm('").append(iwrb.getLocalizedString("are_you_sure", "Are you sure?"));
-			action.append("')) {return false;}");
-			rejectButton.setOnClick(action.toString());
 		}
 	}
 	

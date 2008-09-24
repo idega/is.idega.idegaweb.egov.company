@@ -69,6 +69,7 @@ import com.idega.util.EncryptionType;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.SendMail;
+import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 
@@ -126,22 +127,24 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	}
 
 	public String approveApplication(IWContext iwc, String applicationId) {
-		if (!setStatusToCompanyApplication(applicationId, getCaseStatusGranted().getStatus())) {
-			return null;
-		}
-
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {
 			return null;
 		}
+		
+		String currentStatus = compApp.getStatus();
+		if (!setStatusToCompanyApplication(compApp, getCaseStatusGranted().getStatus())) {
+			return null;
+		}
 
-		IWResourceBundle iwrb = getResourceBundle();
+		IWResourceBundle iwrb = getResourceBundle(iwc);
 		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
 		subject.append(iwrb.getLocalizedString("application_approved_mail_subject", "application was approved"));
 		String text = iwrb.getLocalizedString("application_successfully_approved", "Application was successfully approved!");
 
 		String adminPassword = makeAccountsForCompanyAdmins(iwc, compApp);
 		if (StringUtil.isEmpty(adminPassword)) {
+			setStatusToCompanyApplication(compApp, currentStatus);
 			return null;
 		}
 		
@@ -177,9 +180,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	
 	public String getLoginCreatedInfo(IWContext iwc, String login, String password) {
 		String portNumber = new StringBuilder(":").append(String.valueOf(iwc.getServerPort())).toString();
-		//FIXME now makes inaccessible url running server on localhost
-//		String serverLink = StringHandler.replace(iwc.getServerURL(), portNumber, CoreConstants.EMPTY);
-		String serverLink = iwc.getServerURL();
+		String serverLink = StringHandler.replace(iwc.getServerURL(), portNumber, CoreConstants.EMPTY);
 		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		
@@ -374,20 +375,24 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	}
 
 	public boolean rejectApplication(IWApplicationContext iwac, String applicationId, String explanationText) {
-		if (!setStatusToCompanyApplication(applicationId, getCaseStatusDeleted().getStatus())) {
-			return false;
-		}
-		if (!closeAccount(applicationId)) {
-			return false;
-		}
-		
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {
 			return false;
 		}
-
+		
+		String currentStatus = compApp.getStatus();
+		if (!setStatusToCompanyApplication(compApp, getCaseStatusDenied().getStatus())) {
+			return false;
+		}
+		
+		if (!closeAccount(applicationId)) {
+			setStatusToCompanyApplication(compApp, currentStatus);
+			return false;
+		}
+		
 		Company company = compApp.getCompany();
 		if (company == null) {
+			setStatusToCompanyApplication(compApp, currentStatus);
 			return false;
 		}
 		company.setOpen(false);
@@ -406,33 +411,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		IWResourceBundle iwrb = getResourceBundle();
 		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
 		subject.append(iwrb.getLocalizedString("application.closed_message_subject", "application was canceled"));
-		return sendMail(email, subject.toString(), explanationText);
-	}
-	
-	public boolean reactivateApplication(IWApplicationContext iwac, String applicationId, String explanationText) {
-		if (!setStatusToCompanyApplication(applicationId, getCaseStatusOpen().getStatus())) {
-			return false;
-		}
+		sendMail(email, subject.toString(), explanationText);
 		
-		CompanyApplication compApp = getApplication(applicationId);
-		if (compApp == null) {
-			return false;
-		}
-
-		Email email = null;
-		try {
-			email = getUserBusiness(iwac).getUsersMainEmail(compApp.getApplicantUser());
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		if (email == null) {
-			return false;
-		}
-		
-		IWResourceBundle iwrb = getResourceBundle();
-		StringBuilder subject = new StringBuilder(getMailSubjectStart(compApp));
-		subject.append(iwrb.getLocalizedString("application.reactivated_message_subject", "application was reactivated"));
-		return sendMail(email, subject.toString(), explanationText);
+		return true;
 	}
 	
 	public boolean requestInformation(IWApplicationContext iwac, String applicationId, String explanationText) {
@@ -456,9 +437,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		subject.append(iwrb.getLocalizedString("application.request_info_message_subject", "Further information requested"));
 		return sendMail(email, subject.toString(), explanationText);
 	}
-
-	private boolean setStatusToCompanyApplication(String applicationId, String status) {
-		CompanyApplication compApp = getApplication(applicationId);
+	
+	private boolean setStatusToCompanyApplication(CompanyApplication compApp, String status) {
 		if (compApp == null) {
 			return false;
 		}
@@ -987,5 +967,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		
 		return new StringBuilder(CoreConstants.WEBDAV_SERVLET_URI).append(CONTRACT_SLIDE_PATH).append(contractFile.getName()).toString();
+	}
+	
+	public boolean isAccountOpen(CompanyApplication application) {
+		if (application == null) {
+			return false;
+		}
+		
+		//	TODO
+		return true;
 	}
 }

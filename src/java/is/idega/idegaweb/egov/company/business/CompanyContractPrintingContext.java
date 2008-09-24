@@ -1,5 +1,5 @@
 /*
- * $Id: CompanyContractPrintingContext.java,v 1.1 2008/09/24 10:28:50 anton Exp $
+ * $Id: CompanyContractPrintingContext.java,v 1.2 2008/09/24 13:49:41 valdas Exp $
  * Created on Jun 14, 2007
  *
  * Copyright (C) 2007 Idega Software hf. All Rights Reserved.
@@ -51,7 +51,7 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 	}
 
 	private void init(IWApplicationContext iwac, Application application, Locale locale) throws RemoteException {
-		Map props = new HashMap();
+		Map<String, Object> props = new HashMap<String, Object>();
 		Company company = ((CompanyApplication)application).getCompany();
 		Commune commune = company.getWorkingArea();
 		if (commune == null) {

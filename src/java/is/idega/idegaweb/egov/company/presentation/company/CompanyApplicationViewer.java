@@ -155,7 +155,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 
 		User user = application.getApplicantUser();
 		if (user != null) {
-			heading = new Heading1(iwrb.getLocalizedString("application.admin_information", "Admin information"));
+			heading = new Heading1(iwrb.getLocalizedString("application.contact_person_information", "Contact person information"));
 			heading.setStyleClass("subHeader");
 			form.add(heading);
 
@@ -320,45 +320,58 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		}
 		bottom.add(home);
 
+		String applicationId = application.getId();
 		String status = application.getCaseStatus() == null ? null : application.getCaseStatus().getStatus();
+		
+		Link reject = getButtonLink(iwrb.getLocalizedString("reject", "Reject"));
+		reject.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REJECTION_FORM));
+		reject.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, applicationId);
+		reject.setClickConfirmation(iwrb.getLocalizedString("application.reject_confirmation", "Are you sure you want to reject this application?"));
+		
 		if (Arrays.asList(getCompanyBusiness().getStatusesForOpenCases()).contains(status)) {
+			//	Unhandled application
+			
 			Link approve = getButtonLink(iwrb.getLocalizedString("approve", "Approve"));
 			approve.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_APPROVE));
+			approve.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, applicationId);
 			approve.setClickConfirmation(iwrb.getLocalizedString("application.approve_confirmation", "Are you sure you want to approve this application?"));
 			bottom.add(approve);
 
-			Link reject = getButtonLink(iwrb.getLocalizedString("reject", "Reject"));
-			reject.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REJECTION_FORM));
-			reject.setToFormSubmit(form);
 			bottom.add(reject);
 		}
 		if (Arrays.asList(getCompanyBusiness().getStatusesForRejectedCases()).contains(status)) {
+			//	Rejected application
+			
 			Link reactivate = getButtonLink(iwrb.getLocalizedString("reactivate", "Reactivate"));
-			reactivate.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REACTIVATE));
-			reactivate.setToFormSubmit(form);
+			reactivate.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REACTIVATE));
+			reactivate.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, applicationId);
 			bottom.add(reactivate);
 		}
-		if (status.equals(getCompanyBusiness().getCaseStatusGranted())) {
-			Link close = getButtonLink(iwrb.getLocalizedString("close_account", "Close account"));
-			close.setValueOnClick(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_CLOSING_FORM));
-			close.setToFormSubmit(form);
-			bottom.add(close);
-		}
-		if (status.equals(getCompanyBusiness().getCaseStatusCancelled())) {
-			Link open = getButtonLink(iwrb.getLocalizedString("open_account", "Open account"));
-			open.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_OPEN));
-			open.setClickConfirmation(iwrb.getLocalizedString("open_account_confirmation", "Are you sure you want to reopen account for this application?"));
-			bottom.add(open);
+		if (status.equals(getCompanyBusiness().getCaseStatusGranted().getStatus())) {
+			//	Application is approved
+			bottom.add(reject);
+			
+			boolean accountOpened = getCompanyBusiness().isAccountOpen(application);
+			Link closeOrOpenAccount = getButtonLink(accountOpened ? iwrb.getLocalizedString("close_account", "Close account") :
+				iwrb.getLocalizedString("open_account", "Open account"));
+			closeOrOpenAccount.addParameter(ApplicationCreator.ACTION, accountOpened ? String.valueOf(ApplicationApproverRejecter.ACTION_CLOSING_FORM) :
+				String.valueOf(ApplicationApproverRejecter.ACTION_OPEN));
+			closeOrOpenAccount.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, applicationId);
+			closeOrOpenAccount.setClickConfirmation(accountOpened ?
+				iwrb.getLocalizedString("close_account_confirmation", "Are you sure you want to close account for this application?") : 
+				iwrb.getLocalizedString("open_account_confirmation", "Are you sure you want to reopen account for this application?"));
+			bottom.add(closeOrOpenAccount);
 		}
 		
 		Link contract = getButtonLink(iwrb.getLocalizedString("company_application_contract", "Contract"));
-		StringBuffer javaScript = new StringBuffer("showLoadingMessage('")
-										.append(iwrb.getLocalizedString("downloading", "Downloading..."))
-										.append("'); CompanyApplicationBusiness.generateContract('")
-										.append(String.valueOf(application.getPrimaryKey()))
-										.append("', function(linkToPdf) { closeAllLoadingMessages(); if (linkToPdf == null || '' == linkToPdf) { return false; } if (linkToPdf.indexOf('.pdf') != -1) { window.location.href = linkToPdf; } else { alert(linkToPdf); }} );");
-		
-		contract.setOnClick(javaScript.toString());
+		String javaScript = new StringBuilder("showLoadingMessage('")
+								.append(iwrb.getLocalizedString("downloading", "Downloading..."))
+								.append("'); CompanyApplicationBusiness.generateContract('")
+								.append(String.valueOf(application.getPrimaryKey()))
+								.append("', function(linkToPdf) { closeAllLoadingMessages(); if (linkToPdf == null || '' == linkToPdf) { return false; }")
+								.append(" if (linkToPdf.indexOf('.pdf') != -1) { window.location.href = linkToPdf; } else { alert(linkToPdf); }} );")
+							.toString();
+		contract.setOnClick(javaScript);
 		contract.setURL("javascript:void(0)");
 		
 		bottom.add(contract);
