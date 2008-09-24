@@ -7,11 +7,20 @@
  */
 package is.idega.idegaweb.egov.company;
 
+import java.rmi.RemoteException;
+
+import javax.ejb.CreateException;
+import javax.ejb.FinderException;
+
+import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
+import com.idega.user.business.GroupBusiness;
+import com.idega.user.data.GroupType;
 
-public class IWBundleStarter extends is.idega.idegaweb.egov.fsk.IWBundleStarter implements IWBundleStartable {
+public class IWBundleStarter implements IWBundleStartable {
 	
 	public void start(IWBundle starterBundle) {
 		IWApplicationContext iwac = starterBundle.getApplication().getIWApplicationContext();
@@ -22,6 +31,31 @@ public class IWBundleStarter extends is.idega.idegaweb.egov.fsk.IWBundleStarter 
 		insertGroupType(iwac, EgovCompanyConstants.GROUP_TYPE_COMPANY_SUB_GROUP);
 		
 		//	TODO: insert company types?
+	}
+	
+	private void insertGroupType(IWApplicationContext iwac, String groupType) {
+		try {
+			GroupBusiness business = (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
+			GroupType type;
+			try {
+				type = business.getGroupTypeFromString(groupType);
+			}
+			catch (FinderException e) {
+				type = business.getGroupTypeHome().create();
+				type.setType(groupType);
+				type.setVisibility(true);
+				type.store();
+			}
+		}
+		catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		catch (CreateException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void stop(IWBundle starterBundle) {
