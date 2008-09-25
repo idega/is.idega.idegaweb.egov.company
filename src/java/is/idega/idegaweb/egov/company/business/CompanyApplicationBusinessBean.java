@@ -5,6 +5,8 @@ import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
+import is.idega.idegaweb.egov.company.bean.AdminUser;
+import is.idega.idegaweb.egov.company.bean.CompanyInfo;
 import is.idega.idegaweb.egov.company.data.CompanyApplication;
 import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
 import is.idega.idegaweb.egov.company.data.CompanyEmployee;
@@ -31,6 +33,7 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
 import com.idega.company.CompanyConstants;
+import com.idega.company.business.CompanyBusiness;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
 import com.idega.core.accesscontrol.business.AccessController;
@@ -39,10 +42,13 @@ import com.idega.core.accesscontrol.business.LoginDBHandler;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
+import com.idega.core.contact.data.Phone;
 import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
 import com.idega.core.file.util.MimeTypeUtil;
+import com.idega.core.location.data.Address;
+import com.idega.core.location.data.PostalCode;
 import com.idega.data.IDOLookup;
 import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWApplicationContext;
@@ -72,6 +78,7 @@ import com.idega.util.SendMail;
 import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
+import com.idega.util.text.Name;
 
 public class CompanyApplicationBusinessBean extends ApplicationBusinessBean implements CompanyApplicationBusiness {
 
@@ -144,6 +151,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 		String adminPassword = makeAccountsForCompanyAdmins(iwc, compApp);
 		if (StringUtil.isEmpty(adminPassword)) {
+			logger.log(Level.INFO, "Error approving application: " + applicationId + ", can not create account for company admin");
 			setStatusToCompanyApplication(compApp, currentStatus);
 			return null;
 		}
@@ -191,6 +199,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		.toString();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private String makeAccountsForCompanyAdmins(IWApplicationContext iwac, CompanyApplication compApp) {
 		Company company = compApp.getCompany();
 		if (company == null) {
@@ -203,13 +212,10 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return CoreConstants.MINUS;
 		}
 		
-		/*Collection<Group> companies = compApp.getGroups();
-		if (ListUtil.isEmpty(companies)) {
-			return null;
-		}*/
-		
-		Group rootGroupForCompany = compApp.getApplicantUser().getPrimaryGroup(); /*getRootGroupForCompanies(companies.iterator().next());*/
-		if (rootGroupForCompany == null) {
+		String companyName = company.getName();
+		User applicant = compApp.getApplicantUser();
+		if (applicant == null) {
+			logger.log(Level.SEVERE, "Unkown contact person for company: " + companyName);
 			return null;
 		}
 		
@@ -223,17 +229,33 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return null;
 		}
 		
+		Collection<Group> applicantGroups = null;
+		try {
+			applicantGroups = userBusiness.getUserGroups(applicant);
+		} catch (EJBException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		if (ListUtil.isEmpty(applicantGroups)) {
+			return null;
+		}
+		Group rootGroupForCompany = getRootGroupForCompanies(applicantGroups.iterator().next());//compApp.getApplicantUser().getPrimaryGroup(); /*getRootGroupForCompanies(companies.iterator().next());*/
+		if (rootGroupForCompany == null) {
+			return null;
+		}
+		
 		String personalId = company.getPersonalID();
 		try {
 			companyAdmin = userBusiness.getUser(personalId);
 		} catch (RemoteException e) {
 		} catch (FinderException e) {
 		}
-		String name = company.getName();
 		String password = LoginDBHandler.getGeneratedPasswordForUser();
 		if (companyAdmin == null) {
 			try {
-				companyAdmin = userBusiness.createUserWithLogin(name, null, null, personalId, name, null, null, null,
+				companyAdmin = userBusiness.createUserWithLogin(companyName, null, null, personalId, companyName, null, null, null,
 						Integer.valueOf(rootGroupForCompany.getId()), personalId, password, true, null, -1, null, true, true, EncryptionType.MD5);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
@@ -243,12 +265,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 				e.printStackTrace();
 			}
 			if (companyAdmin == null) {
-				return null;
-			}
-			
-			User applicant = compApp.getApplicantUser();
-			if (applicant == null) {
-				logger.log(Level.SEVERE, "Unkown contact person for company: " + name);
 				return null;
 			}
 			
@@ -301,9 +317,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		compApp.setAdminUser(companyAdmin);
 		compApp.store();
 		
-//		for (Group companyGroup: companies) {
-			makeUserCompanyAdmin(iwac, companyAdmin, rootGroupForCompany);
-//		}
+		/*for (Group companyGroup: applicantGroups) {
+			makeUserCompanyAdmin(iwac, companyAdmin, companyGroup);
+		}*/
 		
 		return password;
 	}
@@ -976,5 +992,165 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 		//	TODO
 		return true;
+	}
+	
+	public AdminUser getUser(String personalId) {
+		if (StringUtil.isEmpty(personalId)) {
+			return new AdminUser();
+		}
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc == null) {
+			return new AdminUser();
+		}
+		Locale locale = iwc.getCurrentLocale();
+		if (locale == null) {
+			locale = Locale.ENGLISH;
+		}
+		
+		UserBusiness userBusiness = null;
+		try {
+			userBusiness = (UserBusiness) getServiceInstance(UserBusiness.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		if (userBusiness == null) {
+			return new AdminUser();
+		}
+		
+		try {
+			User user = userBusiness.getUser(personalId);
+
+			Name name = new Name(user.getFirstName(), user.getMiddleName(), user.getLastName());
+
+			Phone workPhone = null;
+			try {
+				workPhone = userBusiness.getUsersWorkPhone(user);
+			}
+			catch (NoPhoneFoundException e) {
+				// No phone found...
+			}
+
+			Phone mobilePhone = null;
+			try {
+				mobilePhone = userBusiness.getUsersMobilePhone(user);
+			}
+			catch (NoPhoneFoundException e) {
+				// No phone found...
+			}
+
+			Email email = null;
+			try {
+				email = userBusiness.getUsersMainEmail(user);
+			}
+			catch (NoEmailFoundException e) {
+				// No email found...
+			}
+
+			AdminUser adminUser = new AdminUser();
+			adminUser.setPK(user.getPrimaryKey().toString());
+			adminUser.setPersonalID(user.getPersonalID());
+			adminUser.setName(name.getName(locale));
+			if (workPhone != null) {
+				adminUser.setWorkPhone(workPhone.getNumber());
+			}
+			if (mobilePhone != null) {
+				adminUser.setMobilePhone(mobilePhone.getNumber());
+			}
+			if (email != null) {
+				adminUser.setEmail(email.getEmailAddress());
+			}
+
+			return adminUser;
+		}
+		catch (FinderException fe) {
+			logger.log(Level.INFO, "User was not found by provided ID: " + personalId);
+			AdminUser user = new AdminUser();
+			user.setName(getLocalizedString("invalid_personal_id", "Invalid personal ID", locale));
+			return user;
+		}
+		catch (RemoteException re) {
+			re.printStackTrace();
+		}
+		
+		return new AdminUser();
+	}
+	
+	public CompanyInfo getCompany(String companyUniqueId, String companyPhone, String companyFax, String companyEmail, String companyWebpage,
+			String companyBankAccount) {
+		CompanyInfo companyInfo = new CompanyInfo();
+		companyInfo.setPersonalID(companyUniqueId);
+
+		CompanyBusiness companyBusiness = null;
+		try {
+			companyBusiness = (CompanyBusiness) getServiceInstance(CompanyBusiness.class);
+		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		if (companyBusiness == null) {
+			return companyInfo;
+		}
+		
+		try {
+			Company company = companyBusiness.getCompany(companyUniqueId);
+			Address address = company.getAddress();
+			PostalCode code = address != null ? address.getPostalCode() : null;
+			Phone phone = company.getPhone();
+			Phone fax = company.getFax();
+			Email email = company.getEmail();
+
+			companyInfo.setPK(company.getPrimaryKey().toString());
+			companyInfo.setName(company.getName());
+			if (address != null) {
+				companyInfo.setAddress(address.getStreetAddress());
+			}
+			if (code != null) {
+				companyInfo.setPostalCode(code.getPostalCode());
+				companyInfo.setCity(code.getName());
+			}
+
+			if (companyPhone != null && companyPhone.length() > 0) {
+				companyInfo.setPhone(companyPhone);
+			}
+			else if (phone != null) {
+				companyInfo.setPhone(phone.getNumber());
+			}
+
+			if (companyFax != null && companyFax.length() > 0) {
+				companyInfo.setFax(companyFax);
+			}
+			else if (fax != null) {
+				companyInfo.setFax(fax.getNumber());
+			}
+
+			if (companyEmail != null && companyEmail.length() > 0) {
+				companyInfo.setEmail(companyEmail);
+			}
+			else if (email != null) {
+				companyInfo.setEmail(email.getEmailAddress());
+			}
+
+			if (companyWebpage != null && companyWebpage.length() > 0) {
+				companyInfo.setWebPage(companyWebpage);
+			}
+			else {
+				companyInfo.setWebPage(company.getWebPage());
+			}
+
+			if (companyBankAccount != null && companyBankAccount.length() > 0) {
+				companyInfo.setBankAccount(companyBankAccount);
+			}
+			else {
+				companyInfo.setBankAccount(company.getBankAccount());
+			}
+		}
+		catch (FinderException fe) {
+			logger.log(Level.INFO, "Company was not found by provided ID: " + companyUniqueId);
+		}
+		catch (RemoteException re) {
+			re.printStackTrace();
+		}
+		
+		return companyInfo;
 	}
 }

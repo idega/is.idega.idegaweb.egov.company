@@ -3,6 +3,8 @@ package is.idega.idegaweb.egov.company.business;
 
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.data.Application;
+import is.idega.idegaweb.egov.company.bean.AdminUser;
+import is.idega.idegaweb.egov.company.bean.CompanyInfo;
 import is.idega.idegaweb.egov.company.data.CompanyApplication;
 import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
@@ -143,4 +145,9 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public String generateContract(String applicationId);
 	
 	public boolean isAccountOpen(CompanyApplication application);
+	
+	public AdminUser getUser(String personalId);
+	
+	public CompanyInfo getCompany(String companyUniqueId, String companyPhone, String companyFax, String companyEmail, String companyWebpage,
+			String companyBankAccount);
 }

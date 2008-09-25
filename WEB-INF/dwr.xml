@@ -12,6 +12,11 @@
     	<create creator="ibo" javascript="CompanyApplicationBusiness" scope="application">
 	      <param name="class" value="is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness"/>
 	      <include method="generateContract" />
+	      <include method="getUser" />
+	      <include method="getCompany" />
 	    </create>
+	    
+	    <convert converter="bean" match="is.idega.idegaweb.egov.company.bean.AdminUser"/>
+		<convert converter="bean" match="is.idega.idegaweb.egov.company.bean.CompanyInfo"/>
 	</allow>
 </dwr>

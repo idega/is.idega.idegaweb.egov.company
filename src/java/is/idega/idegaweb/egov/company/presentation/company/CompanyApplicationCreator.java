@@ -8,6 +8,7 @@ import is.idega.idegaweb.egov.company.data.CompanyApplication;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -131,18 +132,14 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		if (iwc.isParameterSet(PARAMETER_COMPANY_PERSONAL_ID)) {
 			try {
 				company = getCompanyBusiness(iwc).getCompany(iwc.getParameter(PARAMETER_COMPANY_PERSONAL_ID));
-			} catch (FinderException e) {
-				e.printStackTrace();
-			}
+			} catch (FinderException e) {}
 		}
 		
 		User user = null;
 		if (iwc.isParameterSet(PARAMETER_ADMIN_PERSONAL_ID)) {
 			try {
 				user = getUserBusiness(iwc).getUser(iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
-			} catch (FinderException e) {
-				e.printStackTrace();
-			}
+			} catch (FinderException e) {}
 		}
 		
 		Form form = getMainForm(iwc, company, user, ACTION_PHASE_1, iNumberOfPhases);
@@ -184,7 +181,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			CompanyApplication application = null;
 			try {
 				application = getCompanyApplicationBusiness().getCompanyApplicationHome().findByCompany(company);
-			} catch (FinderException e) {}
+			} catch (Exception e) {}
 			if (application != null) {
 				setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.company_already_applied",
 						"The company has already applied for an account."));
@@ -211,8 +208,18 @@ public class CompanyApplicationCreator extends ApplicationForm {
 						"You have entered an invalid bank account number."));
 			}
 		}
-
-		if (!iwc.isParameterSet(PARAMETER_ADMIN_PK)) {
+		
+		User user = null;
+		if (iwc.isParameterSet(PARAMETER_ADMIN_PERSONAL_ID)) {
+			try {
+				user = getUserBusiness(iwc).getUser(iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
+			} catch (Exception e) {}
+			if (user == null) {
+				log(Level.INFO, "User not found by provided ID: " + iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
+				setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select an admin user."));
+			}
+		}
+		else {
 			setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select an admin user."));
 		}
 		if (!iwc.isParameterSet(PARAMETER_WORK_PHONE)) {
@@ -232,13 +239,6 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			return;
 		}
 
-		User user = null;
-		try {
-			user = getUserBusiness(iwc).getUser(iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 		Form form = getMainForm(iwc, company, user, currentPhase, iNumberOfPhases);
 
 		Layer bottom = new Layer(Layer.DIV);
@@ -291,13 +291,14 @@ public class CompanyApplicationCreator extends ApplicationForm {
 	
 	private Form getMainForm(IWContext iwc, Company company, User contactPerson, int phaseNumber, int iNumberOfPhases) {
 		Form form = createForm(phaseNumber);
+		form.setOnSubmit(new StringBuilder("showLoadingMessage('").append(iwrb.getLocalizedString("loading", "Loading...")).append("'); return false;").toString());
 		addErrors(iwc, form);
 		
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
-		scripts.add("/dwr/interface/FSKDWRUtil.js");
-		scripts.add(getBundle(iwc).getVirtualPathWithFileNameString("javascript/application.js"));
+		scripts.add("/dwr/interface/CompanyApplicationBusiness.js");
+		scripts.add(getBundle(iwc).getVirtualPathWithFileNameString("javascript/CompanyApplicationCreatorHelper.js"));
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 
 		form.add(getPhasesHeader(iwrb.getLocalizedString("application.company_information", "Company information"), phaseNumber, iNumberOfPhases));
@@ -322,7 +323,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 
 		TextInput personalID = new TextInput(PARAMETER_COMPANY_PERSONAL_ID);
 		personalID.setID("companyPersonalID");
-		personalID.setOnKeyUp("readCompany();");
+		personalID.setOnKeyUp("CompanyApplicationCreator.getCompanyInfo(event);");
 		personalID.keepStatusOnAction(true);
 
 		TextInput name = new TextInput(PARAMETER_NAME);
@@ -427,7 +428,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		TextInput adminPersonalID = new TextInput(PARAMETER_ADMIN_PERSONAL_ID);
 		adminPersonalID.setID("userPersonalID");
 		adminPersonalID.keepStatusOnAction(true);
-		adminPersonalID.setOnKeyUp("readUser();");
+		adminPersonalID.setOnKeyUp("CompanyApplicationCreator.getContactPersonInformation(event);");
 
 		TextInput adminName = new TextInput(PARAMETER_ADMIN_NAME);
 		adminName.setID("userName");
