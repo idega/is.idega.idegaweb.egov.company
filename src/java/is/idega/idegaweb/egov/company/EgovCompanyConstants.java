@@ -7,6 +7,12 @@
  */
 package is.idega.idegaweb.egov.company;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import com.idega.core.accesscontrol.business.StandardRoles;
+
 public class EgovCompanyConstants {
 	
 	private EgovCompanyConstants() {}
@@ -15,6 +21,9 @@ public class EgovCompanyConstants {
 	
 	public static final String COMPANY_ADMIN_ROLE = "company_admin_role";
 	public static final String COMPANY_EMPLOYEE_ROLE = "company_employee_role";
+	
+	public static final List<String> ALL_COMPANY_ROLES = Collections.unmodifiableList(Arrays.asList(new String[] {StandardRoles.ROLE_KEY_COMPANY,
+			COMPANY_ADMIN_ROLE, COMPANY_EMPLOYEE_ROLE}));
 	
 	public static final String GROUP_TYPE_COMPANY_DIVISIONS = "iw_company_divisions";
 	public static final String GROUP_TYPE_COMPANY_DIVISION = "iw_company_division";
@@ -28,4 +37,6 @@ public class EgovCompanyConstants {
 	public static final Integer APPLICATION_TYPE_APPROVED = 0;
 	public static final Integer APPLICATION_TYPE_REJECTED = 1;
 	public static final Integer APPLICATION_TYPE_UNHANDLED = 2;
+	
+	public static final String USER_LOGIN_METADATA = "userLoginEnabledMetaDataForCompanyPortal";
 }

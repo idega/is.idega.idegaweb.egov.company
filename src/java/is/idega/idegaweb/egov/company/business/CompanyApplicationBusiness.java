@@ -61,8 +61,7 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#rejectApplication
 	 */
-	public boolean rejectApplication(IWApplicationContext iwac, String applicationId,
-			String explanationText) throws RemoteException;
+	public boolean rejectApplication(IWContext iwc, String applicationId, String explanationText) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#reactivateApplication
@@ -160,7 +159,7 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	
 	public List<CompanyApplication> getApplicationsByCaseCodesAndStatuses(String[] caseCodes, List<String> caseStatuses);
 	
-	public boolean closeAccount(String applicationId);
+	public boolean closeAccount(IWContext iwc, String applicationId);
 	
 	public List<User> getCompanyUsers(CompanyApplication application);
 }

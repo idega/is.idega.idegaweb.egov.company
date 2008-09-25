@@ -43,6 +43,7 @@ import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.core.accesscontrol.business.LoginDBHandler;
 import com.idega.core.accesscontrol.business.NotLoggedOnException;
+import com.idega.core.accesscontrol.data.LoginInfo;
 import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
@@ -325,6 +326,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			}
 		}
 		
+		companyAdmin.setJuridicalPerson(true);
+		companyAdmin.store();
+		
 		compApp.setAdminUser(companyAdmin);
 		compApp.store();
 		
@@ -397,7 +401,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return null;
 	}
 
-	public boolean rejectApplication(IWApplicationContext iwac, String applicationId, String explanationText) {
+	public boolean rejectApplication(IWContext iwc, String applicationId, String explanationText) {
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {
 			return false;
@@ -408,7 +412,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return false;
 		}
 		
-		if (!closeAccount(applicationId)) {
+		if (!closeAccount(iwc, applicationId)) {
 			setStatusToCompanyApplication(compApp, currentStatus);
 			return false;
 		}
@@ -540,7 +544,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 	public boolean isCompanyAdministrator(IWContext iwc) {
 		try {
-			return isUserLogged(iwc) && iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_ADMIN_ROLE, iwc);
+			return (isUserLogged(iwc) && iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_ADMIN_ROLE, iwc) &&
+					isUserAccountEnabledForCompanyPortal(iwc));
 		} catch (NotLoggedOnException e) {
 			e.printStackTrace();
 		}
@@ -549,11 +554,32 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 	public boolean isCompanyEmployee(IWContext iwc) {
 		try {
-			return isCompanyAdministrator(iwc) || iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE, iwc);
+			return (isCompanyAdministrator(iwc) || iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE, iwc)) &&
+					isUserAccountEnabledForCompanyPortal(iwc);
 		} catch (NotLoggedOnException e) {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	private boolean isUserAccountEnabledForCompanyPortal(IWContext iwc) {
+		User currentUser = null;
+		try {
+			currentUser = iwc.getCurrentUser();
+		} catch(NotLoggedOnException e) {
+			e.printStackTrace();
+		}
+		if (currentUser == null) {
+			return false;
+		}
+		
+		String accountMetadata = currentUser.getMetaData(EgovCompanyConstants.USER_LOGIN_METADATA);
+		if (StringUtil.isEmpty(accountMetadata)) {
+			//	By default - no value set that means account is not closed
+			return true;
+		}
+		
+		return Boolean.valueOf(accountMetadata);
 	}
 
 	public CompanyApplicationHome getCompanyApplicationHome() {
@@ -569,10 +595,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return false;
 		}
 		
-//		User oldAdmin = companyGroup.getModerator();
-//		if (oldAdmin != null) {
-			//	TODO
-//		}
 		companyGroup.setModerator(companyAdmin);
 		companyGroup.store();
 		
@@ -960,7 +982,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 	}
 
-	public boolean closeAccount(String applicationId) {
+	public boolean closeAccount(IWContext iwc, String applicationId) {
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {
 			return false;
@@ -970,7 +992,10 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return true;
 		}
 		
-//		TODO
+		for (User user: companyPersons) {
+			//	This will not allow to see Company Portal
+			manageUserAccountForCompanyPortal(user, false);
+		}
 		return true;
 	}
 	
@@ -984,21 +1009,46 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return true;
 		}
 		
-		//	TODO
+		for (User user: companyPersons) {
+			//	This will allow to see Company Portal
+			manageUserAccountForCompanyPortal(user, true);
+		}
 		return true;
+	}
+	
+	//	TODO: is this right?
+	private void manageUserAccountForCompanyPortal(User user, boolean enableAccount) {
+		if (user.isJuridicalPerson()) {
+			try {
+				LoginInfo loginInfo = LoginDBHandler.getLoginInfo(LoginDBHandler.getUserLogin(user));
+				loginInfo.setAccountEnabled(enableAccount);
+				loginInfo.store();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		user.setMetaData(EgovCompanyConstants.USER_LOGIN_METADATA, String.valueOf(enableAccount));
+		user.store();
 	}
 	
 	public boolean isAccountOpen(CompanyApplication application) {
 		if (application == null) {
 			return false;
 		}
-		List<User> companyPersons = getCompanyUsers(application);
-		if (ListUtil.isEmpty(companyPersons)) {
+	
+		User adminUser = application.getAdminUser();
+		if (adminUser == null) {
+			logger.log(Level.WARNING, "Admin user not found for company application: " + application.getName());
 			return false;
 		}
 		
-		//	TODO
-		return true;
+		try {
+			return LoginDBHandler.getLoginInfo(LoginDBHandler.getUserLogin(adminUser)).getAccountEnabled();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	public String generateContract(String applicationId) {

@@ -236,7 +236,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			return;
 		}
 
-		Form form = getMainForm(iwc, company, user, iwrb.getLocalizedString("application.company_information_overview", "Company information overview"),
+		Form form = getMainForm(iwc, company, user, iwrb.getLocalizedString("company_information_overview", "Company information overview"),
 				currentPhase, iNumberOfPhases);
 
 		Layer bottom = new Layer(Layer.DIV);

@@ -218,7 +218,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	}
 	
 	private void closeAccount(IWContext iwc) {
-		applicationHandlingResultMessage = getCompanyBusiness().closeAccount(iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER)) ?
+		applicationHandlingResultMessage = getCompanyBusiness().closeAccount(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER)) ?
 				iwrb.getLocalizedString("account_for_application_was_closed", "Account for application was successfully closed!") :
 				iwrb.getLocalizedString("account_for_application_was_not_closed", "Account for application was not closed! Some error occurred.");
 				
