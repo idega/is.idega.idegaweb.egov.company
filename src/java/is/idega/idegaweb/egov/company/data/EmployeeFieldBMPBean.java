@@ -68,6 +68,7 @@ public class EmployeeFieldBMPBean extends GenericEntity implements EmployeeField
 		return idoFindOnePKByQuery(query);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection<EmployeeField> ejbFindAll() throws FinderException {
 		Table table = new Table(this);
 		SelectQuery query = new SelectQuery(table);

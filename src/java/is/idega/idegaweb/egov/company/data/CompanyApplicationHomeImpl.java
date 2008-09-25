@@ -1,7 +1,5 @@
 package is.idega.idegaweb.egov.company.data;
 
-import is.idega.idegaweb.egov.application.data.Application;
-
 import java.util.Collection;
 
 import javax.ejb.CreateException;
@@ -51,12 +49,13 @@ public class CompanyApplicationHomeImpl extends com.idega.data.IDOFactory implem
 		this.idoCheckInPooledEntity(entity);
 		return this.findByPrimaryKey(pk);
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public Collection<Application> findAllByCaseCodesAndStatuses(String[] caseCodes, String[] statuses) throws FinderException {
+	public Collection<CompanyApplication> findByCaseCodes(String[] caseCodes) throws FinderException {
 		com.idega.data.IDOEntity entity = this.idoCheckOutPooledEntity();
-		java.util.Collection ids = ((CompanyApplicationBMPBean) entity).ejbFindAllByCaseCodesAndStatuses(caseCodes, statuses);
+		java.util.Collection ids = ((CompanyApplicationBMPBean) entity).ejbFindAllByCaseCodes(caseCodes);
 		this.idoCheckInPooledEntity(entity);
 		return this.getEntityCollectionForPrimaryKeys(ids);
 	}
+
 }

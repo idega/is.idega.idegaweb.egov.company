@@ -10,8 +10,6 @@ import java.util.Map;
 import javax.ejb.FinderException;
 
 import com.idega.block.process.data.AbstractCaseBMPBean;
-import com.idega.block.process.data.Case;
-import com.idega.block.process.data.CaseBMPBean;
 import com.idega.block.process.data.CaseCode;
 import com.idega.block.text.data.LocalizedText;
 import com.idega.company.data.Company;
@@ -148,26 +146,15 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		return idoFindOnePKByQuery(query);
 	}
 	
-	public Collection ejbFindAllByCaseCodesAndStatuses(String[] caseCodes, String[] statuses) throws FinderException {
+	@SuppressWarnings("unchecked")
+	public Collection ejbFindAllByCaseCodes(String[] caseCodes) throws FinderException {
 		Table applicationTable = new Table(this);
-		Table processTable = new Table(Case.class);
-		Table caseCodeTable = new Table(CaseCode.class);
 		
 		SelectQuery query = new SelectQuery(applicationTable);
 		query.addColumn(applicationTable.getColumn(getIDColumnName()));
-		
-		try {
-			query.addJoin(processTable, caseCodeTable);
-			query.addJoin(applicationTable, caseCodeTable);
-		}
-		catch (IDORelationshipException ire) {
-			throw new FinderException(ire.getMessage());
-		}
-		
 		query.addCriteria(new InCriteria(applicationTable.getColumn(CASE_CODE), caseCodes));
-		query.addCriteria(new InCriteria(processTable.getColumn(CaseBMPBean.COLUMN_CASE_STATUS), statuses));
 		query.addGroupByColumn(applicationTable, getIDColumnName());
-
+		
 		return idoFindPKsByQuery(query);
 	}
 	
@@ -273,11 +260,13 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void setLocalizedUrls(Map localizedEntries, boolean isNewApplication){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void setLocalizedNames(Map localizedEntries, boolean isNewApplication){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
@@ -333,6 +322,7 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
 	}
 
+	@SuppressWarnings("unchecked")
 	public String getQueryForTxLocalizedText(int localeId, Collection localNamesIds){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");

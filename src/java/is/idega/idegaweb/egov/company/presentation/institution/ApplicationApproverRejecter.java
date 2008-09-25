@@ -1,10 +1,10 @@
 package is.idega.idegaweb.egov.company.presentation.institution;
 
-import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
+import is.idega.idegaweb.egov.company.data.CompanyApplication;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 import is.idega.idegaweb.egov.company.presentation.company.CompanyApplicationViewer;
 
@@ -40,7 +40,6 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
-import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
@@ -62,6 +61,11 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	public static final int ACTION_CLOSE = 11;
 	public static final int ACTION_EDIT_FORM = 12;
 	public static final int ACTION_LIST = 14;
+	
+	private static final int NO_ACTIONS = -1;
+	private static final int ALL_ACTIONS = 0;
+	private static final int APPROVE_ACTION = 1;
+	private static final int REJECT_ACTION = 2;
 	
 	private String caseCode;
 	private Integer applicationType;
@@ -140,8 +144,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		}
 		if (StringUtil.isEmpty(applicationHandlingResultMessage)) {
 			applicationHandlingResultMessage = iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred.");
-		} else {
-			applicationHandlingResultMessage = CoreConstants.EMPTY;
 		}
 		
 		listApplications(iwc);
@@ -366,26 +368,25 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		
 		Locale locale = iwc.getCurrentLocale();
 		String[] caseCodes = new String[] {caseCode};
-		ApplicationBusiness appBusiness = getCompanyBusiness();
+		CompanyApplicationBusiness compAppBusiness = getCompanyBusiness();
 		
 		boolean showAllApplications = applicationType == null;
 		if (showAllApplications || EgovCompanyConstants.APPLICATION_TYPE_UNHANDLED.equals(applicationType)) {
 			form.add(getApplicationsSection(iwrb.getLocalizedString("unhandled_applications", "Unhandled applications") + ":", "unhandledApplicationsStyle",
-				appBusiness.getUnhandledApplications(caseCodes), locale, true));
+				compAppBusiness.getUnhandledApplications(caseCodes), locale, ALL_ACTIONS));
 		}
-		//TODO fix possible error
 		if (showAllApplications || EgovCompanyConstants.APPLICATION_TYPE_APPROVED.equals(applicationType)) {
 			form.add(getApplicationsSection(iwrb.getLocalizedString("approved_applications", "Approved applications") + ":", "approvedApplicationsStyle",
-				appBusiness.getApprovedApplications(caseCodes), locale, false));
+				compAppBusiness.getApprovedApplications(caseCodes), locale, REJECT_ACTION));
 		}
 		
 		if (showAllApplications || EgovCompanyConstants.APPLICATION_TYPE_REJECTED.equals(applicationType)) {
 			form.add(getApplicationsSection(iwrb.getLocalizedString("rejected_applications", "Rejected applications") + ":", "rejectedApplicationsStyle",
-				appBusiness.getRejectedApplications(caseCodes), locale, false));
+				compAppBusiness.getRejectedApplications(caseCodes), locale, APPROVE_ACTION));
 		}
 	}
 	
-	private Layer getApplicationsSection(String label, String styleName, Collection<Application> applications, Locale locale, boolean canDoActions) {
+	private Layer getApplicationsSection(String label, String styleName, Collection<CompanyApplication> applications, Locale locale, int actionCode) {
 		Layer container = new Layer();
 		container.setStyleClass(styleName);
 		
@@ -398,12 +399,14 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			return container;
 		}
 		
-		container.add(getApplicationsTable(applications, locale, canDoActions));
+		container.add(getApplicationsTable(applications, locale, actionCode));
 		container.add(new CSSSpacer());
 		return container;
 	}
 	
-	private Table2 getApplicationsTable(Collection<Application> applications, Locale locale, boolean canDoActions) {
+	private Table2 getApplicationsTable(Collection<CompanyApplication> applications, Locale locale, int actionCode) {
+		boolean canDoActions = actionCode != NO_ACTIONS;
+		
 		Table2 table = new Table2();
 		
 		table.setStyleClass("adminTable");
@@ -417,8 +420,20 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		getRowCell(row, iwrb.getLocalizedString("application", "Application"), "firstColumn applicationNameHeader", true);
 		getRowCell(row, iwrb.getLocalizedString("view", "View"), canDoActions ? "applicationViewHeader" : "lastColumn applicationViewHeader", true);
 		if (canDoActions) {
-			getRowCell(row, iwrb.getLocalizedString("approve", "Approve"), "applicationApproveHeader", true);
-			getRowCell(row, iwrb.getLocalizedString("reject", "Reject"), "lastColumn applicationRejectHeader", true);
+			switch (actionCode) {
+			case ALL_ACTIONS:
+				getRowCell(row, iwrb.getLocalizedString("approve", "Approve"), "applicationApproveHeader", true);
+				getRowCell(row, iwrb.getLocalizedString("reject", "Reject"), "lastColumn applicationRejectHeader", true);
+				break;
+			case APPROVE_ACTION:
+				getRowCell(row, iwrb.getLocalizedString("approve", "Approve"), "lastColumn applicationApproveHeader", true);
+				break;
+			case REJECT_ACTION:
+				getRowCell(row, iwrb.getLocalizedString("reject", "Reject"), "lastColumn applicationRejectHeader", true);
+				break;
+			default:
+				break;
+			}
 		}
 		
 		TableCell2 cell = null;
@@ -445,15 +460,33 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			cell.add(getLink(viewImageUri, viewImageTooltip, applicationId, parameters));
 			
 			if (canDoActions) {
-				cell = getRowCell(row, null, "applicationApproveBody", false);
-				parameters = new ArrayList<AdvancedProperty>();
-				parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_APPROVE)));
-				cell.add(getLink(approveImageUri, approveImageTooltip, applicationId, parameters));
-				
-				cell = getRowCell(row, null, "lastColumn applicationRejectBody", false);
-				parameters = new ArrayList<AdvancedProperty>();
-				parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_REJECTION_FORM)));
-				cell.add(getLink(rejectImageUri, rejectImageTooltip, applicationId, parameters));
+				switch (actionCode) {
+				case ALL_ACTIONS:
+					cell = getRowCell(row, null, "applicationApproveBody", false);
+					parameters = new ArrayList<AdvancedProperty>();
+					parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_APPROVE)));
+					cell.add(getLink(approveImageUri, approveImageTooltip, applicationId, parameters));
+					
+					cell = getRowCell(row, null, "lastColumn applicationRejectBody", false);
+					parameters = new ArrayList<AdvancedProperty>();
+					parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_REJECTION_FORM)));
+					cell.add(getLink(rejectImageUri, rejectImageTooltip, applicationId, parameters));
+					break;
+				case APPROVE_ACTION:
+					cell = getRowCell(row, null, "applicationApproveBody", false);
+					parameters = new ArrayList<AdvancedProperty>();
+					parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_APPROVE)));
+					cell.add(getLink(approveImageUri, approveImageTooltip, applicationId, parameters));
+					break;
+				case REJECT_ACTION:
+					cell = getRowCell(row, null, "lastColumn applicationRejectBody", false);
+					parameters = new ArrayList<AdvancedProperty>();
+					parameters.add(new AdvancedProperty(ApplicationCreator.ACTION, String.valueOf(ACTION_REJECTION_FORM)));
+					cell.add(getLink(rejectImageUri, rejectImageTooltip, applicationId, parameters));
+					break;
+				default:
+					break;
+				}
 			}
 			
 			if (rowIndex % 2 == 0) {

@@ -11,6 +11,7 @@ import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
@@ -150,4 +151,12 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	
 	public CompanyInfo getCompany(String companyUniqueId, String companyPhone, String companyFax, String companyEmail, String companyWebpage,
 			String companyBankAccount);
+	
+	public Collection<CompanyApplication> getUnhandledApplications(String[] caseCodes);
+	
+	public Collection<CompanyApplication> getApprovedApplications(String[] caseCodes);
+	
+	public Collection<CompanyApplication> getRejectedApplications(String[] caseCodes);
+	
+	public List<CompanyApplication> getApplicationsByCaseCodesAndStatuses(String[] caseCodes, List<String> caseStatuses);
 }

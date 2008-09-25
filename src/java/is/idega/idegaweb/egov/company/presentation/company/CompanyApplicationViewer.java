@@ -330,7 +330,6 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		
 		if (Arrays.asList(getCompanyBusiness().getStatusesForOpenCases()).contains(status)) {
 			//	Unhandled application
-			
 			Link approve = getButtonLink(iwrb.getLocalizedString("approve", "Approve"));
 			approve.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_APPROVE));
 			approve.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, applicationId);
@@ -341,7 +340,6 @@ public class CompanyApplicationViewer extends CompanyBlock {
 		}
 		if (Arrays.asList(getCompanyBusiness().getStatusesForRejectedCases()).contains(status)) {
 			//	Rejected application
-			
 			Link reactivate = getButtonLink(iwrb.getLocalizedString("reactivate", "Reactivate"));
 			reactivate.addParameter(ApplicationCreator.ACTION, String.valueOf(ApplicationApproverRejecter.ACTION_REACTIVATE));
 			reactivate.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, applicationId);

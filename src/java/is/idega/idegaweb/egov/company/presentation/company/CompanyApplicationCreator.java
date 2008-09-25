@@ -142,7 +142,8 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			} catch (FinderException e) {}
 		}
 		
-		Form form = getMainForm(iwc, company, user, ACTION_PHASE_1, iNumberOfPhases);
+		Form form = getMainForm(iwc, company, user, iwrb.getLocalizedString("application.company_information", "Company information"), ACTION_PHASE_1,
+				iNumberOfPhases);
 		
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
@@ -165,10 +166,6 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.must_enter_personal_id",
 					"You have to enter a personal ID."));
 		}
-		/*else if (!SocialSecurityNumber.isValidSocialSecurityNumber(iwc.getParameter(PARAMETER_PERSONAL_ID), iwc.getCurrentLocale())) {
-			setError(PARAMETER_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_company_personal_id",
-			 "The personal ID you have entered is not a valid company personal ID."));
-		}*/
 		else {
 			try {
 				company = getCompanyBusiness(iwc).getCompany(iwc.getParameter(PARAMETER_COMPANY_PERSONAL_ID));
@@ -239,7 +236,8 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			return;
 		}
 
-		Form form = getMainForm(iwc, company, user, currentPhase, iNumberOfPhases);
+		Form form = getMainForm(iwc, company, user, iwrb.getLocalizedString("application.company_information_overview", "Company information overview"),
+				currentPhase, iNumberOfPhases);
 
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
@@ -289,9 +287,10 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		addFormItem(container, labelText, interfaceObject, null, false);
 	}
 	
-	private Form getMainForm(IWContext iwc, Company company, User contactPerson, int phaseNumber, int iNumberOfPhases) {
+	private Form getMainForm(IWContext iwc, Company company, User contactPerson, String phaseHeader, int phaseNumber, int iNumberOfPhases) {
 		Form form = createForm(phaseNumber);
-		form.setOnSubmit(new StringBuilder("showLoadingMessage('").append(iwrb.getLocalizedString("loading", "Loading...")).append("'); return false;").toString());
+		form.setOnSubmit(new StringBuilder("showLoadingMessage('").append(iwrb.getLocalizedString("loading", "Loading...")).append("'); return false;")
+				.toString());
 		addErrors(iwc, form);
 		
 		List<String> scripts = new ArrayList<String>();
@@ -301,7 +300,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		scripts.add(getBundle(iwc).getVirtualPathWithFileNameString("javascript/CompanyApplicationCreatorHelper.js"));
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 
-		form.add(getPhasesHeader(iwrb.getLocalizedString("application.company_information", "Company information"), phaseNumber, iNumberOfPhases));
+		form.add(getPhasesHeader(phaseHeader, phaseNumber, iNumberOfPhases));
 
 		Layer info = new Layer(Layer.DIV);
 		info.setStyleClass("info");

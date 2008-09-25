@@ -31,6 +31,8 @@ import com.idega.util.ListUtil;
 
 public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmployee {
 	
+	private static final long serialVersionUID = -7295557259093159891L;
+
 	private static final String ENTITY_NAME = "COMPANY_EMPLOYEE";
 	
 	private static final String EMPLOYEE_USER = "employee_user";
@@ -52,6 +54,7 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		addAttribute(COMPANY_ADMINISTRATOR,"Is company administrator",true,true,Boolean.class);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection<EmployeeField> getFieldsInRvk() {
 		try {
 		    Collection<EmployeeField> fields = super.idoGetRelatedEntities(EmployeeField.class);
@@ -64,6 +67,7 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection<Integer> getFieldsInRvkPKs() {
 		try {
 		    Collection<Integer> fieldPKs = super.idoGetRelatedEntityPKs(EmployeeField.class);
@@ -97,6 +101,7 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection<Application> getServices() {
 		try {
 		    Collection<Application> services = super.idoGetRelatedEntities(Application.class);
@@ -109,6 +114,7 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection<Integer> getServicesPKs() {
 		try {
 		    Collection<Integer> servicePKs = super.idoGetRelatedEntityPKs(Application.class);
@@ -175,6 +181,7 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		return idoFindOnePKByQuery(query);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection ejbFindByGroup(Group userGroup) throws FinderException {
 		Table employees = new Table(this);
 		Table users = new Table(User.class);
@@ -194,6 +201,7 @@ public class CompanyEmployeeBMPBean extends GenericEntity implements CompanyEmpl
 		return idoFindPKsByQuery(query);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection ejbFindAll() throws FinderException {
 		Table table = new Table(this);
 		SelectQuery query = new SelectQuery(table);

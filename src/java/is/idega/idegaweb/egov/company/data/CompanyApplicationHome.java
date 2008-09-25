@@ -1,7 +1,5 @@
 package is.idega.idegaweb.egov.company.data;
 
-import is.idega.idegaweb.egov.application.data.Application;
-
 import java.util.Collection;
 
 import javax.ejb.FinderException;
@@ -23,5 +21,5 @@ public interface CompanyApplicationHome extends com.idega.data.IDOHome{
 	 public CompanyApplication findByPrimaryKey(Object pk) throws javax.ejb.FinderException;
 	 public CompanyApplication findByPersonalID(java.lang.String p0)throws javax.ejb.FinderException;
 	 public CompanyApplication findByCompany(Company company) throws FinderException;
-	 public Collection<Application> findAllByCaseCodesAndStatuses(String[] caseCodes, String[] statuses) throws FinderException;
+	 public Collection<CompanyApplication> findByCaseCodes(String[] caseCodes) throws FinderException;
 }
