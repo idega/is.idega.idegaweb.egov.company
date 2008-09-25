@@ -352,7 +352,7 @@ public class CompanyApplicationViewer extends CompanyBlock {
 			boolean accountOpened = getCompanyBusiness().isAccountOpen(application);
 			Link closeOrOpenAccount = getButtonLink(accountOpened ? iwrb.getLocalizedString("close_account", "Close account") :
 				iwrb.getLocalizedString("open_account", "Open account"));
-			closeOrOpenAccount.addParameter(ApplicationCreator.ACTION, accountOpened ? String.valueOf(ApplicationApproverRejecter.ACTION_CLOSING_FORM) :
+			closeOrOpenAccount.addParameter(ApplicationCreator.ACTION, accountOpened ? String.valueOf(ApplicationApproverRejecter.ACTION_CLOSE_ACCOUNT) :
 				String.valueOf(ApplicationApproverRejecter.ACTION_OPEN));
 			closeOrOpenAccount.addParameter(ApplicationCreator.APPLICATION_ID_PARAMETER, applicationId);
 			closeOrOpenAccount.setClickConfirmation(accountOpened ?

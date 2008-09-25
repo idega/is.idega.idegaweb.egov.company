@@ -169,7 +169,13 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		compApp.store();
 		
 		if (adminPassword.equals(CoreConstants.MINUS)) {
-			return text;	//	Company admin already exists
+			//	Company admin already exists
+			if (!reopenAccount(iwc, applicationId)) {
+				setStatusToCompanyApplication(compApp, currentStatus);
+				logger.log(Level.WARNING, "Can not reopen accounts for company: " + company.getName());
+				return null;
+			}
+			return text;	
 		}
 		
 		Email email = null;
@@ -776,7 +782,12 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			e.printStackTrace();
 		}
 		
-		return ListUtil.isEmpty(companyUsers) ? null : new ArrayList<User>(companyUsers);
+		if (ListUtil.isEmpty(companyUsers)) {
+			logger.log(Level.WARNING, "No users found for company application: " + application.getName());
+			return null;
+		}
+		
+		return new ArrayList<User>(companyUsers);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -949,14 +960,13 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 	}
 
-	private boolean closeAccount(String applicationId) {
+	public boolean closeAccount(String applicationId) {
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {
 			return false;
 		}
 		List<User> companyPersons = getCompanyUsers(compApp);
 		if (ListUtil.isEmpty(companyPersons)) {
-			logger.log(Level.WARNING, "No users found for company application: " + compApp.getName());
 			return true;
 		}
 		
@@ -971,7 +981,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		List<User> companyPersons = getCompanyUsers(compApp);
 		if (ListUtil.isEmpty(companyPersons)) {
-			logger.log(Level.WARNING, "No users found for company application: " + compApp.getName());
 			return true;
 		}
 		
@@ -985,7 +994,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		List<User> companyPersons = getCompanyUsers(application);
 		if (ListUtil.isEmpty(companyPersons)) {
-			logger.log(Level.WARNING, "No users found for company application: " + application.getName());
 			return false;
 		}
 		

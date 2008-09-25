@@ -159,4 +159,8 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public Collection<CompanyApplication> getRejectedApplications(String[] caseCodes);
 	
 	public List<CompanyApplication> getApplicationsByCaseCodesAndStatuses(String[] caseCodes, List<String> caseStatuses);
+	
+	public boolean closeAccount(String applicationId);
+	
+	public List<User> getCompanyUsers(CompanyApplication application);
 }

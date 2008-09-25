@@ -61,6 +61,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	public static final int ACTION_CLOSE = 11;
 	public static final int ACTION_EDIT_FORM = 12;
 	public static final int ACTION_LIST = 14;
+	public static final int ACTION_CLOSE_ACCOUNT = 15;
 	
 	private static final int NO_ACTIONS = -1;
 	private static final int ALL_ACTIONS = 0;
@@ -114,6 +115,9 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 				break;
 			case ACTION_LIST:
 				listApplications(iwc);
+				break;
+			case ACTION_CLOSE_ACCOUNT:
+				closeAccount(iwc);
 				break;
 			default:
 				listApplications(iwc);
@@ -210,6 +214,14 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 				iwrb.getLocalizedString("account_for_application_was_opened", "Account for application was successfully opened!") :
 				iwrb.getLocalizedString("account_for_application_was_not_opened", "Account for application was not opened! Some error occurred.");
 		
+		listApplications(iwc);
+	}
+	
+	private void closeAccount(IWContext iwc) {
+		applicationHandlingResultMessage = getCompanyBusiness().closeAccount(iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER)) ?
+				iwrb.getLocalizedString("account_for_application_was_closed", "Account for application was successfully closed!") :
+				iwrb.getLocalizedString("account_for_application_was_not_closed", "Account for application was not closed! Some error occurred.");
+				
 		listApplications(iwc);
 	}
 	
