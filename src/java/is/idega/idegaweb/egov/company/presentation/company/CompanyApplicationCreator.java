@@ -4,14 +4,10 @@ import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
-import is.idega.idegaweb.egov.company.data.CompanyApplication;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ejb.FinderException;
 
@@ -48,7 +44,6 @@ import com.idega.presentation.ui.TextInput;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
-import com.idega.util.EmailValidator;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
@@ -65,7 +60,7 @@ import com.idega.util.expression.ELUtil;
 
 public class CompanyApplicationCreator extends ApplicationForm {
 	
-	private static final int iNumberOfPhases = 3;
+	private static final int iNumberOfPhases = 2;
 
 	private static final int ACTION_PHASE_1 = 1;
 	private static final int ACTION_OVERVIEW = 2;
@@ -94,8 +89,8 @@ public class CompanyApplicationCreator extends ApplicationForm {
 	
 	private static final String BANK_ACCOUNT_DEFAULT = "0000-00-000000";
 	
-	private String requiredFieldLocalizationKey = "this_field_is_required";
-	private String requiredFieldLocalizationValue = "This field is required!";
+//	private String requiredFieldLocalizationKey = "this_field_is_required";
+//	private String requiredFieldLocalizationValue = "This field is required!";
 	
 	private IWResourceBundle iwrb;
 
@@ -113,12 +108,12 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		try {
 			switch (parseAction(iwc)) {
 				case ACTION_PHASE_1:
-					showPhaseOne(iwc, ACTION_OVERVIEW, iNumberOfPhases);
+					showPhaseOne(iwc, ACTION_SAVE, iNumberOfPhases);
 					break;
 
-				case ACTION_OVERVIEW:
-					showOverview(iwc, ACTION_PHASE_1, ACTION_OVERVIEW, ACTION_SAVE, iNumberOfPhases);
-					break;
+//				case ACTION_OVERVIEW:
+//					showOverview(iwc, ACTION_PHASE_1, ACTION_OVERVIEW, ACTION_SAVE, iNumberOfPhases);
+//					break;
 
 				case ACTION_SAVE:
 					save(iwc);
@@ -159,107 +154,107 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		add(form);
 	}
 	
-	private void showOverview(IWContext iwc, int prevPhase, int currentPhase, int nextPhase, int iNumberOfPhases) throws RemoteException {
-		Company company = null;
-		
-		if (!iwc.isParameterSet(PARAMETER_AGREEMENT)) {
-			setError(PARAMETER_AGREEMENT, iwrb.getLocalizedString("application_error.must_agree_terms", "You have to agree to the terms."));
-		}
-		if (!iwc.isParameterSet(PARAMETER_COMPANY_PERSONAL_ID)) {
-			setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.must_enter_personal_id",
-					"You have to enter a personal ID."));
-		}
-		else {
-			try {
-				company = getCompanyBusiness(iwc).getCompany(iwc.getParameter(PARAMETER_COMPANY_PERSONAL_ID));
-			}
-			catch (FinderException e) {
-				setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.company_not_found",
-						"The personal ID you have entered is not in the company register."));
-			}
-			
-			CompanyApplication application = null;
-			try {
-				application = getCompanyApplicationBusiness().getCompanyApplicationHome().findByCompany(company);
-			} catch (Exception e) {}
-			if (application != null) {
-				setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.company_already_applied",
-						"The company has already applied for an account."));
-			}
-		}
-		if (!iwc.isParameterSet(PARAMETER_PHONE)) {
-			setError(PARAMETER_PHONE, iwrb.getLocalizedString("application_error.must_enter_phone", "You have to enter a phone number."));
-		}
-		if (!iwc.isParameterSet(PARAMETER_EMAIL)) {
-			setError(PARAMETER_EMAIL, iwrb.getLocalizedString("application_error.must_enter_email", "You have to enter an e-mail address."));
-		}
-		else if (!EmailValidator.getInstance().validateEmail(iwc.getParameter(PARAMETER_EMAIL))) {
-			setError(PARAMETER_EMAIL, iwrb.getLocalizedString("application_error.invalid_email", "You have entered an invalid e-mail address."));
-		}
-		if (!iwc.isParameterSet(PARAMETER_BANK_ACCOUNT) || iwc.getParameter(PARAMETER_BANK_ACCOUNT).equals(BANK_ACCOUNT_DEFAULT)) {
-			setError(PARAMETER_BANK_ACCOUNT, iwrb.getLocalizedString("application_error.must_enter_bank_account", "You have to enter a bank account."));
-		}
-		else {
-			String bankAccount = iwc.getParameter(PARAMETER_BANK_ACCOUNT);
-			Pattern pat = Pattern.compile("^[0-9]{4}-[0-9]{2}-[0-9]{6}$");
-			Matcher matcher = pat.matcher(bankAccount);
-			if (!matcher.find()) {
-				setError(PARAMETER_BANK_ACCOUNT, iwrb.getLocalizedString("application_error.invalid_bank_account_number",
-						"You have entered an invalid bank account number."));
-			}
-		}
-		
-		User user = null;
-		if (iwc.isParameterSet(PARAMETER_ADMIN_PERSONAL_ID)) {
-			try {
-				user = getUserBusiness(iwc).getUser(iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
-			} catch (Exception e) {}
-			if (user == null) {
-				log(Level.INFO, "User not found by provided ID: " + iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
-				setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select an admin user."));
-			}
-		}
-		else {
-			setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select an admin user."));
-		}
-		if (!iwc.isParameterSet(PARAMETER_WORK_PHONE)) {
-			setError(PARAMETER_WORK_PHONE, iwrb.getLocalizedString("application_error.must_enter_work_phone", "You have to enter work phone."));
-		}
-		if (!iwc.isParameterSet(PARAMETER_MOBILE_PHONE)) {
-			setError(PARAMETER_MOBILE_PHONE, iwrb.getLocalizedString("application_error.must_enter_mobile_phone", "You have to enter mobile phone."));
-		}
-		if (!iwc.isParameterSet(PARAMETER_ADMIN_EMAIL)) {
-			setError(PARAMETER_ADMIN_EMAIL, iwrb.getLocalizedString("application_error.must_enter_admin_email", "You have to enter an email address."));
-		}
-		else if (!EmailValidator.getInstance().validateEmail(iwc.getParameter(PARAMETER_ADMIN_EMAIL))) {
-			setError(PARAMETER_ADMIN_EMAIL, iwrb.getLocalizedString("application_error.invalid_email", "You have entered an invalid e-mail address."));
-		}
-		if (hasErrors()) {
-			showPhaseOne(iwc, ACTION_OVERVIEW, iNumberOfPhases);
-			return;
-		}
-
-		Form form = getMainForm(iwc, company, user, iwrb.getLocalizedString("company_information_overview", "Company information overview"),
-				currentPhase, iNumberOfPhases);
-
-		Layer bottom = new Layer(Layer.DIV);
-		bottom.setStyleClass("bottom");
-		form.add(bottom);
-
-		Link next = getButtonLink(iwrb.getLocalizedString("send", "Send"));
-		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(nextPhase));
-		next.setToFormSubmit(form);
-		bottom.add(next);
-
-		Link back = getButtonLink(iwrb.getLocalizedString("previous", "Previous"));
-		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(prevPhase));
-		back.setToFormSubmit(form);
-		bottom.add(back);
-		
-		add(form);
-	}
+//	private void showOverview(IWContext iwc, int prevPhase, int currentPhase, int nextPhase, int iNumberOfPhases) throws RemoteException {
+//		Company company = null;
+//		
+//		if (!iwc.isParameterSet(PARAMETER_AGREEMENT)) {
+//			setError(PARAMETER_AGREEMENT, iwrb.getLocalizedString("application_error.must_agree_terms", "You have to agree to the terms."));
+//		}
+//		if (!iwc.isParameterSet(PARAMETER_COMPANY_PERSONAL_ID)) {
+//			setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.must_enter_personal_id",
+//					"You have to enter a personal ID."));
+//		}
+//		else {
+//			try {
+//				company = getCompanyBusiness(iwc).getCompany(iwc.getParameter(PARAMETER_COMPANY_PERSONAL_ID));
+//			}
+//			catch (FinderException e) {
+//				setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.company_not_found",
+//						"The personal ID you have entered is not in the company register."));
+//			}
+//			
+//			CompanyApplication application = null;
+//			try {
+//				application = getCompanyApplicationBusiness().getCompanyApplicationHome().findByCompany(company);
+//			} catch (Exception e) {}
+//			if (application != null) {
+//				setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.company_already_applied",
+//						"The company has already applied for an account."));
+//			}
+//		}
+//		if (!iwc.isParameterSet(PARAMETER_PHONE)) {
+//			setError(PARAMETER_PHONE, iwrb.getLocalizedString("application_error.must_enter_phone", "You have to enter a phone number."));
+//		}
+//		if (!iwc.isParameterSet(PARAMETER_EMAIL)) {
+//			setError(PARAMETER_EMAIL, iwrb.getLocalizedString("application_error.must_enter_email", "You have to enter an e-mail address."));
+//		}
+//		else if (!EmailValidator.getInstance().validateEmail(iwc.getParameter(PARAMETER_EMAIL))) {
+//			setError(PARAMETER_EMAIL, iwrb.getLocalizedString("application_error.invalid_email", "You have entered an invalid e-mail address."));
+//		}
+//		if (!iwc.isParameterSet(PARAMETER_BANK_ACCOUNT) || iwc.getParameter(PARAMETER_BANK_ACCOUNT).equals(BANK_ACCOUNT_DEFAULT)) {
+//			setError(PARAMETER_BANK_ACCOUNT, iwrb.getLocalizedString("application_error.must_enter_bank_account", "You have to enter a bank account."));
+//		}
+//		else {
+//			String bankAccount = iwc.getParameter(PARAMETER_BANK_ACCOUNT);
+//			Pattern pat = Pattern.compile("^[0-9]{4}-[0-9]{2}-[0-9]{6}$");
+//			Matcher matcher = pat.matcher(bankAccount);
+//			if (!matcher.find()) {
+//				setError(PARAMETER_BANK_ACCOUNT, iwrb.getLocalizedString("application_error.invalid_bank_account_number",
+//						"You have entered an invalid bank account number."));
+//			}
+//		}
+//		
+//		User user = null;
+//		if (iwc.isParameterSet(PARAMETER_ADMIN_PERSONAL_ID)) {
+//			try {
+//				user = getUserBusiness(iwc).getUser(iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
+//			} catch (Exception e) {}
+//			if (user == null) {
+//				log(Level.INFO, "User not found by provided ID: " + iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
+//				setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select an admin user."));
+//			}
+//		}
+//		else {
+//			setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select an admin user."));
+//		}
+//		if (!iwc.isParameterSet(PARAMETER_WORK_PHONE)) {
+//			setError(PARAMETER_WORK_PHONE, iwrb.getLocalizedString("application_error.must_enter_work_phone", "You have to enter work phone."));
+//		}
+//		if (!iwc.isParameterSet(PARAMETER_MOBILE_PHONE)) {
+//			setError(PARAMETER_MOBILE_PHONE, iwrb.getLocalizedString("application_error.must_enter_mobile_phone", "You have to enter mobile phone."));
+//		}
+//		if (!iwc.isParameterSet(PARAMETER_ADMIN_EMAIL)) {
+//			setError(PARAMETER_ADMIN_EMAIL, iwrb.getLocalizedString("application_error.must_enter_admin_email", "You have to enter an email address."));
+//		}
+//		else if (!EmailValidator.getInstance().validateEmail(iwc.getParameter(PARAMETER_ADMIN_EMAIL))) {
+//			setError(PARAMETER_ADMIN_EMAIL, iwrb.getLocalizedString("application_error.invalid_email", "You have entered an invalid e-mail address."));
+//		}
+//		if (hasErrors()) {
+//			showPhaseOne(iwc, ACTION_OVERVIEW, iNumberOfPhases);
+//			return;
+//		}
+//
+//		Form form = getMainForm(iwc, company, user, iwrb.getLocalizedString("company_information_overview", "Company information overview"),
+//				currentPhase, iNumberOfPhases);
+//
+//		Layer bottom = new Layer(Layer.DIV);
+//		bottom.setStyleClass("bottom");
+//		form.add(bottom);
+//
+//		Link next = getButtonLink(iwrb.getLocalizedString("send", "Send"));
+//		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(nextPhase));
+//		next.setToFormSubmit(form);
+//		bottom.add(next);
+//
+//		Link back = getButtonLink(iwrb.getLocalizedString("previous", "Previous"));
+//		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(prevPhase));
+//		back.setToFormSubmit(form);
+//		bottom.add(back);
+//		
+//		add(form);
+//	}
 	
-	private void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject, String parameter, String styleClass, boolean required) {
+	private void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject, String parameter, String styleClass) {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		if (!StringUtil.isEmpty(styleClass)) {
@@ -270,24 +265,24 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		formItem.add(label);
 		formItem.add(interfaceObject);
 		
-		if (required) {
-			formItem.setStyleClass("required");
-			addRequiredFieldMark(formItem);
-			
-			if (hasError(parameter)) {
-				formItem.setStyleClass("hasError");
-			}
-		}
+//		if (required) {
+//			formItem.setStyleClass("required");
+//			addRequiredFieldMark(formItem);
+//			
+//			if (hasError(parameter)) {
+//				formItem.setStyleClass("hasError");
+//			}
+//		}
 		
 		container.add(formItem);
 	}
 	
-	private void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject, String parameter, boolean required) {
-		addFormItem(container, labelText, interfaceObject, parameter, null, required);
+	private void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject, String parameter) {
+		addFormItem(container, labelText, interfaceObject, parameter, null);
 	}
 	
 	private void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject) {
-		addFormItem(container, labelText, interfaceObject, null, false);
+		addFormItem(container, labelText, interfaceObject, null);
 	}
 	
 	private Form getMainForm(IWContext iwc, Company company, User contactPerson, String phaseHeader, int phaseNumber, int iNumberOfPhases) {
@@ -397,7 +392,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		bankAccount.setContent(BANK_ACCOUNT_DEFAULT);
 		bankAccount.keepStatusOnAction(true);
 
-		addFormItem(section, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID, PARAMETER_COMPANY_PERSONAL_ID, true);
+		addFormItem(section, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID, PARAMETER_COMPANY_PERSONAL_ID);
 		
 		addFormItem(section, iwrb.getLocalizedString("name", "Name"), name);
 
@@ -407,15 +402,15 @@ public class CompanyApplicationCreator extends ApplicationForm {
 
 		addFormItem(section, iwrb.getLocalizedString("city", "City"), city);
 
-		addFormItem(section, iwrb.getLocalizedString("phone", "Phone"), phone, PARAMETER_PHONE, true);
+		addFormItem(section, iwrb.getLocalizedString("phone", "Phone"), phone, PARAMETER_PHONE);
 
 		addFormItem(section, iwrb.getLocalizedString("fax", "Fax"), fax);
 
 		addFormItem(section, iwrb.getLocalizedString("web_page", "Web page"), webPage);
 
-		addFormItem(section, iwrb.getLocalizedString("email", "E-mail"), email, PARAMETER_EMAIL, true);
+		addFormItem(section, iwrb.getLocalizedString("email", "E-mail"), email, PARAMETER_EMAIL);
 
-		addFormItem(section, iwrb.getLocalizedString("bank_account", "Bank account"), bankAccount, PARAMETER_BANK_ACCOUNT, true);
+		addFormItem(section, iwrb.getLocalizedString("bank_account", "Bank account"), bankAccount, PARAMETER_BANK_ACCOUNT);
 
 		section.add(new CSSSpacer());
 
@@ -463,15 +458,15 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			adminName.setContent(contactPerson.getName());
 		}
 
-		addFormItem(section, iwrb.getLocalizedString("personal_id", "Personal ID"), adminPersonalID, PARAMETER_ADMIN_PERSONAL_ID, true);
+		addFormItem(section, iwrb.getLocalizedString("personal_id", "Personal ID"), adminPersonalID, PARAMETER_ADMIN_PERSONAL_ID);
 
 		addFormItem(section, iwrb.getLocalizedString("name", "Name"), adminName);
 
-		addFormItem(section, iwrb.getLocalizedString("work_phone", "Work phone"), workPhone, PARAMETER_WORK_PHONE, true);
+		addFormItem(section, iwrb.getLocalizedString("work_phone", "Work phone"), workPhone, PARAMETER_WORK_PHONE);
 
-		addFormItem(section, iwrb.getLocalizedString("mobile_phone", "Mobile phone"), mobilePhone, PARAMETER_MOBILE_PHONE, true);
+		addFormItem(section, iwrb.getLocalizedString("mobile_phone", "Mobile phone"), mobilePhone, PARAMETER_MOBILE_PHONE);
 
-		addFormItem(section, iwrb.getLocalizedString("email", "E-mail"), adminEmail, PARAMETER_ADMIN_EMAIL, true);
+		addFormItem(section, iwrb.getLocalizedString("email", "E-mail"), adminEmail, PARAMETER_ADMIN_EMAIL);
 		
 		section.add(new CSSSpacer());
 
@@ -492,7 +487,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		paragraph.add(new Text(iwrb.getLocalizedString("application.agreement", "Agreement text")));
 		section.add(paragraph);
 		
-		addFormItem(section, iwrb.getLocalizedString("application.agree_terms", "Yes, I agree"), agree, PARAMETER_AGREEMENT, "radioButtonItem", true);
+		addFormItem(section, iwrb.getLocalizedString("application.agree_terms", "Yes, I agree"), agree, PARAMETER_AGREEMENT, "radioButtonItem");
 
 		form.add(adminPK);
 		form.add(new CSSSpacer());
@@ -557,7 +552,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			success = false;
 		}
 		else if (success) {
-			company.getPhone();
+//			company.getPhone();
 			try {
 				Phone phone = userBusiness.getPhoneHome().create();
 				phone.setPhoneTypeId(PhoneTypeBMPBean.HOME_PHONE_ID);
@@ -655,12 +650,12 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		}
 	}
 	
-	private void addRequiredFieldMark(Layer container) {
-		Span requiredText = new Span(new Text("*"));
-		requiredText.setStyleClass("requiredFieldUserApp");
-		requiredText.setToolTip(iwrb.getLocalizedString(requiredFieldLocalizationKey, requiredFieldLocalizationValue));
-		container.add(requiredText);
-	}	
+//	private void addRequiredFieldMark(Layer container) {
+//		Span requiredText = new Span(new Text("*"));
+//		requiredText.setStyleClass("requiredFieldUserApp");
+//		requiredText.setToolTip(iwrb.getLocalizedString(requiredFieldLocalizationKey, requiredFieldLocalizationValue));
+//		container.add(requiredText);
+//	}	
 	
 	private int parseAction(IWContext iwc) {
 		if (iwc.isParameterSet(PARAMETER_ACTION)) {
