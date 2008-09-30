@@ -1,5 +1,6 @@
 package is.idega.idegaweb.egov.company.presentation.company;
 
+import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
@@ -12,9 +13,9 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import com.idega.block.web2.business.Web2Business;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
@@ -44,11 +45,13 @@ import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.InterfaceObject;
 import com.idega.presentation.ui.Label;
 import com.idega.presentation.ui.TextInput;
+import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.EmailValidator;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 
 /**
  * Application (and case) for company creator
@@ -293,13 +296,20 @@ public class CompanyApplicationCreator extends ApplicationForm {
 				.toString());
 		addErrors(iwc, form);
 		
+		//	Scripts
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
 		scripts.add(CoreConstants.DWR_UTIL_SCRIPT);
 		scripts.add("/dwr/interface/CompanyApplicationBusiness.js");
 		scripts.add(getBundle(iwc).getVirtualPathWithFileNameString("javascript/CompanyApplicationCreatorHelper.js"));
+		Web2Business web2 = ELUtil.getInstance().getBean(Web2Business.SPRING_BEAN_IDENTIFIER);
+		scripts.add(web2.getBundleURIToJQueryLib());
+		scripts.add(web2.getBundleUriToHumanizedMessagesScript());
 		PresentationUtil.addJavaScriptSourcesLinesToHeader(iwc, scripts);
 
+		//	CSS
+		PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
+		
 		form.add(getPhasesHeader(phaseHeader, phaseNumber, iNumberOfPhases));
 
 		Layer info = new Layer(Layer.DIV);
@@ -321,8 +331,10 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		section.add(helpLayer);
 
 		TextInput personalID = new TextInput(PARAMETER_COMPANY_PERSONAL_ID);
-		personalID.setID("companyPersonalID");
-		personalID.setOnKeyUp("CompanyApplicationCreator.getCompanyInfo(event);");
+//		personalID.setID("companyPersonalID");
+		personalID.setOnKeyUp(new StringBuilder("CompanyApplicationCreator.getCompanyInfo(event, '").append(personalID.getId())
+								.append("', '").append(iwrb.getLocalizedString("company_not_found", "Sorry, unable to find company by provided ID"))
+								.append("');").toString());
 		personalID.keepStatusOnAction(true);
 
 		TextInput name = new TextInput(PARAMETER_NAME);
@@ -425,9 +437,11 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		adminPK.keepStatusOnAction(true);
 
 		TextInput adminPersonalID = new TextInput(PARAMETER_ADMIN_PERSONAL_ID);
-		adminPersonalID.setID("userPersonalID");
+//		adminPersonalID.setID("userPersonalID");
 		adminPersonalID.keepStatusOnAction(true);
-		adminPersonalID.setOnKeyUp("CompanyApplicationCreator.getContactPersonInformation(event);");
+		adminPersonalID.setOnKeyUp(new StringBuilder("CompanyApplicationCreator.getContactPersonInformation(event, '").append(adminPersonalID.getId())
+										.append("', '").append(iwrb.getLocalizedString("user_not_found", "Sorry, unable to find user by provided ID"))
+										.append("');").toString());
 
 		TextInput adminName = new TextInput(PARAMETER_ADMIN_NAME);
 		adminName.setID("userName");
@@ -509,67 +523,92 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		String adminMobilePhone = iwc.isParameterSet(PARAMETER_MOBILE_PHONE) ? iwc.getParameter(PARAMETER_MOBILE_PHONE) : null;
 		String adminEmail = iwc.isParameterSet(PARAMETER_ADMIN_EMAIL) ? iwc.getParameter(PARAMETER_ADMIN_EMAIL) : null;
 
-		try {
-			User admin = getUserBusiness(iwc).getUser(adminPersonalID);
-			getUserBusiness(iwc).updateUserWorkPhone(admin, adminWorkPhone);
-			getUserBusiness(iwc).updateUserMobilePhone(admin, adminMobilePhone);
+		UserBusiness userBusiness = getUserBusiness(iwc);
+		User admin = null;
+		if (!StringUtil.isEmpty(adminPersonalID)) {
 			try {
-				getUserBusiness(iwc).updateUserMail(admin, adminEmail);
-			} catch (CreateException e) {
+				admin = userBusiness.getUser(adminPersonalID);
+			} catch (FinderException e) {
 				e.printStackTrace();
 			}
-			
-			Company company = getCompanyBusiness(iwc).getCompany(companyPersonalID);
+		}
+		if (admin == null) {
+			success = false;
+		}
+		else {
 			try {
-				Phone phone = getUserBusiness(iwc).getPhoneHome().create();
+				userBusiness.updateUserWorkPhone(admin, adminWorkPhone);
+				userBusiness.updateUserMobilePhone(admin, adminMobilePhone);
+				userBusiness.updateUserMail(admin, adminEmail);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+			
+		Company company = null;
+		if (!StringUtil.isEmpty(companyPersonalID)) {
+			try {
+				company = getCompanyBusiness(iwc).getCompany(companyPersonalID);
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}
+		}
+		if (company == null) {
+			success = false;
+		}
+		else if (success) {
+			company.getPhone();
+			try {
+				Phone phone = userBusiness.getPhoneHome().create();
 				phone.setPhoneTypeId(PhoneTypeBMPBean.HOME_PHONE_ID);
 				phone.setNumber(companyPhone);
 				company.updatePhone(phone);
-			} catch (CreateException e) {
-				e.printStackTrace();
-			}
-		
-			try {
-				Phone fax = getUserBusiness(iwc).getPhoneHome().create();
-				fax.setPhoneTypeId(PhoneTypeBMPBean.FAX_NUMBER_ID);
-				fax.setNumber(companyFax);
-				company.updateFax(fax);
-			} catch (CreateException e) {
-				e.printStackTrace();
-			}
-		
-			try {
-				Email email = getUserBusiness(iwc).getEmailHome().create();
-				email.setEmailAddress(companyEmail);
-				company.updateEmail(email);
-			} catch (CreateException e) {
+			} catch(Exception e) {
 				e.printStackTrace();
 			}
 			
+			try {
+				Phone fax = userBusiness.getPhoneHome().create();
+				fax.setPhoneTypeId(PhoneTypeBMPBean.FAX_NUMBER_ID);
+				fax.setNumber(companyFax);
+				company.updateFax(fax);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			
+			try {
+				Email email = userBusiness.getEmailHome().create();
+				email.setEmailAddress(companyEmail);
+				company.updateEmail(email);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+				
 			company.setWebPage(companyWebPage);
 			company.setBankAccount(companyBankAccount);
 			company.store();
 			
+			Application application = null;
 			try {
-				getCompanyApplicationBusiness().storeApplication(iwc, admin, companyType, company, iwc.getCurrentUser());
-			} catch (CreateException e) {
+				application = getCompanyApplicationBusiness().storeApplication(iwc, admin, companyType, company, iwc.getCurrentUser());
+			} catch (Exception e) {
 				e.printStackTrace();
 				success = false;
 			}
-
-			if (success) {
-				addPhasesReceipt(iwc, iwrb.getLocalizedString("application.receipt", "Application receipt"),
-						iwrb.getLocalizedString("application.receipt_subject", "Application sent"),
-						iwrb.getLocalizedString("application.receipt_body", "Your application has been received."), ACTION_SAVE, iNumberOfPhases);
+			if (application == null) {
+				success = false;
 			}
-			else {
-				add(getPhasesHeader(iwrb.getLocalizedString("application.submit_failed", "Application submit failed"), ACTION_SAVE, iNumberOfPhases));
-				add(getStopLayer(iwrb.getLocalizedString("application.submit_failed", "Application submit failed"),
-						iwrb.getLocalizedString("application.submit_failed_info", "Application submit failed")));
-			}
-		} catch (FinderException e) {
-			e.printStackTrace();
-		} 
+		}
+		if (success) {
+			addPhasesReceipt(iwc, iwrb.getLocalizedString("application.receipt", "Application receipt"),
+					iwrb.getLocalizedString("application.receipt_subject", "Application sent"),
+					iwrb.getLocalizedString("application.receipt_body", "Your application has been received."), ACTION_SAVE, iNumberOfPhases);
+		}
+		else {
+			add(getPhasesHeader(iwrb.getLocalizedString("application.submit_failed", "Application submit failed"), ACTION_SAVE, iNumberOfPhases));
+			add(getStopLayer(iwrb.getLocalizedString("application.submit_failed", "Application submit failed"),
+					iwrb.getLocalizedString("application.submit_failed_info", "Application submit failed")));
+		}
 
 		Layer clearLayer = new Layer(Layer.DIV);
 		clearLayer.setStyleClass("Clear");
@@ -581,7 +620,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 
 		if (iwc.isLoggedOn()) {
 			try {
-				ICPage page = getUserBusiness(iwc).getHomePageForUser(iwc.getCurrentUser());
+				ICPage page = userBusiness.getHomePageForUser(iwc.getCurrentUser());
 				Link link = getButtonLink(iwrb.getLocalizedString("my_page", "My page"));
 				link.setStyleClass("homeButton");
 				link.setPage(page);

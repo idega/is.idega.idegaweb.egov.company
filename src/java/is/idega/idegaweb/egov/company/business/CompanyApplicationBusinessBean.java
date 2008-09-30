@@ -1137,12 +1137,12 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	
 	public AdminUser getUser(String personalId) {
 		if (StringUtil.isEmpty(personalId)) {
-			return new AdminUser();
+			return null;
 		}
 		
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
-			return new AdminUser();
+			return null;
 		}
 		Locale locale = iwc.getCurrentLocale();
 		if (locale == null) {
@@ -1156,7 +1156,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			e.printStackTrace();
 		}
 		if (userBusiness == null) {
-			return new AdminUser();
+			return null;
 		}
 		
 		try {
@@ -1206,15 +1206,13 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		catch (FinderException fe) {
 			logger.log(Level.INFO, "User was not found by provided ID: " + personalId);
-			AdminUser user = new AdminUser();
-			user.setName(getLocalizedString("invalid_personal_id", "Invalid personal ID", locale));
-			return user;
+			return null;
 		}
 		catch (RemoteException re) {
 			re.printStackTrace();
 		}
 		
-		return new AdminUser();
+		return null;
 	}
 	
 	public CompanyInfo getCompany(String companyUniqueId, String companyPhone, String companyFax, String companyEmail, String companyWebpage,
@@ -1229,7 +1227,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			e.printStackTrace();
 		}
 		if (companyBusiness == null) {
-			return companyInfo;
+			return null;
 		}
 		
 		try {
@@ -1287,9 +1285,11 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		catch (FinderException fe) {
 			logger.log(Level.INFO, "Company was not found by provided ID: " + companyUniqueId);
+			return null;
 		}
 		catch (RemoteException re) {
 			re.printStackTrace();
+			return null;
 		}
 		
 		return companyInfo;
