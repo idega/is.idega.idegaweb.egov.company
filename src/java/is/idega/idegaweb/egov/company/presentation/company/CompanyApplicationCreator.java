@@ -63,8 +63,8 @@ public class CompanyApplicationCreator extends ApplicationForm {
 	private static final int iNumberOfPhases = 2;
 
 	private static final int ACTION_PHASE_1 = 1;
-	private static final int ACTION_OVERVIEW = 2;
-	private static final int ACTION_SAVE = 3;
+//	private static final int ACTION_OVERVIEW = 2;
+	private static final int ACTION_SAVE = 2;
 	
 	private static final String PARAMETER_TYPE = "prm_type";
 	private static final String PARAMETER_ACTION = "prm_action";
@@ -147,7 +147,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
 
-		Link next = getButtonLink(iwrb.getLocalizedString("next", "Next"));
+		Link next = getButtonLink(iwrb.getLocalizedString("send", "Send"));
 		next.setValueOnClick(PARAMETER_ACTION, String.valueOf(nextPhase));
 		next.setToFormSubmit(form);
 		bottom.add(next);
