@@ -2,20 +2,26 @@
 <site-templates>
 	<site name="Company Portal" site-category="CompanyPortal">
 		<structure>
-			<page name="Company Portal" type="companyPortalRootPage">
-				<page name="Institution" type="empty">
-					<page name="Services Register" type="companyPortalServicesRegister" />
-					<page name="Unhandled Companies" type="companyPortalUnhandledCompanies" />
-					<page name="Companies Approval" type="companyPortalCompaniesApproval" />
-					<page name="Companies Rejecter" type="companyPortalCompaniesRejecter" />
+			<page name="Company Portal" type="empty">
+				<page name="My Page" type="citizenPage">
+					<page name="Account Preferences" type="userProperties" />
+					<page name="Change Password" type="changePassword" />
 				</page>
-				<page name="Company" type="empty">
-					<page name="Application Creator" type="companyPortalApplicationCreator" />
-					<page name="Employees Manager" type="companyPortalEmployeesManager" />
-				</page>
-				<page name="Employee" type="empty">
-					<page name="Company Services Viewer" type="companyPortalServicesViewer" />
-					<page name="Employee Registrator" type="companyPortalEmployeeRegistrator" />
+				<page name="Administration Page" type="companyPortalRootPage">
+					<page name="Institution" type="empty">
+						<page name="Services Register" type="companyPortalServicesRegister" />
+						<page name="Unhandled Companies" type="companyPortalUnhandledCompanies" />
+						<page name="Companies Approval" type="companyPortalCompaniesApproval" />
+						<page name="Companies Rejecter" type="companyPortalCompaniesRejecter" />
+					</page>
+					<page name="Company" type="empty">
+						<page name="Application Creator" type="companyPortalApplicationCreator" />
+						<page name="Employees Manager" type="companyPortalEmployeesManager" />
+					</page>
+					<page name="Employee" type="empty">
+						<page name="Company Services Viewer" type="companyPortalServicesViewer" />
+						<page name="Employee Registrator" type="companyPortalEmployeeRegistrator" />
+					</page>
 				</page>
 			</page>
 		</structure>
