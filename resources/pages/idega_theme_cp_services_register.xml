@@ -28,7 +28,13 @@
 					</module>
 				</module>
 			</module>
-			<module id="" class="is.idega.idegaweb.egov.company.presentation.institution.ServicesRegister" />
+			<module id="" class="is.idega.idegaweb.egov.company.presentation.institution.ServicesRegister">
+				<property>
+					<name>:method:1:implied:void:setCaseCode:java.lang.String:</name>
+					<value>COMPORT</value>
+					<type>java.lang.String</type>
+				</property>
+			</module>
 		</region>
 	</page>
 </xml>
