@@ -35,10 +35,6 @@ public class CompanyServicesViewer extends CompanyBlock {
 		add(container);
 		container.add(new Heading1(getResourceBundle(iwc).getLocalizedString("company_services", "Company services")));
 
-		// Temporal remove this after testing
-		/*Collection<Group> selectedGroups = getUserBusiness(iwc).getGroupBusiness().getGroupsByGroupName("company group");
-		setGroup(selectedGroups.iterator().next());*/
-
 		if (!getCompanyBusiness().isCompanyEmployee(iwc)) {
 			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("insufficient_rights", "Insufficient rights")));
 			return;
