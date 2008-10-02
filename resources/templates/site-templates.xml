@@ -15,7 +15,7 @@
 						<page name="Companies Rejecter" type="companyPortalCompaniesRejecter" />
 					</page>
 					<page name="Company" type="empty">
-						<page name="Application Creator" type="companyPortalApplicationCreator" />
+						<page name="Company Application" type="companyPortalApplicationCreator" />
 						<page name="Employees Manager" type="companyPortalEmployeesManager" />
 					</page>
 					<page name="Employee" type="empty">
