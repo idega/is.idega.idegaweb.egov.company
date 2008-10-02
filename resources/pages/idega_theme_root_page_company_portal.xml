@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<page type="companyPortalRootPage">
+		<region id="left" label="left">
+			<module id="" class="com.idega.presentation.Layer">
+				<property>
+					<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+					<value>box</value>
+					<type>java.lang.String</type>
+				</property>
+				<module id="" class="com.idega.presentation.Layer">
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>boxHeader</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>boxHeaderBig</value>
+						<type>java.lang.String</type>
+					</property>
+					<module id="" class="com.idega.presentation.text.Heading1">
+						<property>
+						<name>:method:1:implied:void:setText:java.lang.String:</name>
+						<value>Company Portal</value>
+						<type>java.lang.String</type>
+						</property>
+					</module>
+				</module>
+				<module id="" class="com.idega.presentation.Layer">
+					<module id="" class="com.idega.presentation.text.Heading2">
+						<property>
+							<name>:method:1:implied:void:setText:java.lang.String:</name>
+							<value>Institution administration</value>
+							<type>java.lang.String</type>
+						</property>
+					</module>
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>adminHeader</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:java.lang.String:setID:java.lang.String:</name>
+						<value>companyPortalInstitutionAdministrationHeader</value>
+						<type>java.lang.String</type>
+					</property>
+				</module>
+				<module id="" class="com.idega.block.navigation.presentation.NavigationList">
+					<property>
+						<name>:method:1:implied:void:setHideSubPages:boolean:</name>
+						<value>Y</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:void:setShowRoot:boolean:</name>
+						<value>N</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>adminList</value>
+						<type>java.lang.String</type>
+					</property>
+				</module>
+				<module id="" class="com.idega.presentation.Layer">
+					<module id="" class="com.idega.presentation.text.Heading2">
+						<property>
+							<name>:method:1:implied:void:setText:java.lang.String:</name>
+							<value>Company administration</value>
+							<type>java.lang.String</type>
+						</property>
+					</module>
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>adminHeader</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:java.lang.String:setID:java.lang.String:</name>
+						<value>companyPortalCompanyAdministrationHeader</value>
+						<type>java.lang.String</type>
+					</property>
+				</module>
+				<module id="" class="com.idega.block.navigation.presentation.NavigationList">
+					<property>
+						<name>:method:1:implied:void:setHideSubPages:boolean:</name>
+						<value>Y</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:void:setShowRoot:boolean:</name>
+						<value>N</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>adminList</value>
+						<type>java.lang.String</type>
+					</property>
+				</module>
+				<module id="" class="com.idega.presentation.Layer">
+					<module id="" class="com.idega.presentation.text.Heading2">
+						<property>
+							<name>:method:1:implied:void:setText:java.lang.String:</name>
+							<value>Company Employee</value>
+							<type>java.lang.String</type>
+						</property>
+					</module>
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>adminHeader</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:java.lang.String:setID:java.lang.String:</name>
+						<value>afterSchoolCareHeader</value>
+						<type>java.lang.String</type>
+					</property>
+				</module>
+				<module id="" class="com.idega.block.navigation.presentation.NavigationList">
+					<property>
+						<name>:method:1:implied:void:setHideSubPages:boolean:</name>
+						<value>Y</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:void:setShowRoot:boolean:</name>
+						<value>N</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>adminList</value>
+						<type>java.lang.String</type>
+					</property>
+				</module>
+			</module>
+		</region>
+	</page>
+</xml>

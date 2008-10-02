@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<page type="companyPortalServicesViewer">
+		<region id="left" label="left">
+			<module id="" class="com.idega.presentation.Layer">
+				<property>
+					<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+					<value>box</value>
+					<type>java.lang.String</type>
+				</property>
+				<module id="" class="com.idega.presentation.Layer">
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>boxHeader</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>boxHeaderBig</value>
+						<type>java.lang.String</type>
+					</property>
+					<module id="" class="com.idega.presentation.text.Heading1">
+						<property>
+							<name>:method:1:implied:void:setText:java.lang.String:</name>
+							<value>Company services</value>
+							<type>java.lang.String</type>
+						</property>
+					</module>
+				</module>
+			</module>
+			<module id="" class="is.idega.idegaweb.egov.company.presentation.employee.CompanyServicesViewer" />
+		</region>
+	</page>
+</xml>

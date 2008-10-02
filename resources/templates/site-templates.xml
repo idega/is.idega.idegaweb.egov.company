@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site-templates>
+	<site name="Company Portal" site-category="CompanyPortal">
+		<structure>
+			<page name="Administration Page" type="companyPortalRootPage">
+				<page name="Institution" type="empty">
+					<page name="Services Register" type="companyPortalServicesRegister" />
+					<page name="Unhandled Companies" type="companyPortalUnhandledCompanies" />
+					<page name="Companies Approval" type="companyPortalCompaniesApproval" />
+					<page name="Companies Rejecter" type="companyPortalCompaniesRejecter" />
+				</page>
+				<page name="Company" type="empty">
+					<page name="Application Creator" type="companyPortalApplicationCreator" />
+					<page name="Employees Manager" type="companyPortalEmployeesManager" />
+				</page>
+				<page name="Employee" type="empty">
+					<page name="Company Services Viewer" type="companyPortalServicesViewer" />
+					<page name="Employee Registrator" type="companyPortalEmployeeRegistrator" />
+				</page>
+			</page>
+		</structure>
+		<variables>
+			<variable name="site_title" value="Company Portal" />
+		</variables>
+	</site>
+</site-templates>
