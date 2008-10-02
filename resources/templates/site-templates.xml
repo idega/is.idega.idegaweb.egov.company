@@ -2,7 +2,7 @@
 <site-templates>
 	<site name="Company Portal" site-category="CompanyPortal">
 		<structure>
-			<page name="Administration Page" type="companyPortalRootPage">
+			<page name="Company Portal" type="companyPortalRootPage">
 				<page name="Institution" type="empty">
 					<page name="Services Register" type="companyPortalServicesRegister" />
 					<page name="Unhandled Companies" type="companyPortalUnhandledCompanies" />
