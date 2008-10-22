@@ -1,5 +1,5 @@
 /*
- * $Id: CompanyContractPrintingContext.java,v 1.3 2008/10/22 07:12:27 anton Exp $
+ * $Id: CompanyContractPrintingContext.java,v 1.4 2008/10/22 09:48:31 anton Exp $
  * Created on Jun 14, 2007
  *
  * Copyright (C) 2007 Idega Software hf. All Rights Reserved.
@@ -15,7 +15,6 @@ import is.idega.idegaweb.egov.company.data.CompanyApplication;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.HashMap;
@@ -32,9 +31,6 @@ import com.idega.core.location.data.Commune;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
-import com.idega.xml.XMLDocument;
-import com.idega.xml.XMLElement;
-import com.idega.xml.XMLOutput;
 
 public class CompanyContractPrintingContext extends PrintingContextImpl {
 
@@ -68,7 +64,7 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 		addDocumentProperties(props);
 		setResourceDirectory(new File(getResourcRealPath(getBundle(iwac), locale)));
 		try {
-			setTemplateStream(getTemplateUrlAsStream(getBundle(iwac), locale, "company_contract_template.xml", true));
+			setTemplateStream(getTemplateUrlAsStream(getBundle(iwac), locale, "company_contract_template.xml", false));
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -88,12 +84,12 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 
 	protected FileInputStream getTemplateUrlAsStream(IWBundle iwb, Locale locale, String name, boolean createIfNotExists) throws IOException {
 		File template = new File(getTemplateUrl(iwb, locale, name));
-		if (!template.exists() && createIfNotExists) {
-			File templateFolder = new File(getTemplateFolderUrl(iwb, locale, name));
-			templateFolder.mkdirs();
-			
-			createTemplateFile(template);
-		}
+//		if (!template.exists() && createIfNotExists) {
+//			File templateFolder = new File(getTemplateFolderUrl(iwb, locale, name));
+//			templateFolder.mkdirs();
+//			
+//			createTemplateFile(template);
+//		}
 		return new FileInputStream(template);
 	}
 
@@ -105,44 +101,44 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 		return getResourcRealPath(iwb, locale);
 	}
 
-	private void createTemplateFile(File file) throws IOException {
-		
-		file.createNewFile();
-		FileOutputStream fos = new FileOutputStream(file);
+//	private void createTemplateFile(File file) throws IOException {
+//		
+//		file.createNewFile();
+//		FileOutputStream fos = new FileOutputStream(file);
+//
+//		XMLOutput xmlOutput = new XMLOutput("  ", true);
+//		xmlOutput.setLineSeparator(System.getProperty("line.separator"));
+//		xmlOutput.setTextNormalize(true);
+//		xmlOutput.setEncoding("UTF-8");
+//		XMLDocument doc = getTemplateXMLDocument();
+//		xmlOutput.output(doc, fos);
+//		fos.close();
+//	}
 
-		XMLOutput xmlOutput = new XMLOutput("  ", true);
-		xmlOutput.setLineSeparator(System.getProperty("line.separator"));
-		xmlOutput.setTextNormalize(true);
-		xmlOutput.setEncoding("UTF-8");
-		XMLDocument doc = getTemplateXMLDocument();
-		xmlOutput.output(doc, fos);
-		fos.close();
-	}
-
-	protected XMLDocument getBasicXMLDocument() {
-		XMLElement document = new XMLElement("document");
-		document.setAttribute("size", "A4");
-		document.setAttribute("margin-left", "25");
-		document.setAttribute("margin-right", "25");
-		document.setAttribute("margin-top", "25");
-		document.setAttribute("margin-bottom", "25");
-		XMLDocument doc = new XMLDocument(document);
-
-		return doc;
-	}
-
-	protected XMLDocument getTemplateXMLDocument() {
-		XMLDocument doc = getBasicXMLDocument();
-		XMLElement document = doc.getRootElement();
-		XMLElement subject = new XMLElement("paragraph");
-		subject.addContent("${msg.subject}");
-		document.addContent(subject);
-		XMLElement body = new XMLElement("paragraph");
-		body.setAttribute("halign", "justified");
-		body.addContent("${msg.body}");
-		document.addContent(body);
-		return doc;
-	}
+//	protected XMLDocument getBasicXMLDocument() {
+//		XMLElement document = new XMLElement("document");
+//		document.setAttribute("size", "A4");
+//		document.setAttribute("margin-left", "25");
+//		document.setAttribute("margin-right", "25");
+//		document.setAttribute("margin-top", "25");
+//		document.setAttribute("margin-bottom", "25");
+//		XMLDocument doc = new XMLDocument(document);
+//
+//		return doc;
+//	}
+//
+//	protected XMLDocument getTemplateXMLDocument() {
+//		XMLDocument doc = getBasicXMLDocument();
+//		XMLElement document = doc.getRootElement();
+//		XMLElement subject = new XMLElement("paragraph");
+//		subject.addContent("${msg.subject}");
+//		document.addContent(subject);
+//		XMLElement body = new XMLElement("paragraph");
+//		body.setAttribute("halign", "justified");
+//		body.addContent("${msg.body}");
+//		document.addContent(body);
+//		return doc;
+//	}
 
 	private String getBundleIdentifier() {
 		return EgovCompanyConstants.IW_BUNDLE_IDENTIFIER;
