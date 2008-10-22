@@ -37,6 +37,10 @@ public class CompanyServicesViewer extends CompanyBlock {
 			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("insufficient_rights", "Insufficient rights")));
 			return;
 		}
+		
+		if (group == null) {
+			group = getGroupThatIsCompanyForCurrentUser(iwc);
+		}
 		if (group == null) {
 			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("select_group_that_represents_company",
 					"Select a group that represents company")));
@@ -53,7 +57,9 @@ public class CompanyServicesViewer extends CompanyBlock {
 		}
 
 		if (ListUtil.isEmpty(applicationsForSelectedGroup)) {
-			container.add(getMessage(getResourceBundle(iwc).getLocalizedString("no_services_found", "No services found")));
+			container.add(getMessage(new StringBuilder(getResourceBundle(iwc).getLocalizedString("there_are_no_services_provided_by_company",
+																									"There are no services provided by company"))
+										.append(": ").append(group.getNodeName(iwc.getCurrentLocale())).toString()));
 			return;
 		}
 

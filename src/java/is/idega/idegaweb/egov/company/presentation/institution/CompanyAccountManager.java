@@ -11,6 +11,7 @@ import com.idega.company.CompanyConstants;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Link;
 import com.idega.user.app.SimpleUserApp;
 import com.idega.user.data.Group;
@@ -34,6 +35,10 @@ public class CompanyAccountManager extends CompanyBlock {
 					"You have insufficient rights to manage accounts!"));
 			return;
 		}
+		
+		if (group == null) {
+			group = getGroupThatIsCompanyForCurrentUser(iwc);
+		}
 		if (group == null) {
 			showMessage(iwrb.getLocalizedString("select_group_first_please", "Select group (that represents company) firstly, please!"));
 			return;
@@ -55,6 +60,8 @@ public class CompanyAccountManager extends CompanyBlock {
 		
 		container.add(getMessage(iwrb.getLocalizedString("company_employees_accounts_manager", "Company employees accounts manager")));
 		
+		container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("company", "Company") + ": " + group.getNodeName(iwc.getCurrentLocale())));
+		
 		container.add(getSwitcherLink(iwrb.getLocalizedString("manage_company_account", "Manage company account"), PARAMETER_MANAGE_COMPANY_ACCOUNT));
 		
 		Layer suaInContainer = getSimpleUserApplication(iwc, ListUtil.convertListOfStringsToCommaseparatedString(Arrays.asList(new String [] {
@@ -71,6 +78,8 @@ public class CompanyAccountManager extends CompanyBlock {
 		add(container);
 		
 		container.add(getMessage(iwrb.getLocalizedString("company_account_manager", "Company account manager")));
+		
+		container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("company", "Company") + ": " + group.getNodeName(iwc.getCurrentLocale())));
 		
 		container.add(getSwitcherLink(iwrb.getLocalizedString("manage_accounts_of_company_employees", "Manage accounts of company employees"),
 				PARAMETER_MANAGE_COMPANY_EMPLOYEES_ACCOUNT));

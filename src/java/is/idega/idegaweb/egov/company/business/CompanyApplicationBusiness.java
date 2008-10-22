@@ -162,4 +162,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public boolean closeAccount(IWContext iwc, String applicationId);
 	
 	public List<User> getCompanyUsers(CompanyApplication application);
+	
+	public Group getCompanyUsersCompany(User user);
 }

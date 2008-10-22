@@ -97,6 +97,10 @@ public class CompanyEmployeeManager extends CompanyBlock {
 					"You have insufficient rights to manage accounts!"));
 			return;
 		}
+		
+		if (group == null) {
+			group = getGroupThatIsCompanyForCurrentUser(iwc);
+		}
 		if (getGroup() == null) {
 			showMessage(iwrb.getLocalizedString("no_user_group_selected", "There's no user group selected"));
 			return;

@@ -1,5 +1,7 @@
 package is.idega.idegaweb.egov.company.presentation;
 
+import java.rmi.RemoteException;
+
 import is.idega.idegaweb.egov.application.presentation.ApplicationBlock;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
@@ -17,6 +19,7 @@ import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
+import com.idega.user.data.Group;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
@@ -48,6 +51,20 @@ public abstract class CompanyBlock extends ApplicationBlock {
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/CompanyApplicationBusiness.js");
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/engine.js");
 		PresentationUtil.addStyleSheetToHeader(iwc, bundle.getVirtualPathWithFileNameString("style/egov_company.css"));
+	}
+	
+	protected Group getGroupThatIsCompanyForCurrentUser(IWContext iwc) {
+		CompanyApplicationBusiness companyBusiness = getCompanyBusiness();
+		
+		try {
+			if (companyBusiness.isCompanyEmployee(iwc)) {
+				return companyBusiness.getCompanyUsersCompany(iwc.getCurrentUser());
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	protected void showInsufficientRightsMessage(String message) {

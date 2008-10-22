@@ -210,7 +210,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		.toString();
 	}
 	
-	@SuppressWarnings("unchecked")
 	private String makeAccountsForCompanyAdmins(IWApplicationContext iwac, CompanyApplication compApp) {
 		Company company = compApp.getCompany();
 		if (company == null) {
@@ -240,19 +239,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return null;
 		}
 		
-		Collection<Group> applicantGroups = null;
-		try {
-			applicantGroups = userBusiness.getUserGroups(applicant);
-		} catch (EJBException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		
-		if (ListUtil.isEmpty(applicantGroups)) {
-			return null;
-		}
-		Group rootGroupForCompany = getRootGroupForCompanies(applicantGroups.iterator().next());
+		Group rootGroupForCompany = getCompanyUsersCompany(applicant);
 		if (rootGroupForCompany == null) {
 			logger.log(Level.INFO, "Can not find group for company: " + companyName);
 			return null;
@@ -333,6 +320,38 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		compApp.store();
 		
 		return makeUserCompanyAdmin(iwac, companyAdmin, rootGroupForCompany) ? password : null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Group getCompanyUsersCompany(User user) {
+		if (user == null) {
+			return null;
+		}
+		
+		UserBusiness userBusiness = null;
+		try {
+			userBusiness = getUserBusiness();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		if (userBusiness == null) {
+			return null;
+		}
+		
+		Collection<Group> applicantGroups = null;
+		try {
+			applicantGroups = userBusiness.getUserGroups(user);
+		} catch (EJBException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		if (ListUtil.isEmpty(applicantGroups)) {
+			return null;
+		}
+		
+		return getRootGroupForCompanies(applicantGroups.iterator().next());
 	}
 	
 	public Group getRootGroupForCompanies(Group company) {
