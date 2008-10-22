@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
+import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 
 import com.idega.business.IBOLookup;
@@ -29,6 +30,7 @@ import com.idega.presentation.text.Heading1;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.presentation.group.GroupsFilter;
+import com.idega.util.ArrayUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
@@ -115,6 +117,17 @@ public class ServicesRegister extends ApplicationCreator {
 	}
 	
 	@Override
+	protected boolean validate(IWContext iwc) {
+		String[] selectedGroups = iwc.getParameterValues(SELECTED_GROUPS_PARAMETER_NAME);
+		if (ArrayUtil.isEmpty(selectedGroups)) {
+			iwc.addMessage(SELECTED_GROUPS_PARAMETER_NAME, new FacesMessage(getResourceBundle(iwc).getLocalizedString("group_must_be_selected",
+																																"Group must be selected!")));
+		}
+		
+		return super.validate(iwc);
+	}
+	
+	@Override
 	protected String saveApplication(IWContext iwc, List<ICLocale> locales) throws RemoteException, CreateException, FinderException {
 		String appId = null;
 		try {
@@ -127,9 +140,9 @@ public class ServicesRegister extends ApplicationCreator {
 		}
 		
 		String[] selectedGroups = iwc.getParameterValues(SELECTED_GROUPS_PARAMETER_NAME);
-		if (selectedGroups == null || selectedGroups.length == 0) {
-			log(Level.INFO, "No groups selected for application: " + appId);
-			return appId;
+		if (ArrayUtil.isEmpty(selectedGroups)) {
+			log(Level.SEVERE, "No groups selected for application: " + appId);
+			return null;
 		}
 		
 		Application app = null;
