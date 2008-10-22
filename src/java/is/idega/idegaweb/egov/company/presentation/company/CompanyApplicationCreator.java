@@ -403,7 +403,11 @@ public class CompanyApplicationCreator extends ApplicationForm {
 
 		TextInput bankAccount = new TextInput(PARAMETER_BANK_ACCOUNT);
 		bankAccount.setID("companyBankAccount");
-		bankAccount.setContent(BANK_ACCOUNT_DEFAULT);
+		String bankAccountNumber = BANK_ACCOUNT_DEFAULT;
+		if (company != null) {
+			bankAccountNumber = company.getBankAccount();
+		}
+		bankAccount.setContent(StringUtil.isEmpty(bankAccountNumber) ? BANK_ACCOUNT_DEFAULT : bankAccountNumber);
 		bankAccount.keepStatusOnAction(true);
 
 		addFormItem(section, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID, PARAMETER_COMPANY_PERSONAL_ID, true);

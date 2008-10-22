@@ -335,17 +335,13 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return makeUserCompanyAdmin(iwac, companyAdmin, rootGroupForCompany) ? password : null;
 	}
 	
-	private boolean isGroupCompanyType(Group group) {
-		return group == null ? false : CompanyConstants.GROUP_TYPE_COMPANY.equals(group.getGroupType());
-	}
-	
 	public Group getRootGroupForCompanies(Group company) {
 		if (company == null) {
 			return null;
 		}
 		
 		ICTreeNode parentNode = company.getParentNode();
-		if (parentNode == null && isGroupCompanyType(company)) {
+		if (parentNode == null) {
 			return company;	//	Provided group is ROOT group
 		}
 		
@@ -381,7 +377,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			e.printStackTrace();
 		}
 	
-		return isGroupCompanyType(topGroup) ? topGroup : isGroupCompanyType(company) ? company : null;
+		return topGroup == null ? company: topGroup;
 	}
 	
 	public Group getRootGroupForCompanies(IWContext iwc) {
