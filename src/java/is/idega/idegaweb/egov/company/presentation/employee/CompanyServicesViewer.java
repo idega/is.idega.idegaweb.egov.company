@@ -40,7 +40,8 @@ public class CompanyServicesViewer extends CompanyBlock {
 			return;
 		}
 		if (group == null) {
-			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("select_group", "Select a group")));
+			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("select_group_that_represents_company",
+					"Select a group that represents company")));
 			return;
 		}
 
