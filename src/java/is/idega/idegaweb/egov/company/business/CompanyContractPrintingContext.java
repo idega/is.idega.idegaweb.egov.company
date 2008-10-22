@@ -1,5 +1,5 @@
 /*
- * $Id: CompanyContractPrintingContext.java,v 1.5 2008/10/22 11:19:41 anton Exp $
+ * $Id: CompanyContractPrintingContext.java,v 1.6 2008/10/22 15:48:31 valdas Exp $
  * Created on Jun 14, 2007
  *
  * Copyright (C) 2007 Idega Software hf. All Rights Reserved.
@@ -31,6 +31,7 @@ import com.idega.core.location.data.Commune;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.util.FileUtil;
 
 public class CompanyContractPrintingContext extends PrintingContextImpl {
@@ -63,11 +64,14 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 
 		setFileName(getResourceBundle(iwac, locale).getLocalizedString("contract.file_name", "contract") + "_" + String.valueOf(application.getPrimaryKey()));
 		addDocumentProperties(props);
-		System.out.println(getResourcRealPath(getBundle(iwac), locale));
-//		setResourceDirectory(new File(getResourcRealPath(getBundle(iwac), locale)));
 		
+		//	TODO: fix it!!!
+		String baseDirectory = getResourcRealPath(getBundle(iwac), locale);
+		
+		IWBundleResourceFilter.copyResourceFromJarToWebapp(iwac.getIWMainApplication(), baseDirectory + "rvk.jpg");
+		setResourceDirectory(IWBundleResourceFilter.copyResourceFromJarToWebapp(iwac.getIWMainApplication(), baseDirectory, true));
 		try {
-			File file = FileUtil.getFileFromWorkspace(getResourcRealPath(getBundle(iwac), locale) + "company_contract_template.xml");
+			File file = FileUtil.getFileFromWorkspace(baseDirectory + "company_contract_template.xml");
 			setTemplateStream(new FileInputStream(file));
 		}
 		catch (IOException e) {
