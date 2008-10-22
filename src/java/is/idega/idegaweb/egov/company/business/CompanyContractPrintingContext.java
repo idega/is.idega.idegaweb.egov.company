@@ -1,5 +1,5 @@
 /*
- * $Id: CompanyContractPrintingContext.java,v 1.2 2008/09/24 13:49:41 valdas Exp $
+ * $Id: CompanyContractPrintingContext.java,v 1.3 2008/10/22 07:12:27 anton Exp $
  * Created on Jun 14, 2007
  *
  * Copyright (C) 2007 Idega Software hf. All Rights Reserved.
@@ -89,6 +89,9 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 	protected FileInputStream getTemplateUrlAsStream(IWBundle iwb, Locale locale, String name, boolean createIfNotExists) throws IOException {
 		File template = new File(getTemplateUrl(iwb, locale, name));
 		if (!template.exists() && createIfNotExists) {
+			File templateFolder = new File(getTemplateFolderUrl(iwb, locale, name));
+			templateFolder.mkdirs();
+			
 			createTemplateFile(template);
 		}
 		return new FileInputStream(template);
@@ -97,8 +100,13 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 	protected String getTemplateUrl(IWBundle iwb, Locale locale, String name) {
 		return getResourcRealPath(iwb, locale) + name;
 	}
+	
+	protected String getTemplateFolderUrl(IWBundle iwb, Locale locale, String name) {
+		return getResourcRealPath(iwb, locale);
+	}
 
 	private void createTemplateFile(File file) throws IOException {
+		
 		file.createNewFile();
 		FileOutputStream fos = new FileOutputStream(file);
 
