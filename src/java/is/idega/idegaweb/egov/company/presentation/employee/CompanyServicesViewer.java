@@ -8,7 +8,6 @@ import java.util.Collection;
 
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Heading3;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
@@ -33,7 +32,6 @@ public class CompanyServicesViewer extends CompanyBlock {
 
 		Layer container = new Layer();
 		add(container);
-		container.add(new Heading1(getResourceBundle(iwc).getLocalizedString("company_services", "Company services")));
 
 		if (!getCompanyBusiness().isCompanyEmployee(iwc)) {
 			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("insufficient_rights", "Insufficient rights")));

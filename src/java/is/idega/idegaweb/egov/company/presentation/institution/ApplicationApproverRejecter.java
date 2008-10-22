@@ -30,7 +30,6 @@ import com.idega.presentation.TableBodyRowGroup;
 import com.idega.presentation.TableCell2;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
-import com.idega.presentation.text.Heading1;
 import com.idega.presentation.text.Heading2;
 import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Heading4;
@@ -157,7 +156,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		Form form = new Form();
 		add(form);
 		form.setStyleClass("adminForm");
-		form.add(getComponentLabel());
 		
 		if (!iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
 			form.add(getNoApplicationSelectedLabel());
@@ -229,7 +227,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		Form form = new Form();
 		add(form);
 		form.setStyleClass("adminForm");
-		form.add(getComponentLabel());
 		
 		if (!iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
 			form.add(getNoApplicationSelectedLabel());
@@ -297,7 +294,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		Form form = new Form();
 		add(form);
 		form.setStyleClass("adminForm");
-		form.add(getComponentLabel());
 		
 		if (!iwc.isParameterSet(ApplicationCreator.APPLICATION_ID_PARAMETER)) {
 			form.add(getNoApplicationSelectedLabel());
@@ -358,8 +354,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	private void listApplications(IWContext iwc) {
 		Layer container = new Layer();
 		add(container);
-		
-		container.add(getComponentLabel());
+
 		if (!StringUtil.isEmpty(applicationHandlingResultMessage)) {
 			Heading2 message = new Heading2(applicationHandlingResultMessage);
 			container.add(message);
@@ -541,10 +536,6 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 			cell.add(new Text(content));
 		}
 		return cell;
-	}
-	
-	private Heading1 getComponentLabel() {
-		return new Heading1(iwrb.getLocalizedString("applications_approver", "Applications approver"));
 	}
 	
 	private Heading4 getNoApplicationsHeading() {

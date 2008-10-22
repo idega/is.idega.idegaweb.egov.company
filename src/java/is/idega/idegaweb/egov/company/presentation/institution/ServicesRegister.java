@@ -26,7 +26,6 @@ import com.idega.data.IDORemoveRelationshipException;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.text.Heading1;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.presentation.group.GroupsFilter;
@@ -74,8 +73,6 @@ public class ServicesRegister extends ApplicationCreator {
 	
 	@Override
 	public void present(IWContext iwc) throws Exception {
-		add(new Heading1(getResourceBundle(iwc).getLocalizedString("company_services_register", "Company applications register")));
-		
 		super.present(iwc);
 	}
 	
