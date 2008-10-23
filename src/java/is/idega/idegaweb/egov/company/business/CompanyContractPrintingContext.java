@@ -1,5 +1,5 @@
 /*
- * $Id: CompanyContractPrintingContext.java,v 1.6 2008/10/22 15:48:31 valdas Exp $
+ * $Id: CompanyContractPrintingContext.java,v 1.7 2008/10/23 12:29:52 valdas Exp $
  * Created on Jun 14, 2007
  *
  * Copyright (C) 2007 Idega Software hf. All Rights Reserved.
@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import com.idega.block.pdf.business.PrintingContext;
 import com.idega.block.pdf.business.PrintingContextImpl;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -31,7 +32,6 @@ import com.idega.core.location.data.Commune;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWResourceBundle;
-import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.util.FileUtil;
 
 public class CompanyContractPrintingContext extends PrintingContextImpl {
@@ -56,7 +56,7 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 			commune = getCommuneBusiness(iwac).getDefaultCommune();
 		}
 
-		props.put("iwb", getBundle(iwac));
+		props.put(PrintingContext.IW_BUNDLE_ROPERTY_NAME, getBundle(iwac));
 		props.put("iwrb", getResourceBundle(iwac, locale));
 
 		props.put("name", company.getName());
@@ -64,13 +64,10 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 
 		setFileName(getResourceBundle(iwac, locale).getLocalizedString("contract.file_name", "contract") + "_" + String.valueOf(application.getPrimaryKey()));
 		addDocumentProperties(props);
-		
-		//	TODO: fix it!!!
-		String baseDirectory = getResourcRealPath(getBundle(iwac), locale);
-		
-		IWBundleResourceFilter.copyResourceFromJarToWebapp(iwac.getIWMainApplication(), baseDirectory + "rvk.jpg");
-		setResourceDirectory(IWBundleResourceFilter.copyResourceFromJarToWebapp(iwac.getIWMainApplication(), baseDirectory, true));
+
+		String baseDirectory = getResourceRealPath(getBundle(iwac), locale);
 		try {
+			setResourceDirectory(FileUtil.getFileAndCreateRecursiveIfNotExists(baseDirectory));
 			File file = FileUtil.getFileFromWorkspace(baseDirectory + "company_contract_template.xml");
 			setTemplateStream(new FileInputStream(file));
 		}
@@ -79,11 +76,11 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 		}
 	}
 
-	protected String getResourcRealPath(IWBundle iwb, Locale locale) {
-		String printFolder = iwb.getApplication().getSettings().getProperty("egov.print_template_folder", "/print/");
+	protected String getResourceRealPath(IWBundle iwb, Locale locale) {
+		String printFolder = iwb.getApplication().getSettings().getProperty("company_portal.print_contract_folder", "/print/contract/");
 
 		if (locale != null) {
-			return iwb.getVirtualPathWithFileNameString(locale.toString() + ".locale") + printFolder;
+			return iwb.getResourcesRealPath(locale) + printFolder;
 		}
 		else {
 			return iwb.getResourcesRealPath() + printFolder;
@@ -92,61 +89,12 @@ public class CompanyContractPrintingContext extends PrintingContextImpl {
 
 	protected FileInputStream getTemplateUrlAsStream(IWBundle iwb, Locale locale, String name, boolean createIfNotExists) throws IOException {
 		File template = new File(getTemplateUrl(iwb, locale, name));
-//		if (!template.exists() && createIfNotExists) {
-//			File templateFolder = new File(getTemplateFolderUrl(iwb, locale, name));
-//			templateFolder.mkdirs();
-//			
-//			createTemplateFile(template);
-//		}
 		return new FileInputStream(template);
 	}
 
 	protected String getTemplateUrl(IWBundle iwb, Locale locale, String name) {
-		return getResourcRealPath(iwb, locale) + name;
+		return getResourceRealPath(iwb, locale) + name;
 	}
-	
-//	protected String getTemplateFolderUrl(IWBundle iwb, Locale locale, String name) {
-//		return getResourcRealPath(iwb, locale);
-//	}
-
-//	private void createTemplateFile(File file) throws IOException {
-//		
-//		file.createNewFile();
-//		FileOutputStream fos = new FileOutputStream(file);
-//
-//		XMLOutput xmlOutput = new XMLOutput("  ", true);
-//		xmlOutput.setLineSeparator(System.getProperty("line.separator"));
-//		xmlOutput.setTextNormalize(true);
-//		xmlOutput.setEncoding("UTF-8");
-//		XMLDocument doc = getTemplateXMLDocument();
-//		xmlOutput.output(doc, fos);
-//		fos.close();
-//	}
-
-//	protected XMLDocument getBasicXMLDocument() {
-//		XMLElement document = new XMLElement("document");
-//		document.setAttribute("size", "A4");
-//		document.setAttribute("margin-left", "25");
-//		document.setAttribute("margin-right", "25");
-//		document.setAttribute("margin-top", "25");
-//		document.setAttribute("margin-bottom", "25");
-//		XMLDocument doc = new XMLDocument(document);
-//
-//		return doc;
-//	}
-//
-//	protected XMLDocument getTemplateXMLDocument() {
-//		XMLDocument doc = getBasicXMLDocument();
-//		XMLElement document = doc.getRootElement();
-//		XMLElement subject = new XMLElement("paragraph");
-//		subject.addContent("${msg.subject}");
-//		document.addContent(subject);
-//		XMLElement body = new XMLElement("paragraph");
-//		body.setAttribute("halign", "justified");
-//		body.addContent("${msg.body}");
-//		document.addContent(body);
-//		return doc;
-//	}
 
 	private String getBundleIdentifier() {
 		return EgovCompanyConstants.IW_BUNDLE_IDENTIFIER;
