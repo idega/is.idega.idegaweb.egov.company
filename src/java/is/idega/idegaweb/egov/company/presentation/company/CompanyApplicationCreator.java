@@ -22,7 +22,6 @@ import com.idega.business.IBORuntimeException;
 import com.idega.company.business.CompanyBusiness;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
-import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
@@ -108,15 +107,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 	@Override
 	protected void present(IWContext iwc) {
 		iwrb = getResourceBundle(iwc);
-		
-		try {
-			iwc.getCurrentUser();
-		} catch (NotLoggedOnException ex) {
-			setError(PARAMETER_NO_USER, getResourceBundle(iwc).getLocalizedString("application_error.not_logged_in", "Please log in as a system user"));
-		}
 
-		//	TODO: check user's rights?
-		
 		try {
 			switch (parseAction(iwc)) {
 				case ACTION_PHASE_1:
@@ -571,11 +562,11 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			} catch (Exception e) {}
 			if (user == null) {
 				log(Level.INFO, "User not found by provided ID: " + iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
-				setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select an admin user."));
+				setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select contact person."));
 			}
 		}
 		else {
-			setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select an admin user."));
+			setError(PARAMETER_ADMIN_PERSONAL_ID, iwrb.getLocalizedString("application_error.invalid_user", "You have to select contact person."));
 		}
 		if (!iwc.isParameterSet(PARAMETER_WORK_PHONE)) {
 			setError(PARAMETER_WORK_PHONE, iwrb.getLocalizedString("application_error.must_enter_work_phone", "You have to enter work phone."));
