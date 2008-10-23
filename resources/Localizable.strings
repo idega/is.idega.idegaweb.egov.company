@@ -609,6 +609,7 @@ sub_group_editor.created_date=Created date
 sub_group_editor_error.must_select_group=You have to select a group
 there_are_no_applications_of_selected_type=There are no applications of selected type
 there_are_no_applications_of_this_type=There are no applications of this type
+there_are_no_services_provided_by_company=There are no services provided by company
 this_field_is_required=This field is required\!
 to_date=To date
 total=Total
