@@ -3,8 +3,6 @@ package is.idega.idegaweb.egov.company.presentation.institution;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
-import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +25,6 @@ import com.idega.data.IDORemoveRelationshipException;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
-import com.idega.presentation.text.Heading1;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.presentation.group.GroupsFilter;
@@ -54,17 +51,17 @@ public class ServicesRegister extends ApplicationCreator {
 
 	@Override
 	public void main(IWContext iwc) throws Exception {
-		CompanyApplicationBusiness companyApplication = (CompanyApplicationBusiness) IBOLookup.getServiceInstance(iwc, CompanyApplicationBusiness.class);
-		if (!companyApplication.isCompanyAdministrator(iwc)) {
-			Layer container = new Layer();
-			container.setStyleClass("insufficientRigthsStyle");
-			
-			Heading1 errorMessage = new Heading1(getResourceBundle(iwc).getLocalizedString("insufficient_rights_to_register_new_service",
-				"You have insufficient rights to register new service!"));
-			container.add(errorMessage);
-			add(container);
-			return;
-		}
+//		CompanyApplicationBusiness companyApplication = (CompanyApplicationBusiness) IBOLookup.getServiceInstance(iwc, CompanyApplicationBusiness.class);
+//		if (!companyApplication.isCompanyAdministrator(iwc)) {
+//			Layer container = new Layer();
+//			container.setStyleClass("insufficientRigthsStyle");
+//			
+//			Heading1 errorMessage = new Heading1(getResourceBundle(iwc).getLocalizedString("insufficient_rights_to_register_new_service",
+//				"You have insufficient rights to register new service!"));
+//			container.add(errorMessage);
+//			add(container);
+//			return;
+//		}
 		
 		GroupsFilter filter = new GroupsFilter();
 		List<String> groupsForCurrentApp = getGroupsFroCurrentApplication(iwc);
