@@ -498,3 +498,9 @@ total_payments_list.marked_allocation_entries=Grei\u00F0slumerktar r\u00E1\u00F0
 total_payments_list.marked_costs_entries=Grei\u00F0slumerkt ums\u00FDslugjald
 web_page=Vefs\u00ED\u00F0a
 work_phone=Vinnus\u00EDmi
+
+company_portal.administrators_of=Administrators of
+company_portal.employees_of=Employees of
+insufficient_rights_to_register_new_service=You have insufficient rights to register new service\!
+no=No
+yes=Yes
