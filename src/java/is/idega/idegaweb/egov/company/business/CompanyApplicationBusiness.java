@@ -32,14 +32,12 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getApplication
 	 */
-	public CompanyApplication getApplication(String applicationId)
-			throws RemoteException;
+	public CompanyApplication getApplication(String applicationId) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getApplication
 	 */
-	public CompanyApplication getApplication(Company company)
-			throws RemoteException;
+	public CompanyApplication getApplication(Company company) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getBundle
@@ -50,13 +48,12 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#storeApplication
 	 */
 	public Application storeApplication(IWContext iwc, User admin, CompanyType companyType, Company company, User currentUser) throws CreateException,
-		RemoteException;
+			RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#approveApplication
 	 */
-	public String approveApplication(IWContext iwc, String applicationId)
-			throws RemoteException;
+	public String approveApplication(IWContext iwc, String applicationId) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#rejectApplication
@@ -66,15 +63,15 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#reactivateApplication
 	 */
-	public boolean requestInformation(IWApplicationContext iwac, String applicationId,
-			String explanationText) throws RemoteException;
+	public boolean requestInformation(IWApplicationContext iwac, String applicationId, String explanationText) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#sendEmail
 	 */
-	public boolean sendEmail(String email, String subject, String text)
-			throws RemoteException;
+	public boolean sendEmail(String email, String subject, String text) throws RemoteException;
 
+	public boolean isInstitutionAdministration(IWContext iwc);
+	
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#isCompanyAdministrator
 	 */
@@ -88,8 +85,7 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getCompanyApplicationHome
 	 */
-	public CompanyApplicationHome getCompanyApplicationHome()
-			throws RemoteException;
+	public CompanyApplicationHome getCompanyApplicationHome() throws RemoteException;
 
 	/**
 	 * Creates a logging(personal-id) for user and sends email with user name and password
@@ -107,22 +103,14 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 * 
 	 * @return true if user login was created successfully, false otherwise
 	 */
-	public boolean createLogginForUser(IWContext iwc, User user,
-			String phoneHome, String phoneWork, String email, String roleKey,
-			boolean addToRootCitizenGroup) throws LoginCreateException,
-			RemoteException;
+	public boolean createLogginForUser(IWContext iwc, User user, String phoneHome, String phoneWork, String email, String roleKey, boolean addToRootCitizenGroup)
+			throws LoginCreateException, RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getUserApplications
 	 */
-	public Collection<Application> getAvailableApplicationsForUser(IWContext iwc, User user)
-			throws FinderException, RemoteException;
+	public Collection<Application> getAvailableApplicationsForUser(IWContext iwc, User user) throws FinderException, RemoteException;
 
-	/**
-	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getUserCompany
-	 */
-	public Group getUserCompany(IWContext iwc, User user)
-			throws RemoteException;
 	
 	public boolean makeUserCompanyAdmin(IWApplicationContext iwac, User companyAdmin, Group company);
 	
@@ -133,8 +121,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public Collection<Application> getUserApplications(IWContext iwc, User user);
 	
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException;
-	
-	public Collection<Group> getAllUserCompanies(IWContext iwc, User user) throws RemoteException;
 	
 	public PrintingService getPrintingService();
 	
@@ -162,6 +148,4 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public boolean closeAccount(IWContext iwc, String applicationId);
 	
 	public List<User> getCompanyUsers(CompanyApplication application);
-	
-	public Group getCompanyUsersCompany(User user);
 }

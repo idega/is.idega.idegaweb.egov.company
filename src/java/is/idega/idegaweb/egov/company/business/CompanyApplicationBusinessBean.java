@@ -35,7 +35,6 @@ import com.idega.block.process.data.CaseStatus;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
-import com.idega.company.CompanyConstants;
 import com.idega.company.business.CompanyBusiness;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
@@ -239,9 +238,24 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return null;
 		}
 		
-		Group rootGroupForCompany = getCompanyUsersCompany(applicant);
+		CompanyPortalBusiness companyPortalBusiness = getCompanyPortalBusiness(iwac);
+		if (companyPortalBusiness == null) {
+			return null;
+		}
+		
+		Group rootGroupForCompany = companyPortalBusiness.getCompanyGroup(iwac, companyName);
 		if (rootGroupForCompany == null) {
 			logger.log(Level.INFO, "Can not find group for company: " + companyName);
+			return null;
+		}
+		Group adminsGroupForCompany = companyPortalBusiness.getCompanyAdminsGroup(iwac, companyName);
+		if (adminsGroupForCompany == null) {
+			logger.log(Level.INFO, "Can not find admins group for company: " + companyName);
+			return null;
+		}
+		Group allAdminsGroup = companyPortalBusiness.getAllCompaniesAdminsGroup(iwac);
+		if (allAdminsGroup == null) {
+			logger.log(Level.INFO, "Can not find group for all companies admins");
 			return null;
 		}
 		
@@ -255,7 +269,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		if (companyAdmin == null) {
 			try {
 				companyAdmin = userBusiness.createUserWithLogin(companyName, null, null, personalId, companyName, null, null, null,
-						Integer.valueOf(rootGroupForCompany.getId()), personalId, password, true, null, -1, null, true, true, EncryptionType.MD5);
+						Integer.valueOf(allAdminsGroup.getId()), personalId, password, true, null, -1, null, true, true, EncryptionType.MD5);
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			} catch (RemoteException e) {
@@ -297,7 +311,34 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			} catch (NoPhoneFoundException e) {
 				e.printStackTrace();
 			}
+			//	Copying address
+			Address companyAddress = company.getAddress();
+			if (companyAddress != null) {
+				try {
+					userBusiness.updateUsersMainAddressOrCreateIfDoesNotExist(companyAdmin, companyAddress.getStreetAddress(), companyAddress.getPostalCode(),
+							companyAddress.getCountry(), companyAddress.getCity(), companyAddress.getProvince(), companyAddress.getPOBox(),
+							companyAddress.getCommuneID());
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				} catch (CreateException e) {
+					e.printStackTrace();
+				}
+			}
+			
 			companyAdmin.store();
+			
+			//	Adding new user to company admins group
+			if (allAdminsGroup != null) {
+				try {
+					getGroupBusiness(iwac).addUser(Integer.valueOf(adminsGroupForCompany.getId()), companyAdmin);
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				} catch (EJBException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		else {
 			LoginTable login = LoginDBHandler.getUserLogin(companyAdmin);
@@ -320,38 +361,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		compApp.store();
 		
 		return makeUserCompanyAdmin(iwac, companyAdmin, rootGroupForCompany) ? password : null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Group getCompanyUsersCompany(User user) {
-		if (user == null) {
-			return null;
-		}
-		
-		UserBusiness userBusiness = null;
-		try {
-			userBusiness = getUserBusiness();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		if (userBusiness == null) {
-			return null;
-		}
-		
-		Collection<Group> applicantGroups = null;
-		try {
-			applicantGroups = userBusiness.getUserGroups(user);
-		} catch (EJBException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		
-		if (ListUtil.isEmpty(applicantGroups)) {
-			return null;
-		}
-		
-		return getRootGroupForCompanies(applicantGroups.iterator().next());
 	}
 	
 	public Group getRootGroupForCompanies(Group company) {
@@ -693,7 +702,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		Collection<Application> allApplications = getApplicationHome().findAll();
 
 		Group rootGroupForCompanies = getRootGroupForCompanies(iwc);
-		boolean companyAdmin = isCompanyAdministrator(iwc);
 		boolean superAdmin = iwc.isSuperAdmin();
 		Collection<Application> userApplicationList = new ArrayList<Application>();
 		Collection<Group> appGroups = null;
@@ -709,15 +717,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 					appGroups.add(rootGroupForCompanies);
 				}
 				for (Group group : appGroups) {
-					try {
-						if (!appAdded && (superAdmin || companyAdmin || getUserBusiness().isMemberOfGroup(Integer.valueOf(group.getId()), user))) {
-							userApplicationList.add(app);
-							appAdded = true;
-						}
-					} catch (NumberFormatException e) {
-						logger.log(Level.SEVERE, "Error getting applications for userID: " + user.getId(), e);
-					} catch (RemoteException e) {
-						logger.log(Level.SEVERE, "Error getting applications for userID: " + user.getId(), e);
+					if (!appAdded && (superAdmin || getCompanyPortalBusiness(iwc).isMemberOfCompany(iwc, group, user))) {
+						userApplicationList.add(app);
+						appAdded = true;
 					}
 				}
 			}
@@ -744,31 +746,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 	private CitizenBusiness getCitizenBusiness() throws RemoteException {
 		return (CitizenBusiness) getServiceInstance(CitizenBusiness.class);
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Group getUserCompany(IWContext iwc, User user) {
-		if (user == null && !isCompanyEmployee(iwc)) {
-			return null;
-		}
-		
-		UserBusiness userBusiness = null;
-		try {
-			userBusiness = (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		if (userBusiness == null) {
-			return null;
-		}
-		
-		try {
-			return getGroupByType(userBusiness.getUsersTopGroupNodesByViewAndOwnerPermissions(user, iwc), CompanyConstants.GROUP_TYPE_COMPANY);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -826,27 +803,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		
 		return new ArrayList<User>(companyUsers);
 	}
-	
-	@SuppressWarnings("unchecked")
-	private Group getGroupByType(Collection<Group> groups, String groupTypeKey) {
-		if (ListUtil.isEmpty(groups) || StringUtil.isEmpty(groupTypeKey)) {
-			return null;
-		}
-		
-		Group groupFromRecursion = null;
-		for (Group group: groups) {
-			if (groupTypeKey.equals(group.getGroupType())) {
-				return group;
-			}
-			
-			groupFromRecursion = getGroupByType(group.getChildren(), groupTypeKey);
-			if (groupFromRecursion != null) {
-				return groupFromRecursion;
-			}
-		}
-		
-		return null;
-	}
 
 	public Collection<Application> getUserApplications(IWContext iwc, User user) {
 		if (isCompanyAdministrator(iwc)) {
@@ -872,28 +828,13 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		try {
 			compEmployee = compEmplHome.findByUser(user);
 		} catch (FinderException e) {
-			e.printStackTrace();
+			logger.log(Level.WARNING, "No Applications found for user: " + user);
 		}
 		if (compEmployee == null) {
 			return null;
 		}
 		
 		return compEmployee.getServices();
-	}
-	
-	public Collection<Group> getAllUserCompanies(IWContext iwc, User user) throws RemoteException {
-		UserBusiness userBusiness = getUserBusiness();
-		
-		@SuppressWarnings("unchecked")
-		Collection<Group> allGroups = userBusiness.getGroupBusiness().getAllGroups();
-		Collection<Group> userCompanies = new ArrayList<Group>();
-
-		for (Group group : allGroups) {
-			if (group.getGroupType().equals(CompanyConstants.GROUP_TYPE_COMPANY) && userBusiness.isMemberOfGroup(Integer.parseInt(group.getId()), user)) {
-				userCompanies.add(group);
-			}
-		}
-		return userCompanies;
 	}
 
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException {
@@ -910,11 +851,11 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			application.setType(companyType);
 			application.setCaseCode(getApplicationBusiness(iwc).getCaseCode(application.getCaseCodeKey()));
 			
-			//TODO maybe set data from Application interface
-			
 			application.store();
 			
-			changeCaseStatus(application, getCaseStatusOpen(), performer);
+			if (performer != null) {
+				changeCaseStatus(application, getCaseStatusOpen(), performer);
+			}
 			
 			return application;
 		} catch (CreateException e) {
@@ -1308,5 +1249,18 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		}
 		
 		return companyInfo;
+	}
+	
+	private CompanyPortalBusiness getCompanyPortalBusiness(IWApplicationContext iwac) {
+		try {
+			return ELUtil.getInstance().getBean(CompanyPortalBusiness.SPRING_BEAN_IDENTIFIER);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public boolean isInstitutionAdministration(IWContext iwc) {
+		return isUserLogged(iwc);	//	TODO: do we need smth more here?
 	}
 }

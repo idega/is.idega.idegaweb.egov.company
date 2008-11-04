@@ -3,7 +3,6 @@ package is.idega.idegaweb.egov.company.presentation.employee;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import com.idega.presentation.IWContext;
@@ -49,17 +48,10 @@ public class CompanyServicesViewer extends CompanyBlock {
 
 		User user = iwc.getCurrentUser();
 		Collection<Application> userApplicationList = getCompanyBusiness().getUserApplications(iwc, user);
-		Collection<Application> applicationsForSelectedGroup = new ArrayList<Application>();
-		for (Application application : userApplicationList) {
-			if (application.getGroups().contains(getGroup())) {
-				applicationsForSelectedGroup.add(application);
-			}
-		}
-
-		if (ListUtil.isEmpty(applicationsForSelectedGroup)) {
-			container.add(getMessage(new StringBuilder(getResourceBundle(iwc).getLocalizedString("there_are_no_services_provided_by_company",
-																									"There are no services provided by company"))
-										.append(": ").append(group.getNodeName(iwc.getCurrentLocale())).toString()));
+		if (ListUtil.isEmpty(userApplicationList)) {
+			String noServicesMessage = new StringBuilder(getResourceBundle(iwc).getLocalizedString("there_are_no_services_provided_by_company",
+					"There are no services provided by company")).append(": ").append(group.getNodeName(iwc.getCurrentLocale())).toString();
+			container.add(getMessage(noServicesMessage, "companyPortalNoServicesAvailableMessageStyle"));
 			return;
 		}
 
@@ -68,6 +60,6 @@ public class CompanyServicesViewer extends CompanyBlock {
 		ages = getApplicationBusiness(iwc).getAgesForUserAndChildren(user);
 		checkAges = (ages != null);
 
-		container.add(getApplicationList(iwc, checkAges, applicationsForSelectedGroup, ages));
+		container.add(getApplicationList(iwc, checkAges, userApplicationList, ages));
 	}
 }

@@ -22,6 +22,7 @@ import com.idega.business.IBORuntimeException;
 import com.idega.company.business.CompanyBusiness;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
+import com.idega.core.accesscontrol.business.NotLoggedOnException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
@@ -671,13 +672,20 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			company.setBankAccount(companyBankAccount);
 			company.store();
 			
+			User currentUser = null;
+			try {
+				currentUser = iwc.getCurrentUser();
+			} catch (NotLoggedOnException e) {
+				log(Level.INFO, "User is not logged, some settings for application might be not set!");
+			}
 			Application application = null;
 			try {
-				application = getCompanyApplicationBusiness().storeApplication(iwc, user, companyType, company, iwc.getCurrentUser());
+				application = getCompanyApplicationBusiness().storeApplication(iwc, user, companyType, company, currentUser);
 			} catch (Exception e) {
-				e.printStackTrace();
 				success = false;
+				e.printStackTrace();
 			}
+			
 			if (application == null) {
 				success = false;
 			}

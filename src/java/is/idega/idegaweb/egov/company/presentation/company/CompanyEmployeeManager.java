@@ -22,7 +22,6 @@ import javax.ejb.RemoveException;
 import javax.faces.component.html.HtmlMessages;
 
 import com.idega.business.IBOLookup;
-import com.idega.company.CompanyConstants;
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWApplicationContext;
@@ -35,6 +34,7 @@ import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.BackButton;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
@@ -153,7 +153,8 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	private void showCompanyUserList(IWContext iwc) {
 		Layer container = new Layer();
 		add(container);
-		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), PARAMETER_ACTION, ACTION_USER_VIEW + ""));
+		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), PARAMETER_ACTION,
+				String.valueOf(ACTION_USER_VIEW)));
 		
 		Layer accountsManagerInContainer = listExistingCompanyGroupUsers(iwc);
 		container.add(accountsManagerInContainer);
@@ -162,24 +163,18 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	private void showUserForm(IWContext iwc) {
 		Layer container = new Layer();
 		add(container);
-		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), PARAMETER_ACTION, ACTION_VIEW + ""));
+		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW)));
 		
-		Layer employeeUserForm = getEmployeeAccountManager(iwc, 
-				                                           ListUtil.convertListOfStringsToCommaseparatedString(Arrays.asList(new String [] {
-				                                        		   CompanyConstants.GROUP_TYPE_COMPANY, 
-				                                        		   EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISIONS, 
-				                                        		   EgovCompanyConstants.GROUP_TYPE_COMPANY_COURSE,
-				                                        		   EgovCompanyConstants.GROUP_TYPE_COMPANY_DIVISION, 
-				                                        		   EgovCompanyConstants.GROUP_TYPE_COMPANY_SUB_GROUP
-				                                        	})));
+		Layer employeeUserForm = getEmployeeAccountManager(iwc, ListUtil.convertListOfStringsToCommaseparatedString(EgovCompanyConstants.ALL_COMPANY_TYPES));
 		add(employeeUserForm);
 	}
 	
 	private void showCompanyEmployeeEditForm(IWContext iwc, String employeeId) {
 		Layer container = new Layer();
 		add(container);
-		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), PARAMETER_ACTION, ACTION_USER_VIEW + ""));
-		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), PARAMETER_ACTION, ACTION_VIEW + ""));
+		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), PARAMETER_ACTION,
+				String.valueOf(ACTION_USER_VIEW)));
+		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW)));
 		
 		CompanyEmployee employee = null;
 		try {
@@ -195,8 +190,9 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	private void showCompanyEmployeeCreateForm(IWContext iwc, String userId) {
 		Layer container = new Layer();
 		add(container);
-		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), PARAMETER_ACTION, ACTION_USER_VIEW + ""));
-		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), PARAMETER_ACTION, ACTION_VIEW + ""));
+		container.add(getLink(iwrb.getLocalizedString("manage_employee_account", "Edit company employee user account"), PARAMETER_ACTION,
+				String.valueOf(ACTION_USER_VIEW)));
+		container.add(getLink(iwrb.getLocalizedString("show_employee_list", "Show employees list"), PARAMETER_ACTION, String.valueOf(ACTION_VIEW)));
 		
 		User user = null;
 		try {
@@ -242,16 +238,9 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		}
 		return roleTypes;
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	private Layer listExistingCompanyGroupUsers(IWContext iwc) {
-		Collection<User> companyUsers;
-		try {
-			companyUsers = getUserBusiness(iwc).getUsersInPrimaryGroup(getGroup());
-		} catch (RemoteException e) {
-			companyUsers = null;
-			e.printStackTrace();
-		} 
+		Collection<User> companyUsers = getCompanyPortalBusiness().getAllCompanyUsers(getGroup());
 		
 		Layer container = new Layer();
 		container.setStyleClass("usersContainerStyle");
@@ -288,16 +277,18 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("edit");
-		cell.add(Text.getNonBrakingSpace());
+		cell.add(new Text(iwrb.getLocalizedString("edit", "Edit")));
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("remove");
 		cell.setStyleClass("lastColumn");
-		cell.add(Text.getNonBrakingSpace());
+		cell.add(new Text(iwrb.getLocalizedString("remove", "Remove")));
 
 		group = table.createBodyRowGroup();
 		int iRow = 1;
 		
+		String yesLocalized = iwrb.getLocalizedString("yes", "Yes");
+		String noLocalized = iwrb.getLocalizedString("no", "No");
 		if (!ListUtil.isEmpty(companyUsers)) {
 			for (User usr : companyUsers) {
 				CompanyEmployee emp = null;
@@ -311,16 +302,18 @@ public class CompanyEmployeeManager extends CompanyBlock {
 				
 				Link edit = new Link(this.iwb.getImage("images/edit.png", this.iwrb.getLocalizedString("edit", "Edit")));
 				edit.addParameter(PARAMETER_ACTION, ACTION_EDIT);
-				if(emp != null)
-					edit.addParameter(EMPLOYEE_ID_PARAMETER, emp.getPrimaryKey().toString());
-				else 
+				if (emp == null) {
 					edit.addParameter(USER_ID_PARAMETER, usr.getPrimaryKey().toString());
+				}
+				else {
+					edit.addParameter(EMPLOYEE_ID_PARAMETER, emp.getPrimaryKey().toString());
+				}
 				
 				Link delete = new Link(this.iwb.getImage("images/delete.png", this.iwrb.getLocalizedString("remove", "Remove")));
 				delete.addParameter(PARAMETER_ACTION, ACTION_DELETE);
-				if(emp != null)
+				if (emp != null) {
 					delete.addParameter(EMPLOYEE_ID_PARAMETER, emp.getPrimaryKey().toString());
-				
+				}
 	
 				if (iRow % 2 == 0) {
 					row.setStyleClass("evenRow");
@@ -348,8 +341,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 				
 				cell = row.createCell();
 				cell.setStyleClass("employeeAvailability");
-				//TODO change values 
-				cell.add(new Text((emp == null) ? "not created" : "created"));
+				cell.add(new Text((emp == null) ? noLocalized : yesLocalized));
 				
 				cell = row.createCell();
 				cell.setStyleClass("edit");
@@ -366,7 +358,6 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		return container;
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Layer getEmployeeEditForm(IWContext iwc, Object employeeInfoObject) {
 		Layer container = new Layer();
 		
@@ -376,7 +367,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		
 		CompanyEmployee employee = null;
 		User user = null;
-		if(employeeInfoObject instanceof CompanyEmployee) {
+		if (employeeInfoObject instanceof CompanyEmployee) {
 			employee = (CompanyEmployee)employeeInfoObject;
 			user = employee.getUser();
 			form.add(new HiddenInput(EMPLOYEE_ID_PARAMETER, employee.getPrimaryKey().toString()));
@@ -409,38 +400,36 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		
 		Collection<Application> userApplications = null;
 		try {
-			userApplications = getCompanyBusiness().getUserApplications(user);
-		} catch (RemoteException e) {
-			userApplications = new ArrayList<Application>();
+			userApplications = getCompanyBusiness().getAvailableApplicationsForUser(iwc, user);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		SelectPanel applicationSelect = new SelectPanel(SERVICES_INPUT);
 		
-		for(Application app : userApplications) {
-			applicationSelect.addOption(new SelectOption(app.getName(), app.getPrimaryKey() + ""));
+		if (!ListUtil.isEmpty(userApplications)) {
+			for (Application app : userApplications) {
+				applicationSelect.addOption(new SelectOption(app.getName(), app.getPrimaryKey().toString()));
+			}
 		}
 
 		SelectPanel fieldsSelect = new SelectPanel(RVK_FIELDS_INPUT);
-		
 		Collection<EmployeeField> userFieldsInRvk = null;
-		
 		try {
 			userFieldsInRvk = getEmployeeFieldHome().findAll();
 		} catch (RemoteException e) {
-			userFieldsInRvk = new ArrayList<EmployeeField>();
 			e.printStackTrace();
 		} catch (FinderException e) {
-			userFieldsInRvk = new ArrayList<EmployeeField>();
 			e.printStackTrace();
 		}
-		
-		for(EmployeeField field : userFieldsInRvk) {
-			fieldsSelect.addOption(new SelectOption(field.getServiceDescription(), field.getPrimaryKey() + ""));
+		if (!ListUtil.isEmpty(userFieldsInRvk)) {
+			for (EmployeeField field : userFieldsInRvk) {
+				fieldsSelect.addOption(new SelectOption(field.getServiceDescription(), field.getPrimaryKey().toString()));
+			}
 		}
 
 		CheckBox adminCheckBox = new CheckBox(ADMIN_BOX_INPUT, "true");
 		
-		if(employee != null) {
+		if (employee != null) {
 			fieldsSelect.setSelectedElements(CollectionToStringArray(employee.getFieldsInRvkPKs()));
 			applicationSelect.setSelectedElements(CollectionToStringArray(employee.getServicesPKs()));
 			adminCheckBox.setChecked(employee.isCompanyAdministrator());
@@ -517,10 +506,10 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		buttonLayer.setStyleClass("buttonLayer");
 		form.add(buttonLayer);
 		
-		SubmitButton back = new SubmitButton(this.iwrb.getLocalizedString("back", "Back"), PARAMETER_ACTION, ACTION_USER_VIEW + "");
+		BackButton back = new BackButton(this.iwrb.getLocalizedString("back", "Back"));
 		buttonLayer.add(back);
 		
-		SubmitButton save = new SubmitButton(this.iwrb.getLocalizedString("save", "Save"), PARAMETER_ACTION, ACTION_SAVE + "");
+		SubmitButton save = new SubmitButton(this.iwrb.getLocalizedString("save", "Save"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		buttonLayer.add(save);
 		
 		add(form);

@@ -3,24 +3,31 @@
 	<site name="Company Portal" site-category="CompanyPortal">
 		<structure>
 			<page name="Company Portal" type="empty">
-				<page name="My Page" type="citizenPage">
-					<page name="Account Preferences" type="userProperties" />
-					<page name="Change Password" type="changePassword" />
-				</page>
-				<page name="Administration Page" type="companyPortalRootPage">
-					<page name="Institution" type="empty">
-						<page name="Services Register" type="companyPortalServicesRegister" />
-						<page name="Unhandled Companies" type="companyPortalUnhandledCompanies" />
-						<page name="Companies Approval" type="companyPortalCompaniesApproval" />
-						<page name="Companies Rejecter" type="companyPortalCompaniesRejecter" />
+				<page name="Application creator" type="companyPortalApplicationCreator" />
+				<page name="Administration page" type="companyPortalRootPage">
+					<page name="Institution administration" type="empty">
+						<page name="Services registry" type="companyPortalServicesRegister" />
+						<page name="Unhandled applications" type="companyPortalUnhandledCompanies" />
+						<page name="Approved applications" type="companyPortalCompaniesApproval" />
+						<page name="Denied applications" type="companyPortalCompaniesRejecter" />
+						<page name="Companies manager" type="companyPortalCompaniesManager" />
+						<page name="Application creator" type="companyPortalApplicationCreator" />
 					</page>
-					<page name="Company" type="empty">
-						<page name="Company Application" type="companyPortalApplicationCreator" />
-						<page name="Employees Manager" type="companyPortalEmployeesManager" />
+					<page name="Company administration" type="empty">
+						<page name="Employees manager" type="companyPortalEmployeesManager" />
+						<page name="Services" type="companyPortalServicesViewer" />
+						<page name="Company cases" type="companyPortalCompanyCases" />
+						<page name="Settings" type="citizenPage">
+							<page name="Account preferences" type="userProperties" />
+							<page name="Change password" type="changePassword" />
+						</page>
 					</page>
-					<page name="Employee" type="empty">
-						<page name="Company Services Viewer" type="companyPortalServicesViewer" />
-						<page name="Employee Registrator" type="companyPortalEmployeeRegistrator" />
+					<page name="Company employee" type="empty">
+						<page name="Services" type="companyPortalServicesViewer" />
+						<page name="Settings" type="citizenPage">
+							<page name="Account preferences" type="userProperties" />
+							<page name="Change password" type="changePassword" />
+						</page>
 					</page>
 				</page>
 			</page>

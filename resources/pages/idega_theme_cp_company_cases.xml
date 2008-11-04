@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+	<page type="companyPortalCompanyCases">
+		<region id="left" label="left">
+			<module id="" class="com.idega.presentation.Layer">
+				<property>
+					<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+					<value>box</value>
+					<type>java.lang.String</type>
+				</property>
+				<module id="" class="com.idega.presentation.Layer">
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>boxHeader</value>
+						<type>java.lang.String</type>
+					</property>
+					<property>
+						<name>:method:1:implied:void:setStyleClass:java.lang.String:</name>
+						<value>boxHeaderBig</value>
+						<type>java.lang.String</type>
+					</property>
+				</module>
+			</module>
+			<module id="" class="com.idega.block.process.presentation.UserCases">
+				<property>
+					<name>:method:1:implied:void:setHideCaseCode:java.lang.String:</name>
+					<value>MBSKOLV</value>
+					<type>java.lang.String</type>
+				</property>
+				<property>
+					<name>:method:1:implied:void:setHideCaseCode:java.lang.String:</name>
+					<value>MUSICCH</value>
+					<type>java.lang.String</type>
+				</property>
+				<property>
+					<name>:method:1:implied:void:setHideCaseCode:java.lang.String:</name>
+					<value>MBFRITV</value>
+					<type>java.lang.String</type>
+				</property>
+				<property>
+					<name>:method:1:implied:void:setHideCaseCode:java.lang.String:</name>
+					<value>COURSEA</value>
+					<type>java.lang.String</type>
+				</property>
+				<property>
+					<name>:method:1:implied:void:setMaximumNumberOfEntries:int:</name>
+					<value>5</value>
+					<type>java.lang.String</type>
+				</property>
+			</module>
+		</region>
+	</page>
+</xml>

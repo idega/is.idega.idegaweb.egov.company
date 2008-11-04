@@ -1,10 +1,9 @@
 package is.idega.idegaweb.egov.company.presentation;
 
-import java.rmi.RemoteException;
-
 import is.idega.idegaweb.egov.application.presentation.ApplicationBlock;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
+import is.idega.idegaweb.egov.company.business.CompanyPortalBusiness;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -23,6 +22,7 @@ import com.idega.user.data.Group;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 
 public abstract class CompanyBlock extends ApplicationBlock {
 	
@@ -34,6 +34,15 @@ public abstract class CompanyBlock extends ApplicationBlock {
 			return (CompanyApplicationBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),
 					CompanyApplicationBusiness.class);
 		} catch (IBOLookupException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	protected CompanyPortalBusiness getCompanyPortalBusiness() {
+		try {
+			return ELUtil.getInstance().getBean(CompanyPortalBusiness.SPRING_BEAN_IDENTIFIER);//(CompanyPortalBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CompanyPortalBusiness.class);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -54,13 +63,11 @@ public abstract class CompanyBlock extends ApplicationBlock {
 	}
 	
 	protected Group getGroupThatIsCompanyForCurrentUser(IWContext iwc) {
-		CompanyApplicationBusiness companyBusiness = getCompanyBusiness();
-		
 		try {
-			if (companyBusiness.isCompanyEmployee(iwc)) {
-				return companyBusiness.getCompanyUsersCompany(iwc.getCurrentUser());
+			if (getCompanyBusiness().isCompanyEmployee(iwc)) {
+				return getCompanyPortalBusiness().getCompanyGroupByUser(iwc.getCurrentUser());
 			}
-		} catch (RemoteException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -68,7 +75,11 @@ public abstract class CompanyBlock extends ApplicationBlock {
 	}
 	
 	protected void showInsufficientRightsMessage(String message) {
-		showMessage(message, "insufficientRigthsStyle");
+		add(getInsufficientRightsMessage(message));
+	}
+	
+	protected Layer getInsufficientRightsMessage(String message) {
+		return getMessage(message, "companyPortalInsufficientRigthsStyle");
 	}
 	
 	protected void showMessage(String message) {
