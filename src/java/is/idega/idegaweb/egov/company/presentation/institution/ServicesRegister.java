@@ -137,6 +137,16 @@ public class ServicesRegister extends ApplicationCreator {
 	
 	@Override
 	protected boolean validate(IWContext iwc) {
+		Integer categoryId = null;
+		try {
+			categoryId = iwc.isParameterSet(CAT_INPUT) ? Integer.valueOf(iwc.getParameter(CAT_INPUT)) : null;
+		} catch(NumberFormatException e) {
+			e.printStackTrace();
+		}
+		if (categoryId == null) {
+			iwc.addMessage(CAT_INPUT, new FacesMessage(getResourceBundle(iwc).getLocalizedString("invalid_category", "Category must be selected")));
+		}
+		
 		String[] selectedGroups = iwc.getParameterValues(SELECTED_GROUPS_PARAMETER_NAME);
 		if (ArrayUtil.isEmpty(selectedGroups)) {
 			iwc.addMessage(SELECTED_GROUPS_PARAMETER_NAME, new FacesMessage(getResourceBundle(iwc).getLocalizedString("group_must_be_selected",
