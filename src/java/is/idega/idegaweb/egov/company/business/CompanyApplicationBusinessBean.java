@@ -46,7 +46,6 @@ import com.idega.core.accesscontrol.data.LoginInfo;
 import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
-import com.idega.core.data.ICTreeNode;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
 import com.idega.core.file.util.MimeTypeUtil;
@@ -66,7 +65,6 @@ import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.GroupBusiness;
-import com.idega.user.business.GroupHelper;
 import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
@@ -209,6 +207,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		.toString();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private String makeAccountsForCompanyAdmins(IWApplicationContext iwac, CompanyApplication compApp) {
 		Company company = compApp.getCompany();
 		if (company == null) {
@@ -326,19 +325,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			}
 			
 			companyAdmin.store();
-			
-			//	Adding new user to company admins group
-			if (allAdminsGroup != null) {
-				try {
-					getGroupBusiness(iwac).addUser(Integer.valueOf(adminsGroupForCompany.getId()), companyAdmin);
-				} catch (NumberFormatException e) {
-					e.printStackTrace();
-				} catch (EJBException e) {
-					e.printStackTrace();
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		else {
 			LoginTable login = LoginDBHandler.getUserLogin(companyAdmin);
@@ -357,72 +343,27 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		companyAdmin.setJuridicalPerson(true);
 		companyAdmin.store();
 		
+		//	Adding company admin user to company admins group
+		try {
+			GroupBusiness groupBusiness = getGroupBusiness(iwac);
+			Collection<User> users = groupBusiness.getUsers(adminsGroupForCompany);
+			if (users == null || !users.contains(companyAdmin)) {
+				groupBusiness.addUser(Integer.valueOf(adminsGroupForCompany.getId()), companyAdmin);
+			}
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (FinderException e) {
+			e.printStackTrace();
+		} catch (EJBException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
 		compApp.setAdminUser(companyAdmin);
 		compApp.store();
 		
 		return makeUserCompanyAdmin(iwac, companyAdmin, rootGroupForCompany) ? password : null;
-	}
-	
-	public Group getRootGroupForCompanies(Group company) {
-		if (company == null) {
-			return null;
-		}
-		
-		ICTreeNode parentNode = company.getParentNode();
-		if (parentNode == null) {
-			return company;	//	Provided group is ROOT group
-		}
-		
-		GroupBusiness groupBusiness = null;
-		try {
-			groupBusiness = getGroupBusiness(IWMainApplication.getDefaultIWApplicationContext());
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		if (groupBusiness == null) {
-			return null;
-		}
-		
-		ICTreeNode rootNode = parentNode;
-		while (parentNode != null) {
-			parentNode = parentNode.getParentNode();
-			if (parentNode != null) {
-				rootNode = parentNode;
-			}
-		}
-		if (rootNode == null) {
-			return null;
-		}
-		
-		Group topGroup = null;
-		try {
-			topGroup = groupBusiness.getGroupByGroupID(Integer.valueOf(rootNode.getId()));
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (FinderException e) {
-			e.printStackTrace();
-		}
-	
-		return topGroup == null ? company: topGroup;
-	}
-	
-	public Group getRootGroupForCompanies(IWContext iwc) {
-		GroupHelper groupHelper = ELUtil.getInstance().getBean(GroupHelper.class);
-		Collection<Group> topGroups = groupHelper.getTopGroupsFromDomain(iwc);
-		if (ListUtil.isEmpty(topGroups)) {
-			return null;
-		}
-		
-		Group topGroupForCompany = null;
-		for (Group group: topGroups) {
-			topGroupForCompany = getRootGroupForCompanies(group);
-			if (topGroupForCompany != null) {
-				return topGroupForCompany;
-			}
-		}
-		return null;
 	}
 
 	public boolean rejectApplication(IWContext iwc, String applicationId, String explanationText) {
@@ -697,14 +638,24 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness
 	 * #getAvailableApplicationsForUser(com.idega.presentation.IWContext, com.idega.user.data.User)
 	 */
-	public Collection<Application> getAvailableApplicationsForUser(IWContext iwc, User user) throws FinderException {
-		@SuppressWarnings("unchecked")
-		Collection<Application> allApplications = getApplicationHome().findAll();
-
-		Group rootGroupForCompanies = getRootGroupForCompanies(iwc);
+	private Collection<Application> getAvailableApplicationsForUser(IWContext iwc, User user) throws FinderException {
+		Collection<Application> allApplications = getApplicationHome().findAllWithAssignedGroups();
+		if (ListUtil.isEmpty(allApplications)) {
+			return null;
+		}
+		
+		CompanyPortalBusiness companyPortalBusiness = getCompanyPortalBusiness(iwc);
+		
+		Collection<Group> appGroups = null;
 		boolean superAdmin = iwc.isSuperAdmin();
 		Collection<Application> userApplicationList = new ArrayList<Application>();
-		Collection<Group> appGroups = null;
+		Group companyPortalRootGroup = null;
+		try {
+			companyPortalRootGroup = companyPortalBusiness.getCompanyPortalRootGroup(iwc);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		String companyPortalRootGroupId = companyPortalRootGroup == null ? String.valueOf(-1) : companyPortalRootGroup.getId();
 		for (Application app : allApplications) {
 			boolean appAdded = false;
 			appGroups = app.getGroups();
@@ -713,11 +664,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 				logger.log(Level.INFO, "Application " + app.getName() + " has no groups!");
 			}
 			else {
-				if (rootGroupForCompanies != null) {
-					appGroups.add(rootGroupForCompanies);
-				}
 				for (Group group : appGroups) {
-					if (!appAdded && (superAdmin || getCompanyPortalBusiness(iwc).isMemberOfCompany(iwc, group, user))) {
+					if (!appAdded && (superAdmin || group.getId().equals(companyPortalRootGroupId) ||
+																									companyPortalBusiness.isMemberOfCompany(iwc, group, user))) {
 						userApplicationList.add(app);
 						appAdded = true;
 					}
@@ -748,72 +697,72 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return (CitizenBusiness) getServiceInstance(CitizenBusiness.class);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public List<User> getCompanyUsers(CompanyApplication application) {
-		if (application == null) {
-			return null;
-		}
-		
-		User companyPerson = application.getAdminUser();
-		if (companyPerson == null) {
-			companyPerson = application.getApplicantUser();
-		}
-		if (companyPerson == null) {
-			return null;
-		}
-		
-		UserBusiness userBusiness = null;
+	private Collection<Application> getCommonCompanyPortalServices(IWContext iwc) {
 		try {
-			userBusiness = getUserBusiness();
-		} catch (RemoteException e) {
-			e.printStackTrace();
+			return getApplicationHome().findAllByGroups(Arrays.asList(getCompanyPortalBusiness(iwc).getCompanyPortalRootGroup(iwc).getId()));
+		} catch(Exception e) {
+			logger.log(Level.INFO, "No services found for root Company Portal group", e);
 		}
-		if (userBusiness == null) {
-			return null;
-		}
-		
-		Collection<Group> companyPersonGroups = null;
-		try {
-			companyPersonGroups = userBusiness.getUserGroups(companyPerson);
-		} catch (EJBException e) {
-			e.printStackTrace();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		
-		if (ListUtil.isEmpty(companyPersonGroups)) {
-			return null;
-		}
-		Group rootGroupForCompany = getRootGroupForCompanies(companyPersonGroups.iterator().next());
-		if (rootGroupForCompany == null) {
-			return null;
-		}
-		
-		Collection<User> companyUsers = null;
-		try {
-			companyUsers = userBusiness.getUsersInGroup(rootGroupForCompany);
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		}
-		
-		if (ListUtil.isEmpty(companyUsers)) {
-			logger.log(Level.WARNING, "No users found for company application: " + application.getName());
-			return null;
-		}
-		
-		return new ArrayList<User>(companyUsers);
+		return null;
 	}
-
-	public Collection<Application> getUserApplications(IWContext iwc, User user) {
-		if (isCompanyAdministrator(iwc)) {
-			try {
-				return getAvailableApplicationsForUser(iwc, user);
-			} catch (FinderException e) {
-				e.printStackTrace();
-			}
-			return null;
+	
+	private boolean addCommonCompanyPortalServices(CompanyEmployee compEmployee, Collection<Application> rootGroupServices) {
+		if (compEmployee == null) {
+			return false;
 		}
 		
+		if (ListUtil.isEmpty(rootGroupServices)) {
+			return false;
+		}
+		
+		boolean needSaveEmployee = false;
+		Collection<Application> currentServices = compEmployee.getServices();
+		List<Application> allUserApplications = ListUtil.isEmpty(currentServices) ? new ArrayList<Application>() : new ArrayList<Application>(currentServices);
+		for (Application application: rootGroupServices) {
+			if (!allUserApplications.contains(application)) {
+				needSaveEmployee = true;
+				allUserApplications.add(application);
+			}
+		}
+		
+		if (needSaveEmployee) {
+			compEmployee.setServices(allUserApplications);
+			compEmployee.store();
+		}
+		
+		return true;
+	}
+	
+	public boolean addCommonCompanyPortalServices(IWContext iwc) {
+		CompanyEmployeeHome compEmplHome = null;
+		try {
+			compEmplHome = (CompanyEmployeeHome) IDOLookup.getHome(CompanyEmployee.class);
+		} catch (IDOLookupException e) {
+			e.printStackTrace();
+		}
+		if (compEmplHome == null) {
+			return false;
+		}
+		
+		Collection<CompanyEmployee> allEmployees = null;
+		try {
+			allEmployees = compEmplHome.findAll();
+		} catch (FinderException e) {
+			e.printStackTrace();
+		}
+		if (ListUtil.isEmpty(allEmployees)) {
+			return false;
+		}
+		
+		Collection<Application> rootGroupServices = getCommonCompanyPortalServices(iwc);
+		for (CompanyEmployee compEmployee: allEmployees) {
+			addCommonCompanyPortalServices(compEmployee, rootGroupServices);
+		}
+		
+		return true;
+	}
+	
+	public Collection<Application> getAssignedServices(IWContext iwc, User user) {
 		CompanyEmployeeHome compEmplHome = null;
 		try {
 			compEmplHome = (CompanyEmployeeHome) IDOLookup.getHome(CompanyEmployee.class);
@@ -828,13 +777,35 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		try {
 			compEmployee = compEmplHome.findByUser(user);
 		} catch (FinderException e) {
-			logger.log(Level.WARNING, "No Applications found for user: " + user);
+			logger.log(Level.INFO, "There are no services assigned for user: " + user.getName());
 		}
 		if (compEmployee == null) {
 			return null;
 		}
 		
+		//	TODO: maybe it's OK?
+		//addCommonCompanyPortalServices(compEmployee, getCommonCompanyPortalServices(iwc));
+		
 		return compEmployee.getServices();
+	}
+
+	public Collection<Application> getUserApplications(IWContext iwc, User user) {
+		Collection<Application> userApplications = null;
+		try {
+			userApplications = getAvailableApplicationsForUser(iwc, user);
+		} catch (FinderException e) {
+			e.printStackTrace();
+		}
+		
+		if (!(iwc.isSuperAdmin() || isInstitutionAdministration(iwc) || isCompanyAdministrator(iwc))) {
+			//	Common user
+			Collection<Application> assignedServices = getAssignedServices(iwc, user);
+			if (ListUtil.isEmpty(assignedServices)) {
+				return userApplications;
+			}
+		}
+		
+		return userApplications;
 	}
 
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException {
@@ -921,12 +892,15 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	
 	@Override
 	public String getApplicationName(Application app, Locale locale) {
-		Company comp = ((CompanyApplication)app).getCompany();
-		if(comp != null) {
-			return comp.getName();
-		} else {
-			return null;
+		if (app instanceof CompanyApplication) {
+			Company comp = ((CompanyApplication) app).getCompany();
+			if (comp != null) {
+				return comp.getName();
+			} else {
+				return getResourceBundle().getLocalizedString("company_portal.unknown_application_name", "Unkown");
+			}
 		}
+		return super.getApplicationName(app, locale);
 	}
 	
 	public IWSlideService getIWSlideService() throws IBOLookupException {
@@ -943,7 +917,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		if (compApp == null) {
 			return false;
 		}
-		List<User> companyPersons = getCompanyUsers(compApp);
+		List<User> companyPersons = getCompanyPortalBusiness(iwc).getAllCompanyUsers(compApp);
 		if (ListUtil.isEmpty(companyPersons)) {
 			return true;
 		}
@@ -960,7 +934,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		if (compApp == null) {
 			return false;
 		}
-		List<User> companyPersons = getCompanyUsers(compApp);
+		List<User> companyPersons = getCompanyPortalBusiness(iwc).getAllCompanyUsers(compApp);
 		if (ListUtil.isEmpty(companyPersons)) {
 			return true;
 		}
@@ -975,6 +949,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	//	TODO: is this right?
 	private void manageUserAccountForCompanyPortal(User user, boolean enableAccount) {
 		if (user.isJuridicalPerson()) {
+			//	Setting property only for "juridical" persons
 			try {
 				LoginInfo loginInfo = LoginDBHandler.getLoginInfo(LoginDBHandler.getUserLogin(user));
 				loginInfo.setAccountEnabled(enableAccount);
@@ -984,6 +959,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			}
 		}
 		
+		//	Adding metadata for users that Company Portal account is closed
 		user.setMetaData(EgovCompanyConstants.USER_LOGIN_METADATA, String.valueOf(enableAccount));
 		user.store();
 	}
@@ -1261,6 +1237,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 	}
 
 	public boolean isInstitutionAdministration(IWContext iwc) {
-		return isUserLogged(iwc);	//	TODO: do we need smth more here?
+		return isUserLogged(iwc) && (iwc.isSuperAdmin() || iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_SUPER_ADMIN_ROLE, iwc));
 	}
 }

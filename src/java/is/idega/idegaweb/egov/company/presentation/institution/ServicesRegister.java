@@ -3,6 +3,9 @@ package is.idega.idegaweb.egov.company.presentation.institution;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
+import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
+import is.idega.idegaweb.egov.company.business.CompanyPortalBusiness;
+
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,12 +28,15 @@ import com.idega.data.IDORemoveRelationshipException;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
+import com.idega.presentation.text.Heading1;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
+import com.idega.user.data.User;
 import com.idega.user.presentation.group.GroupsFilter;
 import com.idega.util.ArrayUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
+import com.idega.util.expression.ELUtil;
 
 /**
  * @author <a href="mailto:valdas@idega.com">Valdas Žemaitis</a>
@@ -51,17 +57,22 @@ public class ServicesRegister extends ApplicationCreator {
 
 	@Override
 	public void main(IWContext iwc) throws Exception {
-//		CompanyApplicationBusiness companyApplication = (CompanyApplicationBusiness) IBOLookup.getServiceInstance(iwc, CompanyApplicationBusiness.class);
-//		if (!companyApplication.isCompanyAdministrator(iwc)) {
-//			Layer container = new Layer();
-//			container.setStyleClass("insufficientRigthsStyle");
-//			
-//			Heading1 errorMessage = new Heading1(getResourceBundle(iwc).getLocalizedString("insufficient_rights_to_register_new_service",
-//				"You have insufficient rights to register new service!"));
-//			container.add(errorMessage);
-//			add(container);
-//			return;
-//		}
+		CompanyApplicationBusiness companyApplication = (CompanyApplicationBusiness) IBOLookup.getServiceInstance(iwc, CompanyApplicationBusiness.class);
+		
+		boolean hasRights = companyApplication.isInstitutionAdministration(iwc) || companyApplication.isCompanyAdministrator(iwc);
+		if (!hasRights) {
+			Layer container = new Layer();
+			container.setStyleClass("insufficientRigthsStyle");
+			
+			Heading1 errorMessage = new Heading1(getResourceBundle(iwc).getLocalizedString("insufficient_rights_to_register_new_service",
+				"You have insufficient rights to register new service!"));
+			container.add(errorMessage);
+			add(container);
+			
+			User currentUser = iwc.isLoggedOn() ? iwc.getCurrentUser() : null;
+			log(Level.WARNING, currentUser + ": user doesn't have rights to register new service!");
+			return;
+		}
 		
 		GroupsFilter filter = new GroupsFilter();
 		List<String> groupsForCurrentApp = getGroupsFroCurrentApplication(iwc);
@@ -176,6 +187,14 @@ public class ServicesRegister extends ApplicationCreator {
 			}
 		}
 		app.store();
+		
+		CompanyPortalBusiness companyPortalBusiness = ELUtil.getInstance().getBean(CompanyPortalBusiness.SPRING_BEAN_IDENTIFIER);
+		Group companyPortalRootGroup = companyPortalBusiness.getCompanyPortalRootGroup(iwc);
+		if (companyPortalRootGroup != null && groupsForApp.contains(companyPortalRootGroup)) {
+			CompanyApplicationBusiness companyApplicationBusinees = (CompanyApplicationBusiness) IBOLookup.getServiceInstance(iwc,
+																																CompanyApplicationBusiness.class);
+			companyApplicationBusinees.addCommonCompanyPortalServices(iwc);
+		}
 		
 		return appId;
 	}

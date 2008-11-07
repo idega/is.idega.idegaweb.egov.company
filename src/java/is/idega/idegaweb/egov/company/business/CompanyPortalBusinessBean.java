@@ -1,6 +1,7 @@
 package is.idega.idegaweb.egov.company.business;
 
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
+import is.idega.idegaweb.egov.company.data.CompanyApplication;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.company.CompanyConstants;
 import com.idega.core.builder.data.ICPage;
+import com.idega.core.data.ICTreeNode;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
@@ -235,15 +237,19 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			return null;
 		}
 		
+		Collection<Group> groups = null;
 		try {
-			return userBusiness.getUserGroups(user);
+			groups = userBusiness.getUserGroups(user);
 		} catch (EJBException e) {
 			e.printStackTrace();
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		if (ListUtil.isEmpty(groups)) {
+			logger.log(Level.INFO, "There are no groups for user: " + user.getName());
+		}
+		return groups;
 	}
 	
 	public Group getCompanyGroup(IWApplicationContext iwac, String companyName) {
@@ -312,6 +318,10 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 	}
 
 	public List<User> getAllCompanyUsers(Group company) {
+		return getAllCompanyUsers(company, true);
+	}
+	
+	private List<User> getAllCompanyUsers(Group company, boolean sortUsers) {
 		List<User> allUsers = new ArrayList<User>();
 		
 		Collection<User> companyGroupUsers = getUsersInGroup(company);
@@ -319,8 +329,12 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			allUsers.addAll(companyGroupUsers);
 		}
 		
-		Collection<User> adminsGroupUsers = getUsersInGroup(getChildGroupByType(company, EgovCompanyConstants.GROUP_TYPE_COMPANY_ADMINS));
-		if (!ListUtil.isEmpty(adminsGroupUsers)) {
+		Group companyAdmins = getChildGroupByType(company, EgovCompanyConstants.GROUP_TYPE_COMPANY_ADMINS);
+		Collection<User> adminsGroupUsers = getUsersInGroup(companyAdmins);
+		if (ListUtil.isEmpty(adminsGroupUsers)) {
+			logger.log(Level.INFO, "No users in company's admin group: " + companyAdmins);
+		}
+		else {
 			for (User user: adminsGroupUsers) {
 				if (!allUsers.contains(user)) {
 					allUsers.add(user);
@@ -328,8 +342,12 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			}
 		}
 		
-		Collection<User> staffGroupUsers = getUsersInGroup(getChildGroupByType(company, EgovCompanyConstants.GROUP_TYPE_COMPANY_STAFF));
-		if (!ListUtil.isEmpty(staffGroupUsers)) {
+		Group companyStaff = getChildGroupByType(company, EgovCompanyConstants.GROUP_TYPE_COMPANY_STAFF);
+		Collection<User> staffGroupUsers = getUsersInGroup(companyStaff);
+		if (ListUtil.isEmpty(staffGroupUsers)) {
+			logger.log(Level.INFO, "No users in company's staff group: " + companyStaff);
+		}
+		else {
 			for (User user: staffGroupUsers) {
 				if (!allUsers.contains(user)) {
 					allUsers.add(user);
@@ -337,19 +355,71 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			}
 		}
 		
-		if (!ListUtil.isEmpty(allUsers)) {
-			Locale locale = null;
+		if (ListUtil.isEmpty(allUsers)) {
+			logger.log(Level.WARNING, "No users found in company: " + company);
+		}
+		
+		if (sortUsers) {
+			return getSortedUsers(allUsers, null);
+		}
+		
+		return allUsers;
+	}
+	
+	private List<User> getSortedUsers(List<User> users, Locale locale) {
+		if (ListUtil.isEmpty(users)) {
+			return null;
+		}
+		if (locale == null) {
 			IWContext iwc = CoreUtil.getIWContext();
 			if (iwc != null) {
 				locale = iwc.getCurrentLocale();
 			}
-			if (locale == null) {
-				locale = Locale.ENGLISH;
-			}
-			Collections.sort(allUsers, new UserComparator(locale));
+		}
+		if (locale == null) {
+			locale = Locale.ENGLISH;
 		}
 		
-		return allUsers;
+		Collections.sort(users, new UserComparator(locale));
+		return users;
+	}
+	
+	public List<User> getAllCompanyUsers(CompanyApplication application) {
+		if (application == null) {
+			return null;
+		}
+		
+		User companyPerson = application.getAdminUser();
+		if (companyPerson == null) {
+			companyPerson = application.getApplicantUser();
+		}
+		if (companyPerson == null) {
+			return null;
+		}
+		List<Group> allUserCompanies = getAllUserCompanies(companyPerson);
+		if (ListUtil.isEmpty(allUserCompanies)) {
+			return null;
+		}
+		
+		List<User> temp = null;
+		List<User> companyUsers = new ArrayList<User>();
+		for (Group userCompany: allUserCompanies) {
+			temp = getAllCompanyUsers(userCompany);
+			if (!ListUtil.isEmpty(temp)) {
+				for (User user: temp) {
+					if (companyUsers.contains(user)) {
+						companyUsers.add(user);
+					}
+				}
+			}
+		}
+		
+		if (ListUtil.isEmpty(companyUsers)) {
+			logger.log(Level.WARNING, "No users found for company application: " + application.getName());
+			return null;
+		}
+		
+		return getSortedUsers(companyUsers, null);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -407,18 +477,69 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			return null;
 		}
 		
+		Group company = null;
+		String groupType = null;
 		List<Group> userCompanies = new ArrayList<Group>();
 		for (Group group: userGroups) {
-			if (CompanyConstants.GROUP_TYPE_COMPANY.equals(group.getGroupType())) {
-				setHomePage(IWMainApplication.getDefaultIWApplicationContext(), group);
+			groupType = group.getGroupType();
+			company = null;
+			
+			if (CompanyConstants.GROUP_TYPE_COMPANY.equals(groupType)) {
+				if (getParentGroup(group, null, EgovCompanyConstants.COMPANY_PORTAL_ROOT_GROUP) != null) {
+					company = group;
+				}
+			}
+			else if (EgovCompanyConstants.GROUP_TYPE_COMPANY_ADMINS.equals(groupType) || EgovCompanyConstants.GROUP_TYPE_COMPANY_STAFF.equals(groupType)) {
+				company = getParentGroup(group, CompanyConstants.GROUP_TYPE_COMPANY, null);
+			}
+			
+			if (company == null) {
+//				logger.log(Level.INFO, new StringBuilder("Group '").append(group.getName()).append("', type: '").append(groupType)
+//																	.append("' is not Company group from Company Portal!").toString());
+			}
+			else {
+				setHomePage(IWMainApplication.getDefaultIWApplicationContext(), company);
 				
-				if (!userCompanies.contains(group)) {
-					userCompanies.add(group);
+				if (!userCompanies.contains(company)) {
+					userCompanies.add(company);
 				}
 			}
 		}
 		
 		return userCompanies;
+	}
+	
+	private Group getParentGroup(Group group, String type, String name) {
+		if (group == null) {
+			return null;
+		}
+		
+		ICTreeNode parentGroupNode = group.getParentNode();
+		if (parentGroupNode == null) {
+			return null;
+		}
+		
+		Group parentGroup = null;
+		try {
+			parentGroup = getGroupBusiness(IWMainApplication.getDefaultIWApplicationContext()).getGroupByGroupID(Integer.valueOf(parentGroupNode.getId()));
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (FinderException e) {
+			e.printStackTrace();
+		}
+		
+		if (parentGroup == null) {
+			return null;
+		}
+		if (!StringUtil.isEmpty(type) && !type.equals(parentGroup.getGroupType())) {
+			return null;
+		}
+		if (!StringUtil.isEmpty(name) && !name.equals(parentGroup.getName())) {
+			return null;
+		}
+		return parentGroup;
 	}
 
 	public boolean isMemberOfCompany(IWApplicationContext iwac, Group group, User user) {
@@ -441,20 +562,12 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		
 		Group companyGroup = null;
 		if (EgovCompanyConstants.GROUP_TYPE_COMPANY_STAFF.equals(groupType) || EgovCompanyConstants.GROUP_TYPE_COMPANY_ADMINS.equals(groupType)) {
-			try {
-				companyGroup = getGroupBusiness(iwac).getGroupByGroupID(Integer.valueOf(group.getParentNode().getId()));
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			} catch (FinderException e) {
-				e.printStackTrace();
-			}
-			if (companyGroup == null || !CompanyConstants.GROUP_TYPE_COMPANY.equals(companyGroup.getGroupType())) {
-				return false;
-			}
+			companyGroup = getParentGroup(group, CompanyConstants.GROUP_TYPE_COMPANY, null);
 		}
 		
+		if (companyGroup == null) {
+			return false;
+		}
 		return allUserCompanies.contains(companyGroup);
 	}
 

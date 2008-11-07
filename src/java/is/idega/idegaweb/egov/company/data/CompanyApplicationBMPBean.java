@@ -182,199 +182,199 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	
 	public void setPriority(Integer priority) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setPriority() not supported.");
 	}
 	
 	public Integer getPriority() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getPriority() not supported.");
 	}
 	
 	public void setAgeFrom(int age) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setAgeFrom() not supported.");
 	}
 
 	public int getAgeFrom() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getAgeFrom() not supported.");
 	}
 
 	public void setAgeTo(int age) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setAgeTo() not supported.");
 	}
 
 	public int getAgeTo() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getAgeTo() not supported.");
 	}
 	
 	public int getTimesClicked() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getTimesClicked() not supported.");
 	}
 	
 	public void setTimesClicked(int clicked) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setTimesClicked() not supported.");
 	}
 
 	public void setCategory(ApplicationCategory category) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setCategory() not supported.");
 	}
 
 	public ApplicationCategory getCategory() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getCategory() not supported.");
 	}
 
 	public void setElectronic(boolean isElectronic) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setElectronic() not supported.");
 	}
 
 	public boolean getElectronic() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getElectronic() not supported.");
 	}
 	
 	public void setRequiresLogin(boolean requiresLogin) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setRequiresLogin() not supported.");
 	}
 
 	public boolean getRequiresLogin() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getRequiresLogin() not supported.");
 	}
 	
 	public void setVisible(boolean visible) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setVisible() not supported.");
 	}
 	
 	public boolean getVisible() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getVisible() not supported.");
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void setLocalizedUrls(Map localizedEntries, boolean isNewApplication){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setLocalizedUrls() not supported.");
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void setLocalizedNames(Map localizedEntries, boolean isNewApplication){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setLocalizedNames() not supported.");
 	} 
 	
 	public String getLoginPageURL() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getLoginPageURL() not supported.");
 	}
 	
 	public void setLoginPageURL(String url) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setLoginPageURL() not supported.");
 	}
 	
 	public String getAppType() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getAppType() not supported.");
 	}
 
 	public boolean getHiddenFromGuests() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getHiddenFromGuests() not supported.");
 	}
 
 	public LocalizedText getLocalizedText(int icLocaleId) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getLocalizedText() not supported.");
 	}
 
 	public String getLocalizedUrl(Locale locale){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");			
+		throw new java.lang.UnsupportedOperationException("Method getLocalizedUrl() not supported.");			
 	}
 	
 	public String getNameByLocale(Locale locale){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getNameByLocale() not supported.");
 	}
 
 	public String getNameByLocale(){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getNameByLocale() not supported.");
 	}
 
 	public boolean getOpensInNewWindow() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getOpensInNewWindow() not supported.");
 	}
 
 	public String getQueryForMiddleTable(String tableName, int applicationId){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getQueryForMiddleTable() not supported.");
 	}
 
 	@SuppressWarnings("unchecked")
 	public String getQueryForTxLocalizedText(int localeId, Collection localNamesIds){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getQueryForTxLocalizedText() not supported.");
 	}
 
 	public String getUrlByLocale(){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getUrlByLocale() not supported.");
 	}
 
 	public String getUrlByLocale(Locale locale){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getUrlByLocale() not supported.");
 	}
 
 	public void insertLocalizedTextEntry(int localeId, String headline, boolean settingNames){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method insertLocalizedTextEntry() not supported.");
 	}
 	
 	public boolean removeLocalizedEntries(){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method removeLocalizedEntries() not supported.");
 	}
 	
 	public void setAppType(String appType) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setAppType() not supported.");
 	}
 
 	public void setHiddenFromGuests(boolean hiddenFromGuests) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setHiddenFromGuests() not supported.");
 	}
 
 	public void setOpensInNewWindow(boolean opensInNew) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setOpensInNewWindow() not supported.");
 	}
 
 	public void setUrl(String url) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method setUrl() not supported.");
 	}
 
 	public void updateLocalizedTextEntry(Object primaryKey, String headline){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method updateLocalizedTextEntry() not supported.");
 	}
 
 	public String getLocalizedName(Locale locale){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method removeUser() not supported.");
+		throw new java.lang.UnsupportedOperationException("Method getLocalizedName() not supported.");
 	}
 }

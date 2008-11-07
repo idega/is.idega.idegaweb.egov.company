@@ -78,7 +78,8 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	protected void present(IWContext iwc) throws Exception {
 		super.present(iwc);
 		
-		if (!getCompanyBusiness().isCompanyAdministrator(iwc)) {
+		boolean hasRight = getCompanyBusiness().isInstitutionAdministration(iwc) || getCompanyBusiness().isCompanyAdministrator(iwc);
+		if (!hasRight) {
 			showInsufficientRightsMessage(iwrb.getLocalizedString("insufficient_rigths_to_manage_applications",
 					"You have insufficient rights to approve/reject applications!"));
 			return;

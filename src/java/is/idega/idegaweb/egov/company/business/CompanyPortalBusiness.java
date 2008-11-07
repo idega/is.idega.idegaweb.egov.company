@@ -1,9 +1,10 @@
 package is.idega.idegaweb.egov.company.business;
 
 
+import is.idega.idegaweb.egov.company.data.CompanyApplication;
+
 import java.rmi.RemoteException;
 import java.util.List;
-
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
@@ -40,6 +41,7 @@ public interface CompanyPortalBusiness {
 	public void setHomePageToGroups(IWApplicationContext iwac);
 	
 	public List<User> getAllCompanyUsers(Group company);
+	public List<User> getAllCompanyUsers(CompanyApplication application);
 	
 	public List<Group> getAllCompanyGroups(Group company);
 	

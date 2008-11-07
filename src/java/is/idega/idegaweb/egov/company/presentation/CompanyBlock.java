@@ -5,6 +5,8 @@ import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
 import is.idega.idegaweb.egov.company.business.CompanyPortalBusiness;
 
+import java.util.logging.Level;
+
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.company.data.Company;
@@ -16,6 +18,7 @@ import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
+import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.user.data.Group;
@@ -41,7 +44,7 @@ public abstract class CompanyBlock extends ApplicationBlock {
 	
 	protected CompanyPortalBusiness getCompanyPortalBusiness() {
 		try {
-			return ELUtil.getInstance().getBean(CompanyPortalBusiness.SPRING_BEAN_IDENTIFIER);//(CompanyPortalBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), CompanyPortalBusiness.class);
+			return ELUtil.getInstance().getBean(CompanyPortalBusiness.SPRING_BEAN_IDENTIFIER);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -79,6 +82,7 @@ public abstract class CompanyBlock extends ApplicationBlock {
 	}
 	
 	protected Layer getInsufficientRightsMessage(String message) {
+		log(Level.WARNING, this.getClass().getName() + ": insufficient rigths!");
 		return getMessage(message, "companyPortalInsufficientRigthsStyle");
 	}
 	
@@ -95,14 +99,21 @@ public abstract class CompanyBlock extends ApplicationBlock {
 	}
 	
 	protected Layer getMessage(String message, String styleClass) {
+		return getMessage(message, styleClass, false);
+	}
+	
+	protected Layer getMessage(String message, String styleClass, boolean smallMessage) {
 		Layer container = new Layer();
 		if (!StringUtil.isEmpty(styleClass)) {
 			container.setStyleClass(styleClass);
 		}
 		
-		Heading1 errorMessage = new Heading1(message);
-		container.add(errorMessage);
+		container.add(smallMessage ? new Heading3(message) : new Heading1(message));
 		return container;
+	}
+	
+	protected Layer getSmallMessage(String message, String styleClass) {
+		return getMessage(message, styleClass, true);
 	}
 	
 	protected Layer getCompanyInfo(IWContext iwc, Company company) {

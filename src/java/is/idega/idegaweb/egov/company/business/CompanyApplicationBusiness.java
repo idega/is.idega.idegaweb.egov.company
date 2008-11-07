@@ -14,8 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.ejb.CreateException;
-import javax.ejb.FinderException;
-
 import com.idega.block.pdf.business.PrintingService;
 import com.idega.business.IBOLookupException;
 import com.idega.company.data.Company;
@@ -105,12 +103,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 */
 	public boolean createLogginForUser(IWContext iwc, User user, String phoneHome, String phoneWork, String email, String roleKey, boolean addToRootCitizenGroup)
 			throws LoginCreateException, RemoteException;
-
-	/**
-	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getUserApplications
-	 */
-	public Collection<Application> getAvailableApplicationsForUser(IWContext iwc, User user) throws FinderException, RemoteException;
-
 	
 	public boolean makeUserCompanyAdmin(IWApplicationContext iwac, User companyAdmin, Group company);
 	
@@ -119,6 +111,10 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public String getLoginCreatedInfo(IWContext iwc, String login, String password);
 	
 	public Collection<Application> getUserApplications(IWContext iwc, User user);
+	
+	public boolean addCommonCompanyPortalServices(IWContext iwc);
+	
+	public Collection<Application> getAssignedServices(IWContext iwc, User user);
 	
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException;
 	
@@ -146,6 +142,4 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public List<CompanyApplication> getApplicationsByCaseCodesAndStatuses(String[] caseCodes, List<String> caseStatuses);
 	
 	public boolean closeAccount(IWContext iwc, String applicationId);
-	
-	public List<User> getCompanyUsers(CompanyApplication application);
 }

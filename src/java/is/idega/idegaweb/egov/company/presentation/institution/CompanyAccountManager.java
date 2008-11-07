@@ -16,9 +16,6 @@ import com.idega.util.ListUtil;
 
 public class CompanyAccountManager extends CompanyBlock {
 	
-//	private static final String PARAMETER_MANAGE_COMPANY_ACCOUNT = "prm_manage_company_account";
-//	private static final String PARAMETER_MANAGE_COMPANY_EMPLOYEES_ACCOUNT = "prm_manage_company_emplpyees_account";
-	
 	private String roleTypes = null;
 	
 	private Group group = null;
@@ -41,14 +38,7 @@ public class CompanyAccountManager extends CompanyBlock {
 			return;
 		}
 		
-//		if (iwc.isParameterSet(PARAMETER_MANAGE_COMPANY_EMPLOYEES_ACCOUNT)) {
-			showCompanyEmployeesAccountsManager(iwc);
-//			return;
-//		}
-//		
-//		//	By default showing company account manager
-//		showCompanyAccountManager(iwc);
-//		return;
+		showCompanyEmployeesAccountsManager(iwc);
 	}
 	
 	private void showCompanyEmployeesAccountsManager(IWContext iwc) {
@@ -57,31 +47,12 @@ public class CompanyAccountManager extends CompanyBlock {
 		
 		container.add(getMessage(iwrb.getLocalizedString("company_employees_accounts_manager", "Company employees accounts manager")));
 		
-//		container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("company", "Company") + ": " + group.getNodeName(iwc.getCurrentLocale())));
-		
-//		container.add(getSwitcherLink(iwrb.getLocalizedString("manage_company_account", "Manage company account"), PARAMETER_MANAGE_COMPANY_ACCOUNT));
-		
 		Layer suaInContainer = getSimpleUserApplication(iwc, ListUtil.convertListOfStringsToCommaseparatedString(EgovCompanyConstants.ALL_COMPANY_TYPES), false);
 		container.add(suaInContainer);
 		
 		Layer accountsManagerInContainer = getAccountsManager(iwc);
 		container.add(accountsManagerInContainer);
 	}
-	
-	/*private void showCompanyAccountManager(IWContext iwc) {
-		Layer container = new Layer();
-		add(container);
-		
-		container.add(getMessage(iwrb.getLocalizedString("company_account_manager", "Company account manager")));
-		
-		container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("company", "Company") + ": " + group.getNodeName(iwc.getCurrentLocale())));
-		
-		container.add(getSwitcherLink(iwrb.getLocalizedString("manage_accounts_of_company_employees", "Manage accounts of company employees"),
-				PARAMETER_MANAGE_COMPANY_EMPLOYEES_ACCOUNT));
-		
-		Layer suaInContainer = getSimpleUserApplication(iwc, ListUtil.convertListOfStringsToCommaseparatedString(EgovCompanyConstants.ALL_COMPANY_TYPES), true);
-		container.add(suaInContainer);
-	}*/
 	
 	private Layer getSimpleUserApplication(IWContext iwc, String groupTypesForChildrenGroups, boolean juridicalPerson) {
 		Layer container = new Layer();
@@ -104,30 +75,19 @@ public class CompanyAccountManager extends CompanyBlock {
 		sua.setChangePasswordNextTime(true);
 		sua.setAddGroupCreateButton(false);
 		sua.setAddGroupEditButton(juridicalPerson);
-		sua.setAddChildGroupCreateButton(true);
-		sua.setAddChildGroupEditButton(true);
+		sua.setAddChildGroupCreateButton(false);
+		sua.setAddChildGroupEditButton(false);
 		
 		return container;
 	}
 	
 	private String getRoleTypesForChildGroups() {
 		if (roleTypes == null) {
-//			List<String> roles = new ArrayList<String>();
-//			roles.add(StandardRoles.ROLE_KEY_AUTHOR);
-//			roles.add(StandardRoles.ROLE_KEY_EDITOR);
 			List<String> roles = Arrays.asList(EgovCompanyConstants.COMPANY_ADMIN_ROLE,EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE,StandardRoles.ROLE_KEY_COMPANY);
 			roleTypes = ListUtil.convertListOfStringsToCommaseparatedString(roles);
 		}
 		return roleTypes;
 	}
-	
-//	private Layer getSwitcherLink(String message, String parameterToMaintain) {
-//		Layer switcher = new Layer();
-//		Link switchLink = new Link(message);
-//		switcher.add(switchLink);
-//		switchLink.addParameter(parameterToMaintain, Boolean.TRUE.toString());
-//		return switcher;
-//	}
 	
 	private Layer getAccountsManager(IWContext iwc) {
 		Layer container = new Layer();

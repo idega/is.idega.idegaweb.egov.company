@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -26,6 +27,7 @@ import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
+import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.Table2;
@@ -33,21 +35,20 @@ import com.idega.presentation.TableCell2;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
 import com.idega.presentation.text.Link;
+import com.idega.presentation.text.ListItem;
+import com.idega.presentation.text.Lists;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.BackButton;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
-import com.idega.presentation.ui.Label;
-import com.idega.presentation.ui.SelectOption;
-import com.idega.presentation.ui.SelectPanel;
 import com.idega.presentation.ui.SubmitButton;
-import com.idega.presentation.ui.TextInput;
 import com.idega.user.app.SimpleUserApp;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.ArrayUtil;
+import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 
@@ -63,13 +64,8 @@ import com.idega.util.StringUtil;
 
 public class CompanyEmployeeManager extends CompanyBlock {
 
-	private static final String NAME_INPUT = "name";
-	private static final String SURNAME_INPUT = "surname";
-	private static final String PERSONAL_ID_INPUT = "personalId";
-	private static final String GROUP_INPUT = "group";
 	private static final String SERVICES_INPUT = "services";
 	private static final String RVK_FIELDS_INPUT = "fields";
-	private static final String ADMIN_BOX_INPUT = "admin";
 	
 	public static final String EMPLOYEE_ID_PARAMETER = "prm_employee_id";
 	public static final String USER_ID_PARAMETER = "prm_user_id";
@@ -214,15 +210,17 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		SimpleUserApp sua = new SimpleUserApp();
 		container.add(sua);
 		sua.setParentGroup(group);
-		//sua.setUseChildrenOfTopNodesAsParentGroups(!juridicalPerson);
 		sua.setGroupTypes(StandardRoles.ROLE_KEY_COMPANY);
 		sua.setGroupTypesForChildGroups(groupTypesForChildrenGroups);
 		sua.setRoleTypesForChildGroups(getRoleTypesForChildGroups());
-		//sua.setJuridicalPerson(juridicalPerson);
 		sua.setAllowEnableDisableAccount(true);
 		sua.setAllFieldsEditable(true);
 		sua.setSendMailToUser(true);
 		sua.setChangePasswordNextTime(true);
+		sua.setAddChildGroupCreateButton(false);
+		sua.setAddChildGroupEditButton(false);
+		sua.setAddGroupCreateButton(false);
+		sua.setAddGroupEditButton(false);
 		
 		return container;
 	}
@@ -257,39 +255,32 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		TableRow row = group.createRow();
 		TableCell2 cell = row.createHeaderCell();
 		cell.setStyleClass("firstColumn");
-		cell.add(new Text(""));
+		cell.add(new Text(iwrb.getLocalizedString("nr", "Nr.")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("employeeName");
-		cell.add(new Text(this.iwrb.getLocalizedString("employeeName", "Name")));
+		cell.add(new Text(iwrb.getLocalizedString("employeeName", "Name")));
 		
 		cell = row.createHeaderCell();
-		cell.setStyleClass("employeeSurname");
-		cell.add(new Text(this.iwrb.getLocalizedString("employeeSurname", "Surname")));
-		
-		cell = row.createHeaderCell();
-		cell.setStyleClass("employeeGroup");
-		cell.add(new Text(this.iwrb.getLocalizedString("employeeGroup", "Group")));
-		
-		cell = row.createHeaderCell();
-		cell.setStyleClass("employeeAvailability");
-		cell.add(new Text(this.iwrb.getLocalizedString("employee", "Company employee")));
+		cell.setStyleClass("employeePersonalId");
+		cell.add(new Text(iwrb.getLocalizedString("employeePersonalId", "Personal ID")));
 		
 		cell = row.createHeaderCell();
 		cell.setStyleClass("edit");
-		cell.add(new Text(iwrb.getLocalizedString("edit", "Edit")));
+		String servicesLocalized = iwrb.getLocalizedString("assign_services_for_employee", "Assign services");
+		cell.add(new Text(servicesLocalized));
 
 		cell = row.createHeaderCell();
 		cell.setStyleClass("remove");
 		cell.setStyleClass("lastColumn");
-		cell.add(new Text(iwrb.getLocalizedString("remove", "Remove")));
+		String removeServicesLocalized = iwrb.getLocalizedString("remove_all_selected_services", "Remove services");
+		cell.add(new Text(removeServicesLocalized));
 
 		group = table.createBodyRowGroup();
 		int iRow = 1;
-		
-		String yesLocalized = iwrb.getLocalizedString("yes", "Yes");
-		String noLocalized = iwrb.getLocalizedString("no", "No");
 		if (!ListUtil.isEmpty(companyUsers)) {
+			String removeAction = new StringBuilder("if (window.confirm('").append(iwrb.getLocalizedString("are_you_sure", "Are you sure?"))
+									.append("')) { return true; } else return false;").toString();
 			for (User usr : companyUsers) {
 				CompanyEmployee emp = null;
 				try {
@@ -300,7 +291,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 
 				row = table.createRow();
 				
-				Link edit = new Link(this.iwb.getImage("images/edit.png", this.iwrb.getLocalizedString("edit", "Edit")));
+				Link edit = new Link(this.iwb.getImage("images/edit.png", servicesLocalized));
 				edit.addParameter(PARAMETER_ACTION, ACTION_EDIT);
 				if (emp == null) {
 					edit.addParameter(USER_ID_PARAMETER, usr.getPrimaryKey().toString());
@@ -309,11 +300,12 @@ public class CompanyEmployeeManager extends CompanyBlock {
 					edit.addParameter(EMPLOYEE_ID_PARAMETER, emp.getPrimaryKey().toString());
 				}
 				
-				Link delete = new Link(this.iwb.getImage("images/delete.png", this.iwrb.getLocalizedString("remove", "Remove")));
+				Link delete = new Link(this.iwb.getImage("images/delete.png", removeServicesLocalized));
 				delete.addParameter(PARAMETER_ACTION, ACTION_DELETE);
 				if (emp != null) {
 					delete.addParameter(EMPLOYEE_ID_PARAMETER, emp.getPrimaryKey().toString());
 				}
+				delete.setOnClick(removeAction);
 	
 				if (iRow % 2 == 0) {
 					row.setStyleClass("evenRow");
@@ -325,23 +317,15 @@ public class CompanyEmployeeManager extends CompanyBlock {
 				cell = row.createCell();
 				cell.setStyleClass("firstColumn");
 				cell.setStyleClass("number");
-				cell.add(new Text(iRow + ""));
+				cell.add(new Text(String.valueOf(iRow)));
 				
 				cell = row.createCell();
-				cell.setStyleClass("employeeName");
-				cell.add(new Text(usr.getFirstName()));
+				cell.setStyleClass("employeeFullName");
+				cell.add(new Text(usr.getName()));
 				
 				cell = row.createCell();
-				cell.setStyleClass("employeeSurname");
-				cell.add(new Text(usr.getLastName()));
-	
-				cell = row.createCell();
-				cell.setStyleClass("employeeGroup");
-				cell.add(new Text(getGroup().getName()));
-				
-				cell = row.createCell();
-				cell.setStyleClass("employeeAvailability");
-				cell.add(new Text((emp == null) ? noLocalized : yesLocalized));
+				cell.setStyleClass("employeePersonalId");
+				cell.add(new Text(usr.getPersonalID() == null ? iwrb.getLocalizedString("unkown_pesonal_id", "Unknown") : usr.getPersonalID()));
 				
 				cell = row.createCell();
 				cell.setStyleClass("edit");
@@ -350,7 +334,8 @@ public class CompanyEmployeeManager extends CompanyBlock {
 				cell = row.createCell();
 				cell.setStyleClass("lastColumn");
 				cell.setStyleClass("remove");
-				cell.add(delete);
+				cell.add((emp != null && !ListUtil.isEmpty(emp.getServices())) ? delete :
+					new Text(iwrb.getLocalizedString("no_services_assigned_yet", "There are no services assigned yet")));
 					
 				iRow++;
 			}
@@ -368,71 +353,50 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		CompanyEmployee employee = null;
 		User user = null;
 		if (employeeInfoObject instanceof CompanyEmployee) {
-			employee = (CompanyEmployee)employeeInfoObject;
+			employee = (CompanyEmployee) employeeInfoObject;
 			user = employee.getUser();
 			form.add(new HiddenInput(EMPLOYEE_ID_PARAMETER, employee.getPrimaryKey().toString()));
 		} else if (employeeInfoObject instanceof User) {
-			user = (User)employeeInfoObject;
+			user = (User) employeeInfoObject;
 			form.add(new HiddenInput(USER_ID_PARAMETER, user.getPrimaryKey().toString()));
 		} else {
 			throw new RuntimeException(CompanyEmployee.class + " or " + User.class + " are expected");
 		}
 		
-		TextInput userPersonalId = new TextInput("personalId");
-		userPersonalId.setId(PERSONAL_ID_INPUT);
-		userPersonalId.setValue(user.getPersonalID());
-		userPersonalId.setReadOnly(true);
-		
-		TextInput userName = new TextInput("name");
-		userName.setId(NAME_INPUT);
-		userName.setValue(user.getFirstName());
-		userName.setReadOnly(true);
-		
-		TextInput userSurname = new TextInput("surname");
-		userSurname.setId(SURNAME_INPUT);
-		userSurname.setValue(user.getLastName());
-		userSurname.setReadOnly(true);
-		
-		TextInput group = new TextInput("group");
-		group.setId(GROUP_INPUT);
-		group.setValue(getGroup().getName());
-		group.setReadOnly(true);
+		form.add(getSmallMessage(new StringBuilder(iwrb.getLocalizedString("services_for_employee", "Services for employee")).append(CoreConstants.SPACE)
+				.append(user.getName()).append(CoreConstants.COMMA).append(CoreConstants.SPACE)
+				.append(iwrb.getLocalizedString("employee_personal_id_small", "personal ID")).append(CoreConstants.COLON).append(CoreConstants.SPACE)
+				.append(StringUtil.isEmpty(user.getPersonalID()) ? iwrb.getLocalizedString("unknown_personal_id_small", "unkown") : user.getPersonalID())
+				.toString(), "companyEmployeeManagerEmployeeServicesAssigner"));
 		
 		Collection<Application> userApplications = null;
 		try {
-			userApplications = getCompanyBusiness().getAvailableApplicationsForUser(iwc, user);
+			userApplications = getCompanyBusiness().getUserApplications(iwc, user);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		SelectPanel applicationSelect = new SelectPanel(SERVICES_INPUT);
+
+		Collection<Application> assignedServices = employee == null ? null : employee.getServices();
 		
+		Layer servicesContainer = new Layer();
+		servicesContainer.setStyleClass("servicesFormItem servicesFormValues");
 		if (!ListUtil.isEmpty(userApplications)) {
+			Lists list = new Lists();
+			list.setStyleClass("servicesList");
+			servicesContainer.add(list);
+			Locale locale = iwc.getCurrentLocale();
 			for (Application app : userApplications) {
-				applicationSelect.addOption(new SelectOption(app.getName(), app.getPrimaryKey().toString()));
+				ListItem item = new ListItem();
+				list.add(item);
+				
+				Layer serviceContainer = new Layer();
+				item.add(serviceContainer);
+				
+				CheckBox checkService = new CheckBox(SERVICES_INPUT, app.getPrimaryKey().toString());
+				checkService.setChecked(!ListUtil.isEmpty(assignedServices) && assignedServices.contains(app));
+				serviceContainer.add(checkService);
+				serviceContainer.add(getCompanyBusiness().getApplicationName(app, locale));
 			}
-		}
-
-		SelectPanel fieldsSelect = new SelectPanel(RVK_FIELDS_INPUT);
-		Collection<EmployeeField> userFieldsInRvk = null;
-		try {
-			userFieldsInRvk = getEmployeeFieldHome().findAll();
-		} catch (RemoteException e) {
-			e.printStackTrace();
-		} catch (FinderException e) {
-			e.printStackTrace();
-		}
-		if (!ListUtil.isEmpty(userFieldsInRvk)) {
-			for (EmployeeField field : userFieldsInRvk) {
-				fieldsSelect.addOption(new SelectOption(field.getServiceDescription(), field.getPrimaryKey().toString()));
-			}
-		}
-
-		CheckBox adminCheckBox = new CheckBox(ADMIN_BOX_INPUT, "true");
-		
-		if (employee != null) {
-			fieldsSelect.setSelectedElements(CollectionToStringArray(employee.getFieldsInRvkPKs()));
-			applicationSelect.setSelectedElements(CollectionToStringArray(employee.getServicesPKs()));
-			adminCheckBox.setChecked(employee.isCompanyAdministrator());
 		}
 		
 		Layer layer = new Layer(Layer.DIV);
@@ -447,54 +411,15 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		HtmlMessages msgs = (HtmlMessages)iwc.getApplication().createComponent(HtmlMessages.COMPONENT_TYPE);
 		formItem.add(msgs);
 		layer.add(formItem);
-		
+
 		formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
-		Label label = new Label(this.iwrb.getLocalizedString("user_personal_id", "User personal Id"), userPersonalId);
+		Layer label = new Layer();
+		label.setStyleClass("servicesFormItem formLabel");
+		label.add(iwrb.getLocalizedString("services", "Services"));
 		formItem.add(label);
-		formItem.add(userPersonalId);
-		layer.add(formItem);
-		
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label(this.iwrb.getLocalizedString("user_name", "User name"), userName);
-		formItem.add(label);
-		formItem.add(userName);
-		layer.add(formItem);
-		
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label(this.iwrb.getLocalizedString("user_surname", "User surname"), userSurname);
-		formItem.add(label);
-		formItem.add(userSurname);
-		layer.add(formItem);
-		
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label(this.iwrb.getLocalizedString("group", "Group"), group);
-		formItem.add(label);
-		formItem.add(group);
-		layer.add(formItem);
-		
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label(this.iwrb.getLocalizedString("rvkFields", "fields in RVK"), fieldsSelect);
-		formItem.add(label);
-		formItem.add(fieldsSelect);
-		layer.add(formItem);		
-		
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label(this.iwrb.getLocalizedString("applications", "Applications"), applicationSelect);
-		formItem.add(label);
-		formItem.add(applicationSelect);
-		layer.add(formItem);
-		
-		formItem = new Layer(Layer.DIV);
-		formItem.setStyleClass("formItem");
-		label = new Label(this.iwrb.getLocalizedString("admin", "Administrator"), applicationSelect);
-		formItem.add(label);
-		formItem.add(adminCheckBox);
+		formItem.add(servicesContainer);
+		formItem.add(new CSSSpacer());
 		layer.add(formItem);
 		
 		Layer clearLayer = new Layer(Layer.DIV);
@@ -506,10 +431,10 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		buttonLayer.setStyleClass("buttonLayer");
 		form.add(buttonLayer);
 		
-		BackButton back = new BackButton(this.iwrb.getLocalizedString("back", "Back"));
+		BackButton back = new BackButton(iwrb.getLocalizedString("back", "Back"));
 		buttonLayer.add(back);
 		
-		SubmitButton save = new SubmitButton(this.iwrb.getLocalizedString("save", "Save"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+		SubmitButton save = new SubmitButton(iwrb.getLocalizedString("save", "Save"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 		buttonLayer.add(save);
 		
 		add(form);
@@ -521,13 +446,11 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		String[] rvkFields = iwc.getParameterValues(RVK_FIELDS_INPUT);
 		String[] services = iwc.getParameterValues(SERVICES_INPUT);
 		
-		boolean isAdmin = iwc.isParameterSet(ADMIN_BOX_INPUT);
-		
 		CompanyEmployee emp = null;
 		
 		User selectedUser = null;
 		try {
-			if(iwc.isParameterSet(EMPLOYEE_ID_PARAMETER)) {
+			if (iwc.isParameterSet(EMPLOYEE_ID_PARAMETER)) {
 				String employeeId = iwc.getParameter(EMPLOYEE_ID_PARAMETER);
 				emp = getEmployeeHome().findByPrimaryKey(employeeId);
 				selectedUser = emp.getUser();
@@ -556,17 +479,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 			else {
 				emp.setServices(apps);
 			}
-			
-			emp.setCompanyAdministrator(isAdmin);
-			
 			emp.store();
-		
-			if (isAdmin) {
-				getCompanyBusiness().makeUserCompanyAdmin(iwc, selectedUser, getGroup());
-			}
-			else {
-				getCompanyBusiness().makeUserCommonEmployee(iwc, selectedUser, getGroup());
-			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		} catch (FinderException e) {
@@ -622,15 +535,5 @@ public class CompanyEmployeeManager extends CompanyBlock {
 
 	public void setGroup(Group group) {
 		this.group = group;
-	}
-	
-	private String[] CollectionToStringArray(Collection<Integer> collection) {
-		String[] array = new String[collection.size()];
-		int i = 0;
-		for(Integer num : collection) {
-			array[i++] = num.toString();
-		}
-		
-		return array;
 	}
 }

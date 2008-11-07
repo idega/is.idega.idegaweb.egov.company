@@ -158,3 +158,20 @@ table.employeeTable tbody tr.ruled {
 	line-height: 0;
 	visibility: hidden;
 }
+
+div.servicesFormItem {
+	float: left;
+}
+
+div.formLabel {
+	color: #222222;
+	font-weight: bold;
+	width: 160px;
+}
+
+div.servicesFormValues {
+}
+
+ul.servicesList {
+	list-style: none;
+}

@@ -1,6 +1,7 @@
 package is.idega.idegaweb.egov.company.presentation.employee;
 
 import is.idega.idegaweb.egov.application.data.Application;
+import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 
 import java.util.Collection;
@@ -32,7 +33,9 @@ public class CompanyServicesViewer extends CompanyBlock {
 		Layer container = new Layer();
 		add(container);
 
-		if (!getCompanyBusiness().isCompanyEmployee(iwc)) {
+		CompanyApplicationBusiness companyBusiness = getCompanyBusiness();
+		
+		if (!companyBusiness.isCompanyEmployee(iwc)) {
 			container.add(new Heading3(getResourceBundle(iwc).getLocalizedString("insufficient_rights", "Insufficient rights")));
 			return;
 		}
@@ -47,7 +50,8 @@ public class CompanyServicesViewer extends CompanyBlock {
 		}
 
 		User user = iwc.getCurrentUser();
-		Collection<Application> userApplicationList = getCompanyBusiness().getUserApplications(iwc, user);
+		Collection<Application> userApplicationList = (companyBusiness.isInstitutionAdministration(iwc) || companyBusiness.isCompanyAdministrator(iwc)) ?
+																companyBusiness.getUserApplications(iwc, user) : companyBusiness.getAssignedServices(iwc, user);
 		if (ListUtil.isEmpty(userApplicationList)) {
 			String noServicesMessage = new StringBuilder(getResourceBundle(iwc).getLocalizedString("there_are_no_services_provided_by_company",
 					"There are no services provided by company")).append(": ").append(group.getNodeName(iwc.getCurrentLocale())).toString();
