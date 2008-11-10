@@ -16,16 +16,15 @@
 					<page name="Company administration" type="empty">
 						<page name="Employees manager" type="companyPortalEmployeesManager" />
 						<page name="Services" type="companyPortalServicesViewer" />
-						<page name="Company cases" type="companyPortalCompanyCases" />
-						<page name="Settings" type="citizenPage">
-							<page name="Account preferences" type="userProperties" />
+						<page name="Company cases" type="companyPortalCompanyCases">
+							<page name="Message" type="messageViewer" />
+						</page>
+						<page name="Settings" type="citizenSettings">
 							<page name="Change password" type="changePassword" />
 						</page>
 					</page>
 					<page name="Company employee" type="empty">
-						<page name="Services" type="companyPortalServicesViewer" />
-						<page name="Settings" type="citizenPage">
-							<page name="Account preferences" type="userProperties" />
+						<page name="Settings" type="citizenSettings">
 							<page name="Change password" type="changePassword" />
 						</page>
 					</page>

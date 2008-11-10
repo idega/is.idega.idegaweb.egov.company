@@ -52,7 +52,8 @@ public class CompanyApplicationViewer extends CompanyBlock {
 	public void present(IWContext iwc) throws Exception {
 		super.present(iwc);
 		
-		if (!getCompanyBusiness().isCompanyAdministrator(iwc)) {
+		boolean hasRight = getCompanyBusiness().isInstitutionAdministration(iwc) || getCompanyBusiness().isCompanyAdministrator(iwc);
+		if (!hasRight) {
 			showInsufficientRightsMessage(iwrb.getLocalizedString("insufficient_rights_to_view_application",
 					"You have insufficient rights to view application!"));
 			return;

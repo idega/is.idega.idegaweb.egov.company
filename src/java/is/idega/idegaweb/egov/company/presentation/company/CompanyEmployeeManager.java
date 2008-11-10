@@ -380,7 +380,11 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		
 		Layer servicesContainer = new Layer();
 		servicesContainer.setStyleClass("servicesFormItem servicesFormValues");
-		if (!ListUtil.isEmpty(userApplications)) {
+		if (ListUtil.isEmpty(userApplications)) {
+			servicesContainer.add(getMessage(iwrb.getLocalizedString("company_portal.there_are_no_services_available", "There are no services available yet"),
+					"noServicesAvailableForCompanyEmployees", true));
+		}
+		else {
 			Lists list = new Lists();
 			list.setStyleClass("servicesList");
 			servicesContainer.add(list);
