@@ -18,8 +18,6 @@ public class CompanyAccountManager extends CompanyBlock {
 	
 	private String roleTypes = null;
 	
-	private Group group = null;
-	
 	@Override
 	protected void present(IWContext iwc) throws Exception {
 		super.present(iwc);

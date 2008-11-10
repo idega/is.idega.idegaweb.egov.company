@@ -77,8 +77,6 @@ public class CompanyEmployeeManager extends CompanyBlock {
 	private static final int ACTION_SAVE = 4;
 	private static final int ACTION_DELETE = 5;
 
-	
-	private Group group;	
 	private IWBundle iwb;
 	private String roleTypes = null;
 	

@@ -16,8 +16,6 @@ import com.idega.util.ListUtil;
 
 public class CompanyServicesViewer extends CompanyBlock {
 
-	protected Group group;
-
 	public Group getGroup() {
 		return group;
 	}

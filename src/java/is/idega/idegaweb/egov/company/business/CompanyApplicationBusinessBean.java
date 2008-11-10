@@ -501,7 +501,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		try {
 			user = iwuc.getCurrentUser();
 		} catch (NotLoggedOnException e) {
-			logger.log(Level.SEVERE, "User is not logged!", e);
+			logger.log(Level.SEVERE, "User is not logged!");
 		}
 
 		return user == null ? false : true;
