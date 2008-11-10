@@ -667,7 +667,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 				for (Group group : appGroups) {
 					if (!appAdded && (superAdmin || group.getId().equals(companyPortalRootGroupId) ||
 																									companyPortalBusiness.isMemberOfCompany(iwc, group, user))) {
-						userApplicationList.add(app);
+						if (!userApplicationList.contains(app)) {
+							userApplicationList.add(app);
+						}
 						appAdded = true;
 					}
 				}
