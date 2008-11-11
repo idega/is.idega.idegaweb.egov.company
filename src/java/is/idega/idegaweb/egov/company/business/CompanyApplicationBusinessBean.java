@@ -509,9 +509,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 
 	public boolean isCompanyAdministrator(IWContext iwc) {
 		try {
-			return (isUserLogged(iwc) && iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_ADMIN_ROLE, iwc) &&
+			return (isInstitutionAdministration(iwc) || iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_ADMIN_ROLE, iwc) &&
 					isUserAccountEnabledForCompanyPortal(iwc));
-		} catch (NotLoggedOnException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
@@ -521,7 +521,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		try {
 			return (isCompanyAdministrator(iwc) || iwc.getAccessController().hasRole(EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE, iwc)) &&
 					isUserAccountEnabledForCompanyPortal(iwc);
-		} catch (NotLoggedOnException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;

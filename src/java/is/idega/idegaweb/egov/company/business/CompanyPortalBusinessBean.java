@@ -209,6 +209,27 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 	}
 	
 	public Group getCompanyGroupByUser(User user) {
+		Object groupId = null;
+		Group selectedGroup = null;
+		
+		IWContext iwc = CoreUtil.getIWContext();
+		if (iwc != null && (groupId = iwc.getSessionAttribute(EgovCompanyConstants.COMPANY_PORTAL_CURRENT_COMPANY_ATTRIBUTE)) != null) {
+			if (groupId instanceof String) {
+				try {
+					selectedGroup = getGroupBusiness(iwc).getGroupByGroupID(Integer.valueOf(groupId.toString()));
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				} catch (FinderException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		if (selectedGroup !=  null) {
+			return selectedGroup;
+		}
+		
 		List<Group> userCompanies = getAllUserCompanies(user);
 		return ListUtil.isEmpty(userCompanies) ? null : userCompanies.get(0);
 	}
