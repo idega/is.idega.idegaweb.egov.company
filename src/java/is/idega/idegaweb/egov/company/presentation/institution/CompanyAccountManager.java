@@ -28,9 +28,7 @@ public class CompanyAccountManager extends CompanyBlock {
 			return;
 		}
 		
-		if (group == null) {
-			group = getCompanyPortalBusiness().getCompanyPortalRootGroup(iwc);
-		}
+		group = getCompanyPortalBusiness().getCompanyPortalRootGroup(iwc);
 		if (group == null) {
 			showMessage(iwrb.getLocalizedString("select_group_first_please", "Select group (that represents company) firstly, please!"));
 			return;
