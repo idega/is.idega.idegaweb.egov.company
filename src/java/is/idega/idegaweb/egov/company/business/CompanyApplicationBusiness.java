@@ -51,7 +51,7 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#approveApplication
 	 */
-	public String approveApplication(IWContext iwc, String applicationId) throws RemoteException;
+	public List<String> approveApplication(IWContext iwc, String applicationId) throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#rejectApplication
@@ -107,8 +107,6 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	public boolean makeUserCompanyAdmin(IWApplicationContext iwac, User companyAdmin, Group company);
 	
 	public boolean makeUserCommonEmployee(IWApplicationContext iwac, User companyAdmin, Group company);
-	
-	public String getLoginCreatedInfo(IWContext iwc, String login, String password);
 	
 	public Collection<Application> getUserApplications(IWContext iwc, User user);
 	

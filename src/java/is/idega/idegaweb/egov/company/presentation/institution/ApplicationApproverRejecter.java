@@ -10,6 +10,7 @@ import is.idega.idegaweb.egov.company.presentation.company.CompanyApplicationVie
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +31,7 @@ import com.idega.presentation.TableBodyRowGroup;
 import com.idega.presentation.TableCell2;
 import com.idega.presentation.TableRow;
 import com.idega.presentation.TableRowGroup;
-import com.idega.presentation.text.Heading2;
+import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Heading3;
 import com.idega.presentation.text.Heading4;
 import com.idega.presentation.text.Link;
@@ -70,7 +71,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	private String caseCode;
 	private Integer applicationType;
 	
-	private String applicationHandlingResultMessage;
+	private List<String> applicationHandlingResultMessage;
 	
 	private ICPage backPage;
 	
@@ -146,8 +147,8 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		if (StringUtil.isEmpty(applicationHandlingResultMessage)) {
-			applicationHandlingResultMessage = iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred.");
+		if (ListUtil.isEmpty(applicationHandlingResultMessage)) {
+			applicationHandlingResultMessage = Arrays.asList(iwrb.getLocalizedString("application_was_not_approved", "Application was not approved! Some error occurred."));
 		}
 		
 		listApplications(iwc);
@@ -210,16 +211,16 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 	
 	private void reopenAccount(IWContext iwc) {
 		applicationHandlingResultMessage = getCompanyBusiness().reopenAccount(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER)) ?
-				iwrb.getLocalizedString("account_for_application_was_opened", "Account for application was successfully opened!") :
-				iwrb.getLocalizedString("account_for_application_was_not_opened", "Account for application was not opened! Some error occurred.");
+				Arrays.asList(iwrb.getLocalizedString("account_for_application_was_opened", "Account for application was successfully opened!")) :
+				Arrays.asList(iwrb.getLocalizedString("account_for_application_was_not_opened", "Account for application was not opened! Some error occurred."));
 		
 		listApplications(iwc);
 	}
 	
 	private void closeAccount(IWContext iwc) {
 		applicationHandlingResultMessage = getCompanyBusiness().closeAccount(iwc, iwc.getParameter(ApplicationCreator.APPLICATION_ID_PARAMETER)) ?
-				iwrb.getLocalizedString("account_for_application_was_closed", "Account for application was successfully closed!") :
-				iwrb.getLocalizedString("account_for_application_was_not_closed", "Account for application was not closed! Some error occurred.");
+				Arrays.asList(iwrb.getLocalizedString("account_for_application_was_closed", "Account for application was successfully closed!")) :
+				Arrays.asList(iwrb.getLocalizedString("account_for_application_was_not_closed", "Account for application was not closed! Some error occurred."));
 				
 		listApplications(iwc);
 	}
@@ -285,8 +286,8 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
-		applicationHandlingResultMessage = result ? iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully rejected!") :
-			iwrb.getLocalizedString("application_was_not_rejected", "Application was not rejected! Some error occurred.");
+		applicationHandlingResultMessage = result ? Arrays.asList(iwrb.getLocalizedString("application_successfully_rejected", "Application was successfully rejected!")) :
+			Arrays.asList(iwrb.getLocalizedString("application_was_not_rejected", "Application was not rejected! Some error occurred."));
 		
 		listApplications(iwc);
 	}
@@ -356,10 +357,15 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 		Layer container = new Layer();
 		add(container);
 
-		if (!StringUtil.isEmpty(applicationHandlingResultMessage)) {
-			Heading2 message = new Heading2(applicationHandlingResultMessage);
-			container.add(message);
-			message.setStyleClass("applicationHandlingResultMessageStyle");
+		if (!ListUtil.isEmpty(applicationHandlingResultMessage)) {
+			Layer messageContainer = new Layer();
+			messageContainer.setStyleClass("applicationHandlingResultMessageStyle");
+			container.add(messageContainer);
+			
+			for (String line: applicationHandlingResultMessage) {
+				messageContainer.add(getMessage(line, "applicationHandlingResultMessageLineStyle", true));
+				messageContainer.add(new Break());
+			}
 		}
 		
 		if (StringUtil.isEmpty(caseCode)) {

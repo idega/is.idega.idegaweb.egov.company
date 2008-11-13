@@ -135,7 +135,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 		return IWMainApplication.getDefaultIWMainApplication().getBundle(EgovCompanyConstants.IW_BUNDLE_IDENTIFIER);
 	}
 
-	public String approveApplication(IWContext iwc, String applicationId) {
+	public List<String> approveApplication(IWContext iwc, String applicationId) {
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {
 			return null;
@@ -173,7 +173,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 				logger.log(Level.WARNING, "Can not reopen accounts for company: " + company.getName());
 				return null;
 			}
-			return text;	
+			return Arrays.asList(text);	
 		}
 		
 		Email email = null;
@@ -186,25 +186,35 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return null;
 		}
 		
+		List<String> texts = new ArrayList<String>();
+		texts.add(text);
 		LoginTable login = LoginDBHandler.getUserLogin(compApp.getAdminUser());
-		text = new StringBuilder(text).append("\n\r").append(getLoginCreatedInfo(iwc, login.getUserLogin(), adminPassword)).toString();
+		text = new StringBuilder(text).append("\n\r").toString();
+		List<String> loginInfoTexts = getLoginCreatedInfo(iwc, login.getUserLogin(), adminPassword);
+		texts.addAll(loginInfoTexts);
+		StringBuilder emailText = new StringBuilder();
+		for (String loginText: loginInfoTexts) {
+			emailText.append(loginText).append("\n\r");
+		}
 		
-		sendMail(email, subject.toString(), text);
+		sendMail(email, subject.toString(), new StringBuilder(text).append(emailText.toString()).toString());
 		
-		return text;
+		return texts;
 	}
 	
-	public String getLoginCreatedInfo(IWContext iwc, String login, String password) {
+	private List<String> getLoginCreatedInfo(IWContext iwc, String login, String password) {
 		String portNumber = new StringBuilder(":").append(String.valueOf(iwc.getServerPort())).toString();
 		String serverLink = StringHandler.replace(iwc.getServerURL(), portNumber, CoreConstants.EMPTY);
 		
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		
-		return new StringBuilder(iwrb.getLocalizedString("login_here", "Login here")).append(": ").append(serverLink).append("\n\r")
-			.append(iwrb.getLocalizedString("your_user_name", "Your user name")).append(": ").append(login).append(", ")
-			.append(iwrb.getLocalizedString("your_password", "your password")).append(": ").append(password).append(". ")
-			.append(iwrb.getLocalizedString("we_recommend_to_change_password_after_login", "We recommend to change password after login!"))
-		.toString();
+		List<String> texts = new ArrayList<String>();
+		texts.add(new StringBuilder(iwrb.getLocalizedString("login_here", "Login here")).append(": ").append(serverLink).toString());
+		texts.add(new StringBuilder(iwrb.getLocalizedString("your_user_name", "Your user name")).append(": ").append(login).append(", ")
+			.append(iwrb.getLocalizedString("your_password", "your password")).append(": ").append(password).append(".").toString());
+		texts.add(iwrb.getLocalizedString("we_recommend_to_change_password_after_login", "We recommend to change password after login!"));
+		
+		return texts;
 	}
 	
 	@SuppressWarnings("unchecked")
