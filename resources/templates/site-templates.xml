@@ -14,6 +14,7 @@
 				</page>
 				<page name="Company administration" type="empty">
 					<page name="Employees manager" type="companyPortalEmployeesManager" />
+					<page name="Employees services manager" type="companyPortalEmployeesServicesManager" />
 					<page name="Services" type="companyPortalServicesViewer" />
 					<page name="Company cases" type="companyPortalCompanyCases">
 						<page name="Message" type="messageViewer" />
