@@ -147,8 +147,6 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		Form form = getMainForm(iwc, company, user, iwrb.getLocalizedString("application.company_information", "Company information"), ACTION_PHASE_1,
 				iNumberOfPhases);
 		
-		addErrors(iwc, form);
-		
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
