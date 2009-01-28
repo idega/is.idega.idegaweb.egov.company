@@ -66,6 +66,7 @@ public abstract class CompanyBlock extends ApplicationBlock {
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/interface/CompanyApplicationBusiness.js");
 		PresentationUtil.addJavaScriptSourceLineToHeader(iwc, "/dwr/engine.js");
 		PresentationUtil.addStyleSheetToHeader(iwc, bundle.getVirtualPathWithFileNameString("style/egov_company.css"));
+		PresentationUtil.addStyleSheetToHeader(iwc, iwc.getIWMainApplication().getBundle("is.idega.idegaweb.egov.application").getVirtualPathWithFileNameString("style/application.css"));
 		
 		if (group == null) {
 			String groupId = null;
