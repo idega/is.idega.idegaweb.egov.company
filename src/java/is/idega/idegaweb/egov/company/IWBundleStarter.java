@@ -23,6 +23,7 @@ import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWBundleStartable;
+import com.idega.servlet.filter.IWBundleResourceFilter;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.GroupType;
@@ -75,6 +76,8 @@ public class IWBundleStarter implements IWBundleStartable {
 		setRoleToCommuneAcceptedCitizensGroup(iwac, groupBusiness);
 		
 		setHomePageToGroups(iwac);
+
+		IWBundleResourceFilter.copyResourceFromJarToWebapp(starterBundle.getApplication(), starterBundle.getResourcesVirtualPath());
 	}
 	
 	private void setHomePageToGroups(IWApplicationContext iwac) {
