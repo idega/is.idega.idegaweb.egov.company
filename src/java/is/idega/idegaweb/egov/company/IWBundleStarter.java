@@ -77,7 +77,7 @@ public class IWBundleStarter implements IWBundleStartable {
 		
 		setHomePageToGroups(iwac);
 
-		IWBundleResourceFilter.copyResourceFromJarToWebapp(starterBundle.getApplication(), starterBundle.getResourcesVirtualPath());
+		IWBundleResourceFilter.copyAllFilesFromJarDirectory(starterBundle.getApplication(), starterBundle, starterBundle.getResourcesVirtualPath());
 	}
 	
 	private void setHomePageToGroups(IWApplicationContext iwac) {
