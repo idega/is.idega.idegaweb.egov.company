@@ -9,7 +9,7 @@ CompanyApplicationCreator.canGetInfo = function(event, id) {
 	if (element == null) {
 		return false;
 	}
-	var value = DWRUtil.getValue(id);
+	var value = dwr.util.getValue(id);
 	if (value == null || value == '') {
 		return false;
 	}
@@ -21,12 +21,12 @@ CompanyApplicationCreator.getCompanyInfo = function(event, id, errorMessage) {
 		IWCORE.stopEventBubbling(event);
 		closeAllLoadingMessages();
 		
-		var value = DWRUtil.getValue(id);
-		var phone = DWRUtil.getValue('companyPhone');
-		var fax = DWRUtil.getValue('companyFax');
-		var email = DWRUtil.getValue('companyEmail');
-		var webpage = DWRUtil.getValue('companyWebPage');
-		var bankAccount = DWRUtil.getValue('companyBankAccount');
+		var value = dwr.util.getValue(id);
+		var phone = dwr.util.getValue('companyPhone');
+		var fax = dwr.util.getValue('companyFax');
+		var email = dwr.util.getValue('companyEmail');
+		var webpage = dwr.util.getValue('companyWebPage');
+		var bankAccount = dwr.util.getValue('companyBankAccount');
 	
 		CompanyApplicationBusiness.getCompany(value, phone, fax, email, webpage, bankAccount, {
 			callback: function(companyInfo) {
@@ -36,7 +36,7 @@ CompanyApplicationCreator.getCompanyInfo = function(event, id, errorMessage) {
 					return false;
 				}
 				
-				DWRUtil.setValues(companyInfo);
+				dwr.util.setValues(companyInfo);
 			}
 		});
 	}
@@ -46,15 +46,15 @@ CompanyApplicationCreator.getCompanyInfo = function(event, id, errorMessage) {
 }
 
 CompanyApplicationCreator.clearCompanyFormValues = function() {
-	DWRUtil.setValue('companyName', '');
-	DWRUtil.setValue('companyAddress', '');
-	DWRUtil.setValue('companyPostalCode', '');
-	DWRUtil.setValue('companyCity', '');
-	DWRUtil.setValue('companyPhone', '');
-	DWRUtil.setValue('companyFax', '');
-	DWRUtil.setValue('companyEmail', '');
-	DWRUtil.setValue('companyWebPage', '');
-	DWRUtil.setValue('companyBankAccount', '');
+	dwr.util.setValue('companyName', '');
+	dwr.util.setValue('companyAddress', '');
+	dwr.util.setValue('companyPostalCode', '');
+	dwr.util.setValue('companyCity', '');
+	dwr.util.setValue('companyPhone', '');
+	dwr.util.setValue('companyFax', '');
+	dwr.util.setValue('companyEmail', '');
+	dwr.util.setValue('companyWebPage', '');
+	dwr.util.setValue('companyBankAccount', '');
 }
 
 CompanyApplicationCreator.getContactPersonInformation = function(event, id, errorMessage) {
@@ -62,7 +62,7 @@ CompanyApplicationCreator.getContactPersonInformation = function(event, id, erro
 		IWCORE.stopEventBubbling(event);
 		closeAllLoadingMessages();
 		
-		CompanyApplicationBusiness.getUser(DWRUtil.getValue(id), {
+		CompanyApplicationBusiness.getUser(dwr.util.getValue(id), {
 			callback: function(userInfo) {
 				if (userInfo == null) {
 					CompanyApplicationCreator.showHumanizedMessage(errorMessage, id);
@@ -70,7 +70,7 @@ CompanyApplicationCreator.getContactPersonInformation = function(event, id, erro
 					return false;
 				}
 				
-				DWRUtil.setValues(userInfo);
+				dwr.util.setValues(userInfo);
 			}
 		});
 	}
@@ -80,11 +80,11 @@ CompanyApplicationCreator.getContactPersonInformation = function(event, id, erro
 }
 
 CompanyApplicationCreator.clearUserFormValues = function() {
-	DWRUtil.setValue('userPK', '');
-	DWRUtil.setValue('userName', '');
-	DWRUtil.setValue('userWorkPhone', '');
-	DWRUtil.setValue('userMobilePhone', '');
-	DWRUtil.setValue('userEmail', '');
+	dwr.util.setValue('userPK', '');
+	dwr.util.setValue('userName', '');
+	dwr.util.setValue('userWorkPhone', '');
+	dwr.util.setValue('userMobilePhone', '');
+	dwr.util.setValue('userEmail', '');
 }
 
 CompanyApplicationCreator.showHumanizedMessage = function(message, inputId) {
