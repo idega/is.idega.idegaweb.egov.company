@@ -377,4 +377,18 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getLocalizedName() not supported.");
 	}
+
+	public void addSubscriber(User subscriber)
+			throws IDOAddRelationshipException {
+		throw new UnsupportedOperationException("This method is not implemented!");
+	}
+
+	public Collection<User> getSubscribers() {
+		throw new UnsupportedOperationException("This method is not implemented!");
+	}
+
+	public void removeSubscriber(User subscriber)
+			throws IDORemoveRelationshipException {
+		throw new UnsupportedOperationException("This method is not implemented!");
+	}
 }
