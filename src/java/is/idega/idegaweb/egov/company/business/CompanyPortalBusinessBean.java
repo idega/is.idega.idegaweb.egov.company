@@ -104,16 +104,16 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		return group;
 	}
 	
-	public Group createCompanyGroup(IWApplicationContext iwac, String companyName) {
+	public Group createCompanyGroup(IWApplicationContext iwac, String companyName, String personalID) {
 		try {
-			return createCompanyGroup(iwac, getCompanyPortalRootGroup(iwac), companyName);
+			return createCompanyGroup(iwac, getCompanyPortalRootGroup(iwac), companyName, personalID);
 		} catch (RemoteException e) {
 			logger.log(Level.SEVERE, "Error creating group for company: " + companyName, e);
 		}
 		return null;
 	}
 	
-	public Group createCompanyGroup(IWApplicationContext iwac, Group companyPortal, String companyName) {
+	public Group createCompanyGroup(IWApplicationContext iwac, Group companyPortal, String companyName, String personalID) {
 		GroupBusiness groupBusiness = getGroupBusiness(iwac);
 		if (groupBusiness == null) {
 			return null;
@@ -128,7 +128,10 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		if (company == null) {
 			return null;
 		}
+		
 		setHomePage(iwac, company);
+		company.setMetaData("COMPANY_PERSONAL_ID", personalID);
+		company.store();
 		
 		IWResourceBundle iwrb = getResourceBundle(iwac);
 		String adminsGroupName = "Administrators of";
@@ -273,7 +276,7 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		return groups;
 	}
 	
-	public Group getCompanyGroup(IWApplicationContext iwac, String companyName) {
+	public Group getCompanyGroup(IWApplicationContext iwac, String companyName, String personalID) {
 		Group companyPortal = null;
 		try {
 			companyPortal = getCompanyPortalRootGroup(iwac);
@@ -285,19 +288,19 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		}
 		Group company = getGroupByName(companyPortal, companyName);
 		if (company == null) {
-			company = createCompanyGroup(iwac, companyPortal, companyName);
+			company = createCompanyGroup(iwac, companyPortal, companyName, personalID);
 		}
 		
 		setHomePage(iwac, company);
 		return company;
 	}
 	
-	public Group getCompanyAdminsGroup(IWApplicationContext iwac, String companyName) {
-		return getChildGroupByType(getCompanyGroup(iwac, companyName), EgovCompanyConstants.GROUP_TYPE_COMPANY_ADMINS);
+	public Group getCompanyAdminsGroup(IWApplicationContext iwac, String companyName, String personalID) {
+		return getChildGroupByType(getCompanyGroup(iwac, companyName, personalID), EgovCompanyConstants.GROUP_TYPE_COMPANY_ADMINS);
 	}
 	
-	public Group getCompanyStaffGroup(IWApplicationContext iwac, String companyName) {
-		Group companyStaffGroup = getChildGroupByType(getCompanyGroup(iwac, companyName), EgovCompanyConstants.GROUP_TYPE_COMPANY_STAFF);
+	public Group getCompanyStaffGroup(IWApplicationContext iwac, String companyName, String personalID) {
+		Group companyStaffGroup = getChildGroupByType(getCompanyGroup(iwac, companyName, personalID), EgovCompanyConstants.GROUP_TYPE_COMPANY_STAFF);
 		if (companyStaffGroup == null) {
 			return null;
 		}

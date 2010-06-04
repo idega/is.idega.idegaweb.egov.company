@@ -17,8 +17,8 @@ public interface CompanyPortalBusiness {
 	
 	public Group getAllCompaniesAdminsGroup(IWApplicationContext iwac);
 	
-	public Group getCompanyAdminsGroup(IWApplicationContext iwac, String companyName);
-	public Group getCompanyStaffGroup(IWApplicationContext iwac, String companyName);
+	public Group getCompanyAdminsGroup(IWApplicationContext iwac, String companyName, String personalID);
+	public Group getCompanyStaffGroup(IWApplicationContext iwac, String companyName, String personalID);
 	
 	public Group getCompanySuperAdminsGroup(IWApplicationContext iwac);
 	
@@ -26,10 +26,10 @@ public interface CompanyPortalBusiness {
 	public Group getChildGroupByType(Group group, String type);
 	public List<Group> getAllChildGroupsByType(Group group, String type);
 	
-	public Group createCompanyGroup(IWApplicationContext iwac, String companyName);
-	public Group createCompanyGroup(IWApplicationContext iwac, Group companyPortal, String companyName);
+	public Group createCompanyGroup(IWApplicationContext iwac, String companyName, String personalID);
+	public Group createCompanyGroup(IWApplicationContext iwac, Group companyPortal, String companyName, String personalID);
 	
-	public Group getCompanyGroup(IWApplicationContext iwac, String companyName);
+	public Group getCompanyGroup(IWApplicationContext iwac, String companyName, String personalID);
 	
 	public List<Group> getAllUserCompanies(User user);
 	

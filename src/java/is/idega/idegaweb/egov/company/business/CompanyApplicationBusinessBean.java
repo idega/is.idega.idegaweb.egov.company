@@ -252,12 +252,12 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean impl
 			return null;
 		}
 		
-		Group rootGroupForCompany = companyPortalBusiness.getCompanyGroup(iwac, companyName);
+		Group rootGroupForCompany = companyPortalBusiness.getCompanyGroup(iwac, companyName, company.getPersonalID());
 		if (rootGroupForCompany == null) {
 			logger.log(Level.INFO, "Can not find group for company: " + companyName);
 			return null;
 		}
-		Group adminsGroupForCompany = companyPortalBusiness.getCompanyAdminsGroup(iwac, companyName);
+		Group adminsGroupForCompany = companyPortalBusiness.getCompanyAdminsGroup(iwac, companyName, company.getPersonalID());
 		if (adminsGroupForCompany == null) {
 			logger.log(Level.INFO, "Can not find admins group for company: " + companyName);
 			return null;
