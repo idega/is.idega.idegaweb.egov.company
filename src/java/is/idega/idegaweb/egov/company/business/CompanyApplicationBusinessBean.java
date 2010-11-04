@@ -1431,9 +1431,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 								holder.getPersonalID(), null,
 								holder.getPostalCode(), null, null,
 								holder.getName(), holder.getAddress(), null,
-								null, null, holder.getVatNumber(),
-								holder.getAddress(), null, null, null, null,
-								null, null, null, null);
+								"", null, holder.getVatNumber(),
+								holder.getAddress(), "", null, null, null,
+								null, null, "", null);
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
