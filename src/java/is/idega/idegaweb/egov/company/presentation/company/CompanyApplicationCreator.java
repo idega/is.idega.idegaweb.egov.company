@@ -289,7 +289,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		addFormItem(container, labelText, interfaceObject, null, false);
 	}
 	
-	private Form getMainForm(IWContext iwc, Company company, User contactPerson, String phaseHeader, int phaseNumber, int iNumberOfPhases) {
+	protected Form getMainForm(IWContext iwc, Company company, User contactPerson, String phaseHeader, int phaseNumber, int iNumberOfPhases) {
 		Form form = createForm(phaseNumber);
 		form.setOnSubmit(new StringBuilder("showLoadingMessage('").append(iwrb.getLocalizedString("loading", "Loading...")).append("'); return false;")
 				.toString());
