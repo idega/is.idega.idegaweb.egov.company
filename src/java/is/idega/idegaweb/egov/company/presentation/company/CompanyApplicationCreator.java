@@ -66,39 +66,39 @@ import com.idega.util.expression.ELUtil;
 
 public class CompanyApplicationCreator extends ApplicationForm {
 	
-	private static final int iNumberOfPhases = 2;
+	protected static final int iNumberOfPhases = 2;
 
-	private static final int ACTION_PHASE_1 = 1;
+	protected static final int ACTION_PHASE_1 = 1;
 //	private static final int ACTION_OVERVIEW = 2;
-	private static final int ACTION_SAVE = 2;
+	protected static final int ACTION_SAVE = 2;
 	
-	private static final String PARAMETER_TYPE = "prm_type";
-	private static final String PARAMETER_ACTION = "prm_action";
-	private static final String PARAMETER_AGREEMENT = "prm_agreement";
-	private static final String PARAMETER_COMPANY_PERSONAL_ID = "prm_personal_id";
-	private static final String PARAMETER_NAME = "prm_name";
-	private static final String PARAMETER_ADDRESS = "prm_address";
-	private static final String PARAMETER_POSTAL_CODE = "prm_postal_code";
-	private static final String PARAMETER_CITY = "prm_city";
-	private static final String PARAMETER_PHONE = "prm_phone";
-	private static final String PARAMETER_FAX = "prm_fax";
-	private static final String PARAMETER_WEB_PAGE = "prm_web_page";
-	private static final String PARAMETER_EMAIL = "prm_email";
-	private static final String PARAMETER_BANK_ACCOUNT = "prm_bank_account";
+	protected static final String PARAMETER_TYPE = "prm_type";
+	protected static final String PARAMETER_ACTION = "prm_action";
+	protected static final String PARAMETER_AGREEMENT = "prm_agreement";
+	protected static final String PARAMETER_COMPANY_PERSONAL_ID = "prm_personal_id";
+	protected static final String PARAMETER_NAME = "prm_name";
+	protected static final String PARAMETER_ADDRESS = "prm_address";
+	protected static final String PARAMETER_POSTAL_CODE = "prm_postal_code";
+	protected static final String PARAMETER_CITY = "prm_city";
+	protected static final String PARAMETER_PHONE = "prm_phone";
+	protected static final String PARAMETER_FAX = "prm_fax";
+	protected static final String PARAMETER_WEB_PAGE = "prm_web_page";
+	protected static final String PARAMETER_EMAIL = "prm_email";
+	protected static final String PARAMETER_BANK_ACCOUNT = "prm_bank_account";
 
-	private static final String PARAMETER_ADMIN_PK = "prm_admin_pk";
-	private static final String PARAMETER_ADMIN_PERSONAL_ID = "prm_admin_personal_id";
-	private static final String PARAMETER_ADMIN_NAME = "prm_admin_name";
-	private static final String PARAMETER_WORK_PHONE = "prm_work_phone";
-	private static final String PARAMETER_MOBILE_PHONE = "prm_mobile_phone";
-	private static final String PARAMETER_ADMIN_EMAIL = "prm_admin_email";
+	protected static final String PARAMETER_ADMIN_PK = "prm_admin_pk";
+	protected static final String PARAMETER_ADMIN_PERSONAL_ID = "prm_admin_personal_id";
+	protected static final String PARAMETER_ADMIN_NAME = "prm_admin_name";
+	protected static final String PARAMETER_WORK_PHONE = "prm_work_phone";
+	protected static final String PARAMETER_MOBILE_PHONE = "prm_mobile_phone";
+	protected static final String PARAMETER_ADMIN_EMAIL = "prm_admin_email";
 	
-	private static final String BANK_ACCOUNT_DEFAULT = "0000-00-000000";
+	protected static final String BANK_ACCOUNT_DEFAULT = "0000-00-000000";
 	
 //	private String requiredFieldLocalizationKey = "this_field_is_required";
 //	private String requiredFieldLocalizationValue = "This field is required!";
 	
-	private IWResourceBundle iwrb;
+	protected IWResourceBundle iwrb;
 
 	@Override
 	public String getBundleIdentifier() {
@@ -129,7 +129,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		}
 	}
 	
-	private void showPhaseOne(IWContext iwc, int nextPhase, int iNumberOfPhases) throws RemoteException {
+	protected void showPhaseOne(IWContext iwc, int nextPhase, int iNumberOfPhases) throws RemoteException {
 		Company company = null;
 		if (iwc.isParameterSet(PARAMETER_COMPANY_PERSONAL_ID)) {
 			try {
@@ -281,12 +281,34 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		container.add(formItem);
 	}
 	
-	private void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject, String parameter, boolean required) {
+	protected void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject, String parameter, boolean required) {
 		addFormItem(container, labelText, interfaceObject, parameter, null, required);
 	}
 	
-	private void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject) {
+	protected void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject) {
 		addFormItem(container, labelText, interfaceObject, null, false);
+	}
+	
+	protected void addFormItems(Layer section, TextInput personalID, TextInput name, TextInput address, TextInput postalCode, TextInput city, TextInput phone, TextInput fax, TextInput webPage, TextInput email, TextInput bankAccount) {
+		addFormItem(section, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID, PARAMETER_COMPANY_PERSONAL_ID, true);
+		
+		addFormItem(section, iwrb.getLocalizedString("name", "Name"), name);
+
+		addFormItem(section, iwrb.getLocalizedString("address", "Address"), address);
+
+		addFormItem(section, iwrb.getLocalizedString("postal_code", "Postal code"), postalCode);
+
+		addFormItem(section, iwrb.getLocalizedString("city", "City"), city);
+
+		addFormItem(section, iwrb.getLocalizedString("phone", "Phone"), phone, PARAMETER_PHONE, true);
+
+		addFormItem(section, iwrb.getLocalizedString("fax", "Fax"), fax);
+
+		addFormItem(section, iwrb.getLocalizedString("web_page", "Web page"), webPage);
+
+		addFormItem(section, iwrb.getLocalizedString("email", "E-mail"), email, PARAMETER_EMAIL, true);
+
+		addFormItem(section, iwrb.getLocalizedString("bank_account", "Bank account"), bankAccount, PARAMETER_BANK_ACCOUNT, true);		
 	}
 	
 	protected Form getMainForm(IWContext iwc, Company company, User contactPerson, String phaseHeader, int phaseNumber, int iNumberOfPhases) {
@@ -400,25 +422,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		bankAccount.setContent(StringUtil.isEmpty(bankAccountNumber) ? BANK_ACCOUNT_DEFAULT : bankAccountNumber);
 		bankAccount.keepStatusOnAction(true);
 
-		addFormItem(section, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID, PARAMETER_COMPANY_PERSONAL_ID, true);
-		
-		addFormItem(section, iwrb.getLocalizedString("name", "Name"), name);
-
-		addFormItem(section, iwrb.getLocalizedString("address", "Address"), address);
-
-		addFormItem(section, iwrb.getLocalizedString("postal_code", "Postal code"), postalCode);
-
-		addFormItem(section, iwrb.getLocalizedString("city", "City"), city);
-
-		addFormItem(section, iwrb.getLocalizedString("phone", "Phone"), phone, PARAMETER_PHONE, true);
-
-		addFormItem(section, iwrb.getLocalizedString("fax", "Fax"), fax);
-
-		addFormItem(section, iwrb.getLocalizedString("web_page", "Web page"), webPage);
-
-		addFormItem(section, iwrb.getLocalizedString("email", "E-mail"), email, PARAMETER_EMAIL, true);
-
-		addFormItem(section, iwrb.getLocalizedString("bank_account", "Bank account"), bankAccount, PARAMETER_BANK_ACCOUNT, true);
+		addFormItems(section, personalID, name, address, postalCode, city, phone, fax, webPage, email, bankAccount);
 
 		section.add(new CSSSpacer());
 
@@ -503,7 +507,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		return form;
 	}
 
-	private void save(IWContext iwc) throws RemoteException {
+	protected void save(IWContext iwc) throws RemoteException {
 		boolean success = true;
 		Company company = null;
 		
@@ -725,7 +729,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		}
 	}
 	
-	private CompanyApplicationBusiness getCompanyApplicationBusiness() {
+	protected CompanyApplicationBusiness getCompanyApplicationBusiness() {
 		try {
 			return (CompanyApplicationBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),
 					CompanyApplicationBusiness.class);
@@ -735,7 +739,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		return null;
 	}
 	
-	private CompanyBusiness getCompanyBusiness(IWApplicationContext iwac) {
+	protected CompanyBusiness getCompanyBusiness(IWApplicationContext iwac) {
 		try {
 			return (CompanyBusiness) IBOLookup.getServiceInstance(iwac, CompanyBusiness.class);
 		}

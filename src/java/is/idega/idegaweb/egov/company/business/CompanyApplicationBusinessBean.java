@@ -7,6 +7,9 @@ import is.idega.idegaweb.egov.accounting.business.CitizenBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
 import is.idega.idegaweb.egov.application.data.Application;
+import is.idega.idegaweb.egov.citizen.IWBundleStarter;
+import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurLocator;
+import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurSoap_PortType;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.bean.AdminUser;
 import is.idega.idegaweb.egov.company.bean.CompanyInfo;
@@ -16,8 +19,13 @@ import is.idega.idegaweb.egov.company.data.CompanyEmployee;
 import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
 import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +39,18 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 import javax.mail.MessagingException;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.xml.rpc.ServiceException;
 
+import org.apache.axis.EngineConfiguration;
+import org.apache.axis.client.Stub;
+import org.apache.axis.configuration.FileProvider;
+import org.apache.axis.encoding.Base64;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.pdf.business.PrintingContext;
@@ -55,6 +74,8 @@ import com.idega.core.contact.data.Phone;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
 import com.idega.core.file.util.MimeTypeUtil;
+import com.idega.core.idgenerator.business.IdGenerator;
+import com.idega.core.idgenerator.business.IdGeneratorFactory;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.data.IDOLookup;
@@ -89,7 +110,7 @@ import com.idega.util.expression.ELUtil;
 import com.idega.util.text.Name;
 
 public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
-		implements CompanyApplicationBusiness {
+		implements CompanyApplicationBusiness, CallbackHandler {
 
 	private static final long serialVersionUID = 2473252235079303894L;
 	private static final Logger logger = Logger
@@ -99,6 +120,22 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			+ "/company_contracts/";
 
 	private static final String USE_WEBSERVICE_FOR_COMPANY_LOOKUP = "COMPANY_WS_LOOKUP";
+
+	protected static final String BANK_SENDER_PIN = "BANK_SENDER_PIN";
+
+	protected static final String BANK_SENDER_USER_ID = "BANK_SENDER_USER_ID";
+
+	protected static final String BANK_SENDER_USER_PASSWORD = "BANK_SENDER_USER_PW";
+
+	protected static final String BANK_SENDER_PAGELINK = "BANK_SENDER_PAGELINK";
+
+	protected static final String BANK_SENDER_LOGOLINK = "BANK_SENDER_LOGOLINK";
+
+	protected static final String BANK_SENDER_TYPE = "BANK_SENDER_TYPE";
+
+	protected static final String BANK_SENDER_TYPE_VERSION = "BANK_SENDER_TYPE_VERSION";
+
+	protected static final String SERVICE_URL = "https://www.kbbanki.is/Netbanki/StandardServices/Birtingur.asmx";
 
 	@Autowired
 	private SkyrrClient skyrrClient;
@@ -153,9 +190,18 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 	public List<String> approveApplication(IWContext iwc, String applicationId) {
 		CompanyApplication compApp = getApplication(applicationId);
+
+		return approveApplication(iwc, compApp);
+	}
+
+	public List<String> approveApplication(IWContext iwc,
+			CompanyApplication compApp) {
 		if (compApp == null) {
 			return null;
 		}
+
+		boolean sendToBank = getIWApplicationContext().getApplicationSettings()
+				.getBoolean("COMPANY_REG_TO_BANK", false);
 
 		String currentStatus = compApp.getStatus();
 		if (!setStatusToCompanyApplication(compApp, getCaseStatusGranted()
@@ -175,7 +221,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		String adminPassword = makeAccountsForCompanyAdmins(iwc, compApp);
 		if (StringUtil.isEmpty(adminPassword)) {
 			logger.log(Level.INFO, "Error approving application: "
-					+ applicationId
+					+ compApp.getPrimaryKey().toString()
 					+ ", can not create account for company admin");
 			setStatusToCompanyApplication(compApp, currentStatus);
 			return null;
@@ -191,7 +237,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 		if (adminPassword.equals(CoreConstants.MINUS)) {
 			// Company admin already exists
-			if (!reopenAccount(iwc, applicationId)) {
+			if (!reopenAccount(iwc, compApp)) {
 				setStatusToCompanyApplication(compApp, currentStatus);
 				logger.log(
 						Level.WARNING,
@@ -224,10 +270,158 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			emailText.append(loginText).append("\n\r");
 		}
 
-		sendMail(email, subject.toString(),
-				new StringBuilder(text).append(emailText.toString()).toString());
+		if (sendToBank) {
+			sendLoginInfoToBank(compApp, login.getUserLogin(), adminPassword);
+		} else {
+			sendMail(email, subject.toString(),
+					new StringBuilder(text).append(emailText.toString())
+							.toString());
+		}
 
 		return texts;
+	}
+
+	private void sendLoginInfoToBank(CompanyApplication compApp, String login, String password) {
+		String ssn = getIWApplicationContext().getApplicationSettings()
+				.getProperty(BANK_SENDER_PIN);
+		String user3 = getIWApplicationContext().getApplicationSettings()
+				.getProperty(BANK_SENDER_TYPE);
+		String user3version = getIWApplicationContext()
+				.getApplicationSettings().getProperty(BANK_SENDER_TYPE_VERSION,
+						"001");
+		
+		boolean sendToAdmin = getIWApplicationContext().getApplicationSettings().getBoolean("COMPANY_REG_TO_ADMIN", false);
+		String receiverSSN = null;
+		if (sendToAdmin) {
+			receiverSSN = compApp.getAdminUser().getPersonalID();
+		} else {
+			receiverSSN = compApp.getCompany().getPersonalID();
+		}
+		
+		String xml = getXML(compApp.getCompany().getName(), login, password, ssn, compApp.getCompany().getPrimaryKey().toString(), receiverSSN, user3, user3version); 
+		
+		StringBuffer filename = new StringBuffer(ssn);
+		filename.append("PW_");
+		filename.append(IWTimestamp.RightNow().getDateString("ddMMyyyy"));
+		filename.append("_");
+		filename.append(receiverSSN);
+		filename.append(".xml");
+
+		encodeAndSendXML(xml, filename.toString());
+
+	}
+
+	private void encodeAndSendXML(String xml, String filename) {
+		String userId = getIWApplicationContext().getApplicationSettings()
+				.getProperty(BANK_SENDER_USER_ID);
+
+		try {
+			StringBuffer file = new StringBuffer(this.getIWMainApplication()
+					.getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER)
+					.getResourcesRealPath());
+			file.append(File.separator);
+			// Do not change the name of this file because the stupid
+			// autodeployer will start it up otherwise.
+			file.append("deploy_client.wsdd");
+
+			EngineConfiguration config = new FileProvider(new FileInputStream(
+					file.toString()));
+			BirtingurLocator locator = new BirtingurLocator(config);
+			BirtingurSoap_PortType port = locator.getBirtingurSoap(new URL(SERVICE_URL));
+
+			Stub stub = (Stub) port;
+			stub._setProperty(WSHandlerConstants.ACTION,
+					WSHandlerConstants.USERNAME_TOKEN);
+			stub._setProperty(WSHandlerConstants.PASSWORD_TYPE,
+					WSConstants.PW_TEXT);
+			stub._setProperty(WSHandlerConstants.USER, userId);
+			stub._setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, this
+					.getClass().getName());
+
+			port.sendDocument(xml.getBytes(), filename);
+		} catch (ServiceException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void handle(Callback[] callbacks)
+			throws UnsupportedCallbackException {
+		String userId = getIWApplicationContext().getApplicationSettings()
+				.getProperty(BANK_SENDER_USER_ID);
+		String passwd = getIWApplicationContext().getApplicationSettings()
+				.getProperty(BANK_SENDER_USER_PASSWORD);
+
+		for (int i = 0; i < callbacks.length; i++) {
+			if (callbacks[i] instanceof WSPasswordCallback) {
+				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+				if (pc.getIdentifer().equals(userId)) {
+					pc.setPassword(passwd);
+				}
+			} else {
+				throw new UnsupportedCallbackException(callbacks[i],
+						"Unrecognized Callback");
+			}
+		}
+	}
+
+	
+	private String getXML(String name, String login, String password,
+			String senderPin, String xkey, String user1, String user3, String user3version) {
+
+		String definitionName = "idega.is";
+		String acct = senderPin + user1;
+		if (user3version == null || user3version.equals("")) {
+			user3version = "001";
+		}
+		user3 = user3 + "-" + user3version;
+		String user4 = acct + xkey;
+
+		String encoding = "iso-8859-1";
+
+		StringBuffer xml = new StringBuffer("<?xml version=\"1.0\" encoding=\"");
+		xml.append(encoding);
+		xml.append("\"?>\n");
+		xml.append("<!DOCTYPE XML-S SYSTEM \"XML-S.dtd\"[]>\n");
+		xml.append("<XML-S>\n");
+		xml.append("\t<Statement Acct=\"");
+		xml.append(acct);
+		xml.append("\" Date=\"");
+		xml.append(IWTimestamp.RightNow().getDateString("yyyy/MM/dd"));
+		xml.append("\" XKey=\"");
+		xml.append(xkey);
+		xml.append("\">\n");
+		xml.append("\t\t<?bgls.BlueGill.com DefinitionName=");
+		xml.append(definitionName);
+		xml.append("?>\n");
+		xml.append("\t\t<?bgls.BlueGill.com User1=");
+		xml.append(user1);
+		xml.append("?>\n");
+		xml.append("\t\t<?bgls.BlueGill.com User3=");
+		xml.append(user3);
+		xml.append("?>\n");
+		xml.append("\t\t<?bgls.BlueGill.com User4=");
+		xml.append(user4);
+		xml.append("?>\n");
+		xml.append("\t\t<Section Name=\"IDEGA\" Occ=\"1\">\n");
+		xml.append("\t\t\t<Field Name=\"Name\">");
+		xml.append(name);
+		xml.append("</Field>\n");
+		xml.append("\t\t\t<Field Name=\"UserName\">");
+		xml.append(login);
+		xml.append("</Field>\n");
+		xml.append("\t\t\t<Field Name=\"Password\">");
+		xml.append(password);
+		xml.append("\t\t</Section>\n");
+		xml.append("\t</Statement>\n");
+		xml.append("</XML-S>");
+
+		return xml.toString();
 	}
 
 	private List<String> getLoginCreatedInfo(IWContext iwc, String login,
@@ -963,7 +1157,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				CommuneMessageBusiness.class);
 	}
 
-	public Application storeApplication(IWContext iwc, User admin,
+	public CompanyApplication storeApplication(IWContext iwc, User admin,
 			CompanyType companyType, Company company, User performer)
 			throws CreateException, RemoteException {
 		try {
@@ -1097,6 +1291,11 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 	public boolean reopenAccount(IWContext iwc, String applicationId) {
 		CompanyApplication compApp = getApplication(applicationId);
+
+		return reopenAccount(iwc, compApp);
+	}
+
+	public boolean reopenAccount(IWContext iwc, CompanyApplication compApp) {
 		if (compApp == null) {
 			return false;
 		}
@@ -1295,21 +1494,19 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				UserHolder holder = getSkyrrClient().getUser(personalId);
 				if (holder != null) {
 					IWTimestamp t = new IWTimestamp();
-					
-					String day = holder.getPersonalID().substring(0,2);
-					String month = holder.getPersonalID().substring(2,4);
-					String year = holder.getPersonalID().substring(4,6);
-						
+
+					String day = holder.getPersonalID().substring(0, 2);
+					String month = holder.getPersonalID().substring(2, 4);
+					String year = holder.getPersonalID().substring(4, 6);
+
 					int iDay = Integer.parseInt(day);
 					int iMonth = Integer.parseInt(month);
 					int iYear = Integer.parseInt(year);
 					if (holder.getPersonalID().substring(9).equals("9")) {
 						iYear += 1900;
-					}
-					else if (holder.getPersonalID().substring(9).equals("0")) {
+					} else if (holder.getPersonalID().substring(9).equals("0")) {
 						iYear += 2000;
-					}
-					else if (holder.getPersonalID().substring(9).equals("8")) {
+					} else if (holder.getPersonalID().substring(9).equals("8")) {
 						iYear += 1800;
 					}
 					t.setHour(0);
@@ -1320,13 +1517,18 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 					t.setMonth(iMonth);
 					t.setYear(iYear);
 					try {
-						user = userBusiness.createUserByPersonalIDIfDoesNotExist(holder.getName(),holder.getPersonalID(),null,t);
-						StringBuilder address = new StringBuilder(holder.getAddress());
+						user = userBusiness
+								.createUserByPersonalIDIfDoesNotExist(
+										holder.getName(),
+										holder.getPersonalID(), null, t);
+						StringBuilder address = new StringBuilder(
+								holder.getAddress());
 						address.append(";");
 						address.append(holder.getPostalCode());
 						address.append(" ");
 						address.append(";Iceland;is_IS;N/A");
-						userBusiness.updateUsersMainAddressByFullAddressString(user, address.toString());
+						userBusiness.updateUsersMainAddressByFullAddressString(
+								user, address.toString());
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					} catch (CreateException e) {
@@ -1338,7 +1540,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 		try {
 			if (user == null) {
-				user = userBusiness.getUser(personalId);				
+				user = userBusiness.getUser(personalId);
 			}
 
 			Name name = new Name(user.getFirstName(), user.getMiddleName(),

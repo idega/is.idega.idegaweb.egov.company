@@ -169,9 +169,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 				app = getCompanyBusiness().getApplication(primaryKey);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-			} catch (FinderException e) {
-				e.printStackTrace();
-			}
+			} 
 			if (app == null) {
 				form.add(getNoApplicationSelectedLabel());
 			}
@@ -240,9 +238,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 				app = getCompanyBusiness().getApplication(primaryKey);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-			} catch (FinderException e) {
-				e.printStackTrace();
-			}
+			} 
 			if (app == null) {
 				form.add(getNoApplicationSelectedLabel());
 			}
@@ -307,9 +303,7 @@ public class ApplicationApproverRejecter extends CompanyBlock {
 				app = getCompanyBusiness().getApplication(primaryKey);
 			} catch (RemoteException e) {
 				e.printStackTrace();
-			} catch (FinderException e) {
-				e.printStackTrace();
-			}
+			} 
 			if (app == null) {
 				form.add(getNoApplicationSelectedLabel());
 			}
