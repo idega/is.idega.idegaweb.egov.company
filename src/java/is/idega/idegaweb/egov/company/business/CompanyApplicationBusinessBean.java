@@ -7,7 +7,6 @@ import is.idega.idegaweb.egov.accounting.business.CitizenBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
 import is.idega.idegaweb.egov.application.data.Application;
-import is.idega.idegaweb.egov.citizen.IWBundleStarter;
 import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurLocator;
 import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurSoap_PortType;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
@@ -22,6 +21,7 @@ import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
@@ -47,7 +47,6 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.client.Stub;
 import org.apache.axis.configuration.FileProvider;
-import org.apache.axis.encoding.Base64;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -74,8 +73,6 @@ import com.idega.core.contact.data.Phone;
 import com.idega.core.file.data.ICFile;
 import com.idega.core.file.data.ICFileHome;
 import com.idega.core.file.util.MimeTypeUtil;
-import com.idega.core.idgenerator.business.IdGenerator;
-import com.idega.core.idgenerator.business.IdGeneratorFactory;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.data.IDOLookup;
@@ -101,6 +98,7 @@ import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.CoreUtil;
 import com.idega.util.EncryptionType;
+import com.idega.util.FileUtil;
 import com.idega.util.IWTimestamp;
 import com.idega.util.ListUtil;
 import com.idega.util.SendMail;
@@ -281,7 +279,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return texts;
 	}
 
-	private void sendLoginInfoToBank(CompanyApplication compApp, String login, String password) {
+	private void sendLoginInfoToBank(CompanyApplication compApp, String login,
+			String password) {
 		String ssn = getIWApplicationContext().getApplicationSettings()
 				.getProperty(BANK_SENDER_PIN);
 		String user3 = getIWApplicationContext().getApplicationSettings()
@@ -289,17 +288,21 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		String user3version = getIWApplicationContext()
 				.getApplicationSettings().getProperty(BANK_SENDER_TYPE_VERSION,
 						"001");
-		
-		boolean sendToAdmin = getIWApplicationContext().getApplicationSettings().getBoolean("COMPANY_REG_TO_ADMIN", false);
+
+		boolean sendToAdmin = getIWApplicationContext()
+				.getApplicationSettings().getBoolean("COMPANY_REG_TO_ADMIN",
+						false);
 		String receiverSSN = null;
 		if (sendToAdmin) {
 			receiverSSN = compApp.getAdminUser().getPersonalID();
 		} else {
 			receiverSSN = compApp.getCompany().getPersonalID();
 		}
-		
-		String xml = getXML(compApp.getCompany().getName(), login, password, ssn, compApp.getCompany().getPrimaryKey().toString(), receiverSSN, user3, user3version); 
-		
+
+		String xml = getXML(compApp.getCompany().getName(), login, password,
+				ssn, compApp.getCompany().getPrimaryKey().toString(),
+				receiverSSN, user3, user3version);
+
 		StringBuffer filename = new StringBuffer(ssn);
 		filename.append("PW_");
 		filename.append(IWTimestamp.RightNow().getDateString("ddMMyyyy"));
@@ -316,18 +319,16 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				.getProperty(BANK_SENDER_USER_ID);
 
 		try {
-			StringBuffer file = new StringBuffer(this.getIWMainApplication()
-					.getBundle(IWBundleStarter.IW_BUNDLE_IDENTIFIER)
-					.getResourcesRealPath());
-			file.append(File.separator);
-			// Do not change the name of this file because the stupid
-			// autodeployer will start it up otherwise.
-			file.append("deploy_client.wsdd");
+			File file = FileUtil.getFileFromWorkspace(getResourceRealPath(
+						getBundle(getIWApplicationContext()),
+						null)
+						+ "deploy_client.wsdd");
 
 			EngineConfiguration config = new FileProvider(new FileInputStream(
-					file.toString()));
+					file));
 			BirtingurLocator locator = new BirtingurLocator(config);
-			BirtingurSoap_PortType port = locator.getBirtingurSoap(new URL(SERVICE_URL));
+			BirtingurSoap_PortType port = locator.getBirtingurSoap(new URL(
+					SERVICE_URL));
 
 			Stub stub = (Stub) port;
 			stub._setProperty(WSHandlerConstants.ACTION,
@@ -337,6 +338,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			stub._setProperty(WSHandlerConstants.USER, userId);
 			stub._setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, this
 					.getClass().getName());
+			stub._setProperty(WSHandlerConstants.ADD_UT_ELEMENTS, "Nonce Created");
+			stub._setProperty(WSHandlerConstants.TIMESTAMP, IWTimestamp.getTimestampRightNow());
 
 			port.sendDocument(xml.getBytes(), filename);
 		} catch (ServiceException e) {
@@ -347,6 +350,20 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private IWBundle getBundle(IWApplicationContext iwac) {
+		return iwac.getIWMainApplication().getBundle(EgovCompanyConstants.IW_BUNDLE_IDENTIFIER);
+	}
+
+	protected String getResourceRealPath(IWBundle iwb, Locale locale) {
+		if (locale != null) {
+			return iwb.getResourcesRealPath(locale) + "/";
+		} else {
+			return iwb.getResourcesRealPath() + "/";
 		}
 	}
 
@@ -370,9 +387,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		}
 	}
 
-	
 	private String getXML(String name, String login, String password,
-			String senderPin, String xkey, String user1, String user3, String user3version) {
+			String senderPin, String xkey, String user1, String user3,
+			String user3version) {
 
 		String definitionName = "idega.is";
 		String acct = senderPin + user1;
