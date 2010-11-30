@@ -8,7 +8,7 @@ import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurLocator;
-import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurSoap_PortType;
+import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurSoap;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.bean.AdminUser;
 import is.idega.idegaweb.egov.company.bean.CompanyInfo;
@@ -327,7 +327,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			EngineConfiguration config = new FileProvider(new FileInputStream(
 					file));
 			BirtingurLocator locator = new BirtingurLocator(config);
-			BirtingurSoap_PortType port = locator.getBirtingurSoap(new URL(
+			BirtingurSoap port = locator.getBirtingurSoap(new URL(
 					SERVICE_URL));
 
 			Stub stub = (Stub) port;
