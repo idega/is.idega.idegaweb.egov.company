@@ -1543,7 +1543,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 						address.append(";");
 						address.append(holder.getPostalCode());
 						address.append(" ");
-						address.append(";Iceland;is_IS;N/A");
+						address.append(";Iceland:is_IS;N/A");
 						userBusiness.updateUsersMainAddressByFullAddressString(
 								user, address.toString());
 					} catch (RemoteException e) {
