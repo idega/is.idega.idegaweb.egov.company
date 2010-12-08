@@ -133,7 +133,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 	protected static final String BANK_SENDER_TYPE_VERSION = "BANK_SENDER_TYPE_VERSION";
 
-	protected static final String SERVICE_URL = "https://www.kbbanki.is/Netbanki/StandardServices/Birtingur.asmx";
+	protected static final String BANK_SENDER_URL = "BANK_SENDER_URL";
+	
+	protected static final String SERVICE_URL = "https://www.arionbanki.is/Netbanki4/StandardServices/Birtingur.asmx";
 
 	@Autowired
 	private SkyrrClient skyrrClient;
@@ -318,6 +320,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		String userId = getIWApplicationContext().getApplicationSettings()
 				.getProperty(BANK_SENDER_USER_ID);
 
+		String url = getIWApplicationContext().getApplicationSettings().getProperty(BANK_SENDER_URL, SERVICE_URL);
+		
 		try {
 			File file = FileUtil.getFileFromWorkspace(getResourceRealPath(
 						getBundle(getIWApplicationContext()),
