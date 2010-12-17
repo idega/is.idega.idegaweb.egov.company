@@ -1,6 +1,7 @@
 package is.idega.idegaweb.egov.company.presentation.institution;
 
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
+import is.idega.idegaweb.egov.company.business.CompanyUserApplicationEngineBean;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 
 import java.util.Arrays;
@@ -73,6 +74,7 @@ public class CompanyAccountManager extends CompanyBlock {
 		sua.setAddGroupEditButton(juridicalPerson);
 		sua.setAddChildGroupCreateButton(false);
 		sua.setAddChildGroupEditButton(false);
+		sua.setEngineClassName(CompanyUserApplicationEngineBean.class.getName());
 		
 		return container;
 	}

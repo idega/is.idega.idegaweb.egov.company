@@ -438,6 +438,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		xml.append("</Field>\n");
 		xml.append("\t\t\t<Field Name=\"Password\">");
 		xml.append(password);
+		xml.append("</Field>\n");
 		xml.append("\t\t</Section>\n");
 		xml.append("\t</Statement>\n");
 		xml.append("</XML-S>");
