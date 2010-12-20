@@ -1,12 +1,12 @@
 package is.idega.idegaweb.egov.company.presentation.company;
 
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
-import is.idega.idegaweb.egov.company.business.CompanyUserApplicationEngineBean;
 import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import com.idega.core.accesscontrol.business.StandardRoles;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
@@ -76,7 +76,7 @@ public class CompanyEmployeeManager extends CompanyBlock {
 		sua.setAddChildGroupEditButton(false);
 		sua.setAddGroupCreateButton(false);
 		sua.setAddGroupEditButton(false);
-		sua.setEngineClassName(CompanyUserApplicationEngineBean.class.getName());
+		//sua.setEngineClassName(CompanyUserApplicationEngineBean.class.getName());
 		
 		return container;
 	}
