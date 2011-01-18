@@ -296,7 +296,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 						false);
 		String receiverSSN = null;
 		if (sendToAdmin) {
-			receiverSSN = compApp.getAdminUser().getPersonalID();
+			receiverSSN = compApp.getApplicantUser().getPersonalID();
 		} else {
 			receiverSSN = compApp.getCompany().getPersonalID();
 		}
