@@ -118,6 +118,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			+ "/company_contracts/";
 
 	private static final String USE_WEBSERVICE_FOR_COMPANY_LOOKUP = "COMPANY_WS_LOOKUP";
+	
+	private static final String ALLOW_INDIVIDUALS_FOR_COMPANY_LOOKUP = "COMPANY_WS_INDIVIDUAL";
 
 	protected static final String BANK_SENDER_PIN = "BANK_SENDER_PIN";
 
@@ -625,6 +627,27 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				if (login == null) {
 					return null;
 				}
+			}
+			
+			//Add to all admins group if not there
+			try {
+				GroupBusiness groupBusiness = getGroupBusiness(iwac);
+				Collection<User> users = groupBusiness
+						.getUsers(allAdminsGroup);
+				if (users == null || !users.contains(companyAdmin)) {
+					groupBusiness.addUser(
+							Integer.valueOf(allAdminsGroup.getId()),
+							companyAdmin);
+				}
+				companyAdmin.setPrimaryGroup(allAdminsGroup);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (FinderException e) {
+				e.printStackTrace();
+			} catch (EJBException e) {
+				e.printStackTrace();
+			} catch (RemoteException e) {
+				e.printStackTrace();
 			}
 		}
 
@@ -1512,7 +1535,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				user = null;
 			}
 
-			if (user == null) {
+			if (user == null || user.getName() == null || "".equals(user.getName())) {
 				UserHolder holder = getSkyrrClient().getUser(personalId);
 				if (holder != null) {
 					IWTimestamp t = new IWTimestamp();
@@ -1635,6 +1658,10 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				.getApplicationSettings()
 				.getProperty(USE_WEBSERVICE_FOR_COMPANY_LOOKUP, "false");
 
+		String useIndividualWS = IWMainApplication.getDefaultIWApplicationContext()
+				.getApplicationSettings()
+				.getProperty(ALLOW_INDIVIDUALS_FOR_COMPANY_LOOKUP, "false");
+
 		Company company = null;
 
 		if (!"false".equals(useWS)) {
@@ -1654,12 +1681,27 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 						getCompanyRegisterBusiness().updateEntry(
 								holder.getPersonalID(), null,
 								holder.getPostalCode(), null, null,
-								holder.getName(), holder.getAddress(), null,
+								holder.getName(), holder.getAddress(), holder.getPersonalID(),
 								"", null, holder.getVatNumber(),
 								holder.getAddress(), "", null, null, null,
 								null, null, "", null);
 					} catch (RemoteException e) {
 						e.printStackTrace();
+					}
+				} else if (!"false".equals(useIndividualWS)) {
+					UserHolder userHolder = getSkyrrClient().getUser(companyUniqueId);
+					if (userHolder != null) {
+						try {
+							getCompanyRegisterBusiness().updateEntry(
+									userHolder.getPersonalID(), null,
+									userHolder.getPostalCode(), null, null,
+									userHolder.getName(), userHolder.getAddress(), userHolder.getPersonalID(),
+									"", null, null,
+									userHolder.getAddress(), "", null, null, null,
+									null, null, "", null);
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
