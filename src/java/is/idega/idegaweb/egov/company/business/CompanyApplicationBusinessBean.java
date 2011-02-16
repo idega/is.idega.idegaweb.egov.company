@@ -252,7 +252,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 		Email email = null;
 		try {
-			email = getUserBusiness().getUsersMainEmail(compApp.getAdminUser());
+			email = getUserBusiness().getUsersMainEmail(compApp.getApplicantUser());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
