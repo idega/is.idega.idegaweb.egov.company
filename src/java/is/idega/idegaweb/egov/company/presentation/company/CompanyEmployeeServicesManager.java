@@ -415,6 +415,8 @@ public class CompanyEmployeeServicesManager extends CompanyBlock {
 		String employeeId = iwc.getParameter(EMPLOYEE_ID_PARAMETER);
 		try {
 			CompanyEmployee emp = getEmployeeHome().findByPrimaryKey(employeeId);
+			emp.removeAllFields();
+			emp.removeAllServices();
 			emp.remove();
 		} catch (RemoteException e) {
 			e.printStackTrace();
