@@ -118,7 +118,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			+ "/company_contracts/";
 
 	private static final String USE_WEBSERVICE_FOR_COMPANY_LOOKUP = "COMPANY_WS_LOOKUP";
-	
+
 	private static final String ALLOW_INDIVIDUALS_FOR_COMPANY_LOOKUP = "COMPANY_WS_INDIVIDUAL";
 
 	protected static final String BANK_SENDER_PIN = "BANK_SENDER_PIN";
@@ -136,7 +136,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 	protected static final String BANK_SENDER_TYPE_VERSION = "BANK_SENDER_TYPE_VERSION";
 
 	protected static final String BANK_SENDER_URL = "BANK_SENDER_URL";
-	
+
 	protected static final String SERVICE_URL = "https://www.arionbanki.is/Netbanki4/StandardServices/Birtingur.asmx";
 
 	@Autowired
@@ -252,7 +252,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 		Email email = null;
 		try {
-			email = getUserBusiness().getUsersMainEmail(compApp.getApplicantUser());
+			email = getUserBusiness().getUsersMainEmail(
+					compApp.getApplicantUser());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -322,19 +323,18 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		String userId = getIWApplicationContext().getApplicationSettings()
 				.getProperty(BANK_SENDER_USER_ID);
 
-		String url = getIWApplicationContext().getApplicationSettings().getProperty(BANK_SENDER_URL, SERVICE_URL);
-		
+		String url = getIWApplicationContext().getApplicationSettings()
+				.getProperty(BANK_SENDER_URL, SERVICE_URL);
+
 		try {
 			File file = FileUtil.getFileFromWorkspace(getResourceRealPath(
-						getBundle(getIWApplicationContext()),
-						null)
-						+ "deploy_client.wsdd");
+					getBundle(getIWApplicationContext()), null)
+					+ "deploy_client.wsdd");
 
 			EngineConfiguration config = new FileProvider(new FileInputStream(
 					file));
 			BirtingurLocator locator = new BirtingurLocator(config);
-			BirtingurSoap port = locator.getBirtingurSoap(new URL(
-					SERVICE_URL));
+			BirtingurSoap port = locator.getBirtingurSoap(new URL(SERVICE_URL));
 
 			Stub stub = (Stub) port;
 			stub._setProperty(WSHandlerConstants.ACTION,
@@ -344,8 +344,10 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			stub._setProperty(WSHandlerConstants.USER, userId);
 			stub._setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, this
 					.getClass().getName());
-			stub._setProperty(WSHandlerConstants.ADD_UT_ELEMENTS, "Nonce Created");
-			stub._setProperty(WSHandlerConstants.TIMESTAMP, IWTimestamp.getTimestampRightNow());
+			stub._setProperty(WSHandlerConstants.ADD_UT_ELEMENTS,
+					"Nonce Created");
+			stub._setProperty(WSHandlerConstants.TIMESTAMP,
+					IWTimestamp.getTimestampRightNow());
 
 			port.sendDocument(xml.getBytes(), filename);
 		} catch (ServiceException e) {
@@ -362,7 +364,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 	}
 
 	private IWBundle getBundle(IWApplicationContext iwac) {
-		return iwac.getIWMainApplication().getBundle(EgovCompanyConstants.IW_BUNDLE_IDENTIFIER);
+		return iwac.getIWMainApplication().getBundle(
+				EgovCompanyConstants.IW_BUNDLE_IDENTIFIER);
 	}
 
 	protected String getResourceRealPath(IWBundle iwb, Locale locale) {
@@ -370,26 +373,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			return iwb.getResourcesRealPath(locale) + "/";
 		} else {
 			return iwb.getResourcesRealPath() + "/";
-		}
-	}
-
-	public void handle(Callback[] callbacks)
-			throws UnsupportedCallbackException {
-		String userId = getIWApplicationContext().getApplicationSettings()
-				.getProperty(BANK_SENDER_USER_ID);
-		String passwd = getIWApplicationContext().getApplicationSettings()
-				.getProperty(BANK_SENDER_USER_PASSWORD);
-
-		for (int i = 0; i < callbacks.length; i++) {
-			if (callbacks[i] instanceof WSPasswordCallback) {
-				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-				if (pc.getIdentifer().equals(userId)) {
-					pc.setPassword(passwd);
-				}
-			} else {
-				throw new UnsupportedCallbackException(callbacks[i],
-						"Unrecognized Callback");
-			}
 		}
 	}
 
@@ -628,12 +611,11 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 					return null;
 				}
 			}
-			
-			//Add to all admins group if not there
+
+			// Add to all admins group if not there
 			try {
 				GroupBusiness groupBusiness = getGroupBusiness(iwac);
-				Collection<User> users = groupBusiness
-						.getUsers(allAdminsGroup);
+				Collection<User> users = groupBusiness.getUsers(allAdminsGroup);
 				if (users == null || !users.contains(companyAdmin)) {
 					groupBusiness.addUser(
 							Integer.valueOf(allAdminsGroup.getId()),
@@ -1535,7 +1517,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				user = null;
 			}
 
-			if (user == null || user.getName() == null || "".equals(user.getName())) {
+			if (user == null || user.getName() == null
+					|| "".equals(user.getName())) {
 				UserHolder holder = getSkyrrClient().getUser(personalId);
 				if (holder != null) {
 					IWTimestamp t = new IWTimestamp();
@@ -1658,8 +1641,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				.getApplicationSettings()
 				.getProperty(USE_WEBSERVICE_FOR_COMPANY_LOOKUP, "false");
 
-		String useIndividualWS = IWMainApplication.getDefaultIWApplicationContext()
-				.getApplicationSettings()
+		String useIndividualWS = IWMainApplication
+				.getDefaultIWApplicationContext().getApplicationSettings()
 				.getProperty(ALLOW_INDIVIDUALS_FOR_COMPANY_LOOKUP, "false");
 
 		Company company = null;
@@ -1681,24 +1664,26 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 						getCompanyRegisterBusiness().updateEntry(
 								holder.getPersonalID(), null,
 								holder.getPostalCode(), null, null,
-								holder.getName(), holder.getAddress(), holder.getPersonalID(),
-								"", null, holder.getVatNumber(),
-								holder.getAddress(), "", null, null, null,
-								null, null, "", null);
+								holder.getName(), holder.getAddress(),
+								holder.getPersonalID(), "", null,
+								holder.getVatNumber(), holder.getAddress(), "",
+								null, null, null, null, null, "", null);
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
 				} else if (!"false".equals(useIndividualWS)) {
-					UserHolder userHolder = getSkyrrClient().getUser(companyUniqueId);
+					UserHolder userHolder = getSkyrrClient().getUser(
+							companyUniqueId);
 					if (userHolder != null) {
 						try {
 							getCompanyRegisterBusiness().updateEntry(
 									userHolder.getPersonalID(), null,
 									userHolder.getPostalCode(), null, null,
-									userHolder.getName(), userHolder.getAddress(), userHolder.getPersonalID(),
-									"", null, null,
-									userHolder.getAddress(), "", null, null, null,
-									null, null, "", null);
+									userHolder.getName(),
+									userHolder.getAddress(),
+									userHolder.getPersonalID(), "", null, null,
+									userHolder.getAddress(), "", null, null,
+									null, null, null, "", null);
 						} catch (RemoteException e) {
 							e.printStackTrace();
 						}
@@ -1799,4 +1784,25 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		}
 		return skyrrClient;
 	}
+
+	public void handle(Callback[] callbacks)
+			throws UnsupportedCallbackException {
+		String userId = getIWApplicationContext().getApplicationSettings()
+				.getProperty(BANK_SENDER_USER_ID);
+		String passwd = getIWApplicationContext().getApplicationSettings()
+				.getProperty(BANK_SENDER_USER_PASSWORD);
+
+		for (int i = 0; i < callbacks.length; i++) {
+			if (callbacks[i] instanceof WSPasswordCallback) {
+				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
+				if (pc.getIdentifer().equals(userId)) {
+					pc.setPassword(passwd);
+				}
+			} else {
+				throw new UnsupportedCallbackException(callbacks[i],
+						"Unrecognized Callback");
+			}
+		}
+	}
+
 }
