@@ -545,60 +545,12 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				return null;
 			}
 
-			// Copying email
-			try {
-				userBusiness.updateUserMail(companyAdmin, userBusiness
-						.getUsersMainEmail(applicant).getEmailAddress());
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			} catch (CreateException e) {
-				e.printStackTrace();
-			} catch (NoEmailFoundException e) {
-				e.printStackTrace();
-			}
-			// Copying mobile phone
-			try {
-				userBusiness.updateUserMobilePhone(companyAdmin, userBusiness
-						.getUsersMobilePhone(applicant).getNumber());
-			} catch (EJBException e) {
-				e.printStackTrace();
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			} catch (NoPhoneFoundException e) {
-				e.printStackTrace();
-			}
-			// Copying work phone
-			try {
-				userBusiness.updateUserWorkPhone(companyAdmin, userBusiness
-						.getUsersWorkPhone(applicant).getNumber());
-			} catch (EJBException e) {
-				e.printStackTrace();
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			} catch (NoPhoneFoundException e) {
-				e.printStackTrace();
-			}
-			// Copying address
-			Address companyAddress = company.getAddress();
-			if (companyAddress != null) {
-				try {
-					userBusiness.updateUsersMainAddressOrCreateIfDoesNotExist(
-							companyAdmin, companyAddress.getStreetAddress(),
-							companyAddress.getPostalCode(),
-							companyAddress.getCountry(),
-							companyAddress.getCity(),
-							companyAddress.getProvince(),
-							companyAddress.getPOBox(),
-							companyAddress.getCommuneID());
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				} catch (CreateException e) {
-					e.printStackTrace();
-				}
-			}
-
 			companyAdmin.store();
 		} else {
+			if (companyAdmin.getName() == null || "".equals(companyAdmin.getName())) {
+				companyAdmin.setName(companyName);
+				companyAdmin.store();
+			}
 			LoginTable login = LoginDBHandler.getUserLogin(companyAdmin);
 			if (login == null) {
 				try {
@@ -634,6 +586,58 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			}
 		}
 
+		// Copying email
+		try {
+			userBusiness.updateUserMail(companyAdmin, userBusiness
+					.getUsersMainEmail(applicant).getEmailAddress());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (CreateException e) {
+			e.printStackTrace();
+		} catch (NoEmailFoundException e) {
+			e.printStackTrace();
+		}
+		// Copying mobile phone
+		try {
+			userBusiness.updateUserMobilePhone(companyAdmin, userBusiness
+					.getUsersMobilePhone(applicant).getNumber());
+		} catch (EJBException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (NoPhoneFoundException e) {
+			e.printStackTrace();
+		}
+		// Copying work phone
+		try {
+			userBusiness.updateUserWorkPhone(companyAdmin, userBusiness
+					.getUsersWorkPhone(applicant).getNumber());
+		} catch (EJBException e) {
+			e.printStackTrace();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (NoPhoneFoundException e) {
+			e.printStackTrace();
+		}
+		// Copying address
+		Address companyAddress = company.getAddress();
+		if (companyAddress != null) {
+			try {
+				userBusiness.updateUsersMainAddressOrCreateIfDoesNotExist(
+						companyAdmin, companyAddress.getStreetAddress(),
+						companyAddress.getPostalCode(),
+						companyAddress.getCountry(),
+						companyAddress.getCity(),
+						companyAddress.getProvince(),
+						companyAddress.getPOBox(),
+						companyAddress.getCommuneID());
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			} catch (CreateException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		companyAdmin.setJuridicalPerson(true);
 		companyAdmin.store();
 
