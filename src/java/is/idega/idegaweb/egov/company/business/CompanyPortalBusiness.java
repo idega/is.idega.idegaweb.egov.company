@@ -37,7 +37,7 @@ public interface CompanyPortalBusiness {
 	public Group getCompanyStaffGroupByUser(User user);
 	public Group getCompanyAdminsGroupByUser(User user);
 	
-	public void setHomePage(IWApplicationContext iwac, Group group);
+	public void setHomePage(IWApplicationContext iwac, Group group, String homePageKey);
 	public void setHomePageToGroups(IWApplicationContext iwac);
 	
 	public List<User> getAllCompanyUsers(Group company);

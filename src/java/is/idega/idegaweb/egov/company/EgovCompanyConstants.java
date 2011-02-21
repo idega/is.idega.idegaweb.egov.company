@@ -47,6 +47,7 @@ public class EgovCompanyConstants {
 	public static final String COMPANY_SUPER_ADMINS_GROUP_IN_COMPANY_PORTAL = "Company Super Admins";
 	
 	public static final String COMPANY_PORTAL_HOME_PAGE_APPLICATION_PROPERTY = "companyPortalHomePage";
+	public static final String COMPANY_STAFF_HOME_PAGE_APPLICATION_PROPERTY = "companyStaffHomePage";
 	
 	public static final String COMPANY_PORTAL_CURRENT_COMPANY_ATTRIBUTE = "companyPortalCurrentCompanyId";
 }

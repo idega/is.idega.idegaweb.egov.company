@@ -68,7 +68,8 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			return null;
 		}
 		
-		setHomePage(iwac, allAdminsGroup);
+		String homePageKey = iwac.getApplicationSettings().getProperty(EgovCompanyConstants.COMPANY_PORTAL_HOME_PAGE_APPLICATION_PROPERTY);
+		setHomePage(iwac, allAdminsGroup, homePageKey);
 		return allAdminsGroup;
 	}
 	
@@ -129,7 +130,6 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			return null;
 		}
 		
-		setHomePage(iwac, company);
 		company.setMetaData("COMPANY_PERSONAL_ID", personalID);
 		company.store();
 		
@@ -137,8 +137,10 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		String adminsGroupName = "Administrators of";
 		adminsGroupName = iwrb == null ? adminsGroupName : iwrb.getLocalizedString("company_portal.administrators_of", adminsGroupName);
 		try {
-			groupBusiness.createGroupUnder(new StringBuilder(adminsGroupName).append(CoreConstants.SPACE).append(companyName).toString(), null,
+			Group adminGroup = groupBusiness.createGroupUnder(new StringBuilder(adminsGroupName).append(CoreConstants.SPACE).append(companyName).toString(), null,
 					EgovCompanyConstants.GROUP_TYPE_COMPANY_ADMINS, company);
+			String homePageKey = iwac.getApplicationSettings().getProperty(EgovCompanyConstants.COMPANY_PORTAL_HOME_PAGE_APPLICATION_PROPERTY);
+			setHomePage(iwac, adminGroup, homePageKey);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error creating administrators group for company: " + companyName, e);
 		}
@@ -153,19 +155,19 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			logger.log(Level.SEVERE, "Error creating staff group for company: " + companyName, e);
 		}
 		if (companyStaff != null) {
+			String homePageKey = iwac.getApplicationSettings().getProperty(EgovCompanyConstants.COMPANY_STAFF_HOME_PAGE_APPLICATION_PROPERTY);
 			iwac.getIWMainApplication().getAccessController().addRoleToGroup(EgovCompanyConstants.COMPANY_EMPLOYEE_ROLE, companyStaff, iwac);
-			setHomePage(iwac, companyStaff);
+			setHomePage(iwac, companyStaff, homePageKey);
 		}
 		
 		return company;
 	}
 	
-	public void setHomePage(IWApplicationContext iwac, Group group) {
+	public void setHomePage(IWApplicationContext iwac, Group group, String homePageKey) {
 		if (group == null) {
 			return;
 		}
 		
-		String homePageKey = iwac.getApplicationSettings().getProperty(EgovCompanyConstants.COMPANY_PORTAL_HOME_PAGE_APPLICATION_PROPERTY);
 		if (StringUtil.isEmpty(homePageKey)) {
 			return;
 		}
@@ -185,7 +187,8 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 	
 	public void setHomePageToGroups(IWApplicationContext iwac) {
 		//	All administrators of companies
-		setHomePage(iwac, getAllCompaniesAdminsGroup(iwac));
+		String homePageKey = iwac.getApplicationSettings().getProperty(EgovCompanyConstants.COMPANY_PORTAL_HOME_PAGE_APPLICATION_PROPERTY);
+		setHomePage(iwac, getAllCompaniesAdminsGroup(iwac), homePageKey);
 		
 		//	Companies
 		List<Group> companies = null;
@@ -204,8 +207,9 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			
 			//	Company staff
 			if (!ListUtil.isEmpty(companyStaffGroups)) {
+				homePageKey = iwac.getApplicationSettings().getProperty(EgovCompanyConstants.COMPANY_STAFF_HOME_PAGE_APPLICATION_PROPERTY);
 				for (Group companyStaff: companyStaffGroups) {
-					setHomePage(iwac, companyStaff);
+					setHomePage(iwac, companyStaff, homePageKey);
 				}
 			}
 		}
@@ -291,7 +295,8 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			company = createCompanyGroup(iwac, companyPortal, companyName, personalID);
 		}
 		
-		setHomePage(iwac, company);
+		String homePageKey = iwac.getApplicationSettings().getProperty(EgovCompanyConstants.COMPANY_PORTAL_HOME_PAGE_APPLICATION_PROPERTY);
+		setHomePage(iwac, company, homePageKey);
 		return company;
 	}
 	
@@ -304,7 +309,8 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		if (companyStaffGroup == null) {
 			return null;
 		}
-		setHomePage(iwac, companyStaffGroup);
+		String homePageKey = iwac.getApplicationSettings().getProperty(EgovCompanyConstants.COMPANY_STAFF_HOME_PAGE_APPLICATION_PROPERTY);
+		setHomePage(iwac, companyStaffGroup, homePageKey);
 		return companyStaffGroup;
 	}
 	
@@ -518,12 +524,8 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			}
 			
 			if (company == null) {
-//				logger.log(Level.INFO, new StringBuilder("Group '").append(group.getName()).append("', type: '").append(groupType)
-//																	.append("' is not Company group from Company Portal!").toString());
 			}
 			else {
-				setHomePage(IWMainApplication.getDefaultIWApplicationContext(), company);
-				
 				if (!userCompanies.contains(company)) {
 					userCompanies.add(company);
 				}

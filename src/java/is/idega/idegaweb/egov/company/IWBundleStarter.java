@@ -161,7 +161,8 @@ public class IWBundleStarter implements IWBundleStartable {
 		
 		//	Setting home page
 		CompanyPortalBusiness companyPortalBusiness = ELUtil.getInstance().getBean(CompanyPortalBusiness.SPRING_BEAN_IDENTIFIER);
-		companyPortalBusiness.setHomePage(iwac, companyAdmins);
+		String homePageKey = iwac.getApplicationSettings().getProperty(EgovCompanyConstants.COMPANY_PORTAL_HOME_PAGE_APPLICATION_PROPERTY);
+		companyPortalBusiness.setHomePage(iwac, companyAdmins, homePageKey);
 	}
 	
 	private Group createRootGroup(IWApplicationContext iwac, GroupBusiness groupBusiness) throws RemoteException {

@@ -106,6 +106,7 @@ import com.idega.util.StringHandler;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.util.text.Name;
+import com.idega.util.text.SocialSecurityNumber;
 
 public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		implements CompanyApplicationBusiness, CallbackHandler {
@@ -1502,13 +1503,13 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			return null;
 		}
 
-		String useWS = IWMainApplication.getDefaultIWApplicationContext()
+		boolean useWS = IWMainApplication.getDefaultIWApplicationContext()
 				.getApplicationSettings()
-				.getProperty(USE_WEBSERVICE_FOR_COMPANY_LOOKUP, "false");
+				.getBoolean(USE_WEBSERVICE_FOR_COMPANY_LOOKUP, false);
 
 		User user = null;
 
-		if (!"false".equals(useWS)) {
+		if (useWS) {
 			try {
 				user = userBusiness.getUser(personalId);
 			} catch (RemoteException e) {
@@ -1521,29 +1522,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 					|| "".equals(user.getName())) {
 				UserHolder holder = getSkyrrClient().getUser(personalId);
 				if (holder != null) {
-					IWTimestamp t = new IWTimestamp();
+					IWTimestamp t = new IWTimestamp(SocialSecurityNumber.getDateFromSocialSecurityNumber(holder.getPersonalID()));
 
-					String day = holder.getPersonalID().substring(0, 2);
-					String month = holder.getPersonalID().substring(2, 4);
-					String year = holder.getPersonalID().substring(4, 6);
-
-					int iDay = Integer.parseInt(day);
-					int iMonth = Integer.parseInt(month);
-					int iYear = Integer.parseInt(year);
-					if (holder.getPersonalID().substring(9).equals("9")) {
-						iYear += 1900;
-					} else if (holder.getPersonalID().substring(9).equals("0")) {
-						iYear += 2000;
-					} else if (holder.getPersonalID().substring(9).equals("8")) {
-						iYear += 1800;
-					}
-					t.setHour(0);
-					t.setMinute(0);
-					t.setSecond(0);
-					t.setMilliSecond(0);
-					t.setDay(iDay);
-					t.setMonth(iMonth);
-					t.setYear(iYear);
 					try {
 						user = userBusiness
 								.createUserByPersonalIDIfDoesNotExist(
@@ -1637,17 +1617,17 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			return null;
 		}
 
-		String useWS = IWMainApplication.getDefaultIWApplicationContext()
+		boolean useWS = IWMainApplication.getDefaultIWApplicationContext()
 				.getApplicationSettings()
-				.getProperty(USE_WEBSERVICE_FOR_COMPANY_LOOKUP, "false");
+				.getBoolean(USE_WEBSERVICE_FOR_COMPANY_LOOKUP, false);
 
-		String useIndividualWS = IWMainApplication
+		boolean useIndividualWS = IWMainApplication
 				.getDefaultIWApplicationContext().getApplicationSettings()
-				.getProperty(ALLOW_INDIVIDUALS_FOR_COMPANY_LOOKUP, "false");
+				.getBoolean(ALLOW_INDIVIDUALS_FOR_COMPANY_LOOKUP, false);
 
 		Company company = null;
 
-		if (!"false".equals(useWS)) {
+		if (useWS) {
 			try {
 				company = companyBusiness.getCompany(companyUniqueId);
 			} catch (RemoteException e) {
@@ -1671,7 +1651,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
-				} else if (!"false".equals(useIndividualWS)) {
+				} else if (useIndividualWS) {
 					UserHolder userHolder = getSkyrrClient().getUser(
 							companyUniqueId);
 					if (userHolder != null) {
