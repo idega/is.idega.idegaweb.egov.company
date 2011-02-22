@@ -547,8 +547,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 			companyAdmin.store();
 		} else {
-			if (companyAdmin.getName() == null || "".equals(companyAdmin.getName())) {
-				companyAdmin.setName(companyName);
+			if (companyAdmin.getFirstName() == null || "".equals(companyAdmin.getFirstName())) {
+				companyAdmin.setFullName(companyName);
 				companyAdmin.store();
 			}
 			LoginTable login = LoginDBHandler.getUserLogin(companyAdmin);
