@@ -350,7 +350,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			stub._setProperty(WSHandlerConstants.TIMESTAMP,
 					IWTimestamp.getTimestampRightNow());
 
-			port.sendDocument(xml.getBytes(), filename);
+			port.sendDocument(xml.getBytes("iso-8859-1"), filename);
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		} catch (RemoteException e) {
