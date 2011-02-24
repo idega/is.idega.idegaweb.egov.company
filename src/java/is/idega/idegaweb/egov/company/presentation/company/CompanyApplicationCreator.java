@@ -355,6 +355,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 //		personalID.setID("companyPersonalID");
 		personalID.setOnKeyUp(new StringBuilder("CompanyApplicationCreator.getCompanyInfo(event, '").append(personalID.getId())
 								.append("', '").append(iwrb.getLocalizedString("company_not_found", "Sorry, unable to find company by provided ID"))
+								.append("', '").append(iwrb.getLocalizedString("loading", "Loading..."))
 								.append("');").toString());
 		personalID.keepStatusOnAction(true);
 
@@ -448,6 +449,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		adminPersonalID.keepStatusOnAction(true);
 		adminPersonalID.setOnKeyUp(new StringBuilder("CompanyApplicationCreator.getContactPersonInformation(event, '").append(adminPersonalID.getId())
 										.append("', '").append(iwrb.getLocalizedString("user_not_found", "Sorry, unable to find user by provided ID"))
+										.append("', '").append(iwrb.getLocalizedString("loading", "Loading..."))
 										.append("');").toString());
 
 		TextInput adminName = new TextInput(PARAMETER_ADMIN_NAME);

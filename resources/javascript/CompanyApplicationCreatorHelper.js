@@ -16,10 +16,10 @@ CompanyApplicationCreator.canGetInfo = function(event, id) {
 	return value.length == 10 ? true : false;
 }
 
-CompanyApplicationCreator.getCompanyInfo = function(event, id, errorMessage) {
+CompanyApplicationCreator.getCompanyInfo = function(event, id, errorMessage, loadingMessage) {
 	if (CompanyApplicationCreator.canGetInfo(event, id)) {
 		IWCORE.stopEventBubbling(event);
-		closeAllLoadingMessages();
+		showLoadingMessage(loadingMessage);
 		
 		var value = dwr.util.getValue(id);
 		var phone = dwr.util.getValue('companyPhone');
@@ -30,6 +30,8 @@ CompanyApplicationCreator.getCompanyInfo = function(event, id, errorMessage) {
 	
 		CompanyApplicationBusiness.getCompany(value, phone, fax, email, webpage, bankAccount, {
 			callback: function(companyInfo) {
+				closeAllLoadingMessages();
+		
 				if (companyInfo == null) {
 					CompanyApplicationCreator.showHumanizedMessage(errorMessage, id);
 					CompanyApplicationCreator.clearCompanyFormValues();
@@ -57,13 +59,15 @@ CompanyApplicationCreator.clearCompanyFormValues = function() {
 	dwr.util.setValue('companyBankAccount', '');
 }
 
-CompanyApplicationCreator.getContactPersonInformation = function(event, id, errorMessage) {
+CompanyApplicationCreator.getContactPersonInformation = function(event, id, errorMessage, loadingMessage) {
 	if (CompanyApplicationCreator.canGetInfo(event, id)) {
 		IWCORE.stopEventBubbling(event);
-		closeAllLoadingMessages();
+		showLoadingMessage(loadingMessage);
 		
 		CompanyApplicationBusiness.getUser(dwr.util.getValue(id), {
 			callback: function(userInfo) {
+				closeAllLoadingMessages();
+		
 				if (userInfo == null) {
 					CompanyApplicationCreator.showHumanizedMessage(errorMessage, id);
 					CompanyApplicationCreator.clearUserFormValues();
