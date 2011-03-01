@@ -682,9 +682,10 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			} catch (NotLoggedOnException e) {
 				log(Level.INFO, "User is not logged, some settings for application might be not set!");
 			}
-			Application application = null;
+			CompanyApplication application = null;
 			try {
 				application = getCompanyApplicationBusiness().storeApplication(iwc, user, companyType, company, currentUser);
+				getCompanyApplicationBusiness().approveApplication(iwc, application);
 			} catch (Exception e) {
 				success = false;
 				e.printStackTrace();

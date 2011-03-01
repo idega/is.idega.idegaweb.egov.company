@@ -9,6 +9,7 @@ import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
 import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurLocator;
 import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurSoap;
+import is.idega.idegaweb.egov.citizen.wsclient.landsbankinn.SendLoginDataBusiness;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.bean.AdminUser;
 import is.idega.idegaweb.egov.company.bean.CompanyInfo;
@@ -122,23 +123,21 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 	private static final String ALLOW_INDIVIDUALS_FOR_COMPANY_LOOKUP = "COMPANY_WS_INDIVIDUAL";
 
-	protected static final String BANK_SENDER_PIN = "BANK_SENDER_PIN";
+	protected static final String BANK_SENDER_PIN = "COMPANY_BANK_SENDER_PIN";
 
-	protected static final String BANK_SENDER_USER_ID = "BANK_SENDER_USER_ID";
+	protected static final String BANK_SENDER_USER_ID = "COMPANY_BANK_SENDER_USER_ID";
 
-	protected static final String BANK_SENDER_USER_PASSWORD = "BANK_SENDER_USER_PW";
+	protected static final String BANK_SENDER_USER_PASSWORD = "COMPANY_BANK_SENDER_USER_PW";
 
-	protected static final String BANK_SENDER_PAGELINK = "BANK_SENDER_PAGELINK";
+	protected static final String BANK_SENDER_TYPE = "COMPANY_BANK_SENDER_TYPE";
 
-	protected static final String BANK_SENDER_LOGOLINK = "BANK_SENDER_LOGOLINK";
+	protected static final String BANK_SENDER_TYPE_VERSION = "COMPANY_BANK_SENDER_TYPE_VERSION";
 
-	protected static final String BANK_SENDER_TYPE = "BANK_SENDER_TYPE";
-
-	protected static final String BANK_SENDER_TYPE_VERSION = "BANK_SENDER_TYPE_VERSION";
-
-	protected static final String BANK_SENDER_URL = "BANK_SENDER_URL";
+	protected static final String BANK_SENDER_URL = "COMPANY_BANK_SENDER_URL";
 
 	protected static final String SERVICE_URL = "https://www.arionbanki.is/Netbanki4/StandardServices/Birtingur.asmx";
+
+	protected static final String COMPANY_BANK = "COMPANY_BANK";
 
 	@Autowired
 	private SkyrrClient skyrrClient;
@@ -295,6 +294,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				.getApplicationSettings().getProperty(BANK_SENDER_TYPE_VERSION,
 						"001");
 
+		String bank = getIWApplicationContext().getApplicationSettings()
+				.getProperty(COMPANY_BANK, "arion");
+
 		boolean sendToAdmin = getIWApplicationContext()
 				.getApplicationSettings().getBoolean("COMPANY_REG_TO_ADMIN",
 						false);
@@ -316,11 +318,21 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		filename.append(receiverSSN);
 		filename.append(".xml");
 
-		encodeAndSendXML(xml, filename.toString());
-
+		if ("arion".equals(bank)) {
+			encodeAndSendXMLArion(xml, filename.toString());			
+		} if ("landsbanki".equals(bank)) {
+			try {
+				SendLoginDataBusiness send_data = (SendLoginDataBusiness) getServiceInstance(SendLoginDataBusiness.class);
+				send_data.send(xml);
+			} catch (IBOLookupException e) {
+				e.printStackTrace();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
-	private void encodeAndSendXML(String xml, String filename) {
+	private void encodeAndSendXMLArion(String xml, String filename) {
 		String userId = getIWApplicationContext().getApplicationSettings()
 				.getProperty(BANK_SENDER_USER_ID);
 
@@ -335,7 +347,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			EngineConfiguration config = new FileProvider(new FileInputStream(
 					file));
 			BirtingurLocator locator = new BirtingurLocator(config);
-			BirtingurSoap port = locator.getBirtingurSoap(new URL(SERVICE_URL));
+			BirtingurSoap port = locator.getBirtingurSoap(new URL(url));
 
 			Stub stub = (Stub) port;
 			stub._setProperty(WSHandlerConstants.ACTION,
@@ -547,7 +559,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 			companyAdmin.store();
 		} else {
-			if (companyAdmin.getFirstName() == null || "".equals(companyAdmin.getFirstName())) {
+			if (companyAdmin.getFirstName() == null
+					|| "".equals(companyAdmin.getFirstName())) {
 				companyAdmin.setFullName(companyName);
 				companyAdmin.store();
 			}
@@ -626,8 +639,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				userBusiness.updateUsersMainAddressOrCreateIfDoesNotExist(
 						companyAdmin, companyAddress.getStreetAddress(),
 						companyAddress.getPostalCode(),
-						companyAddress.getCountry(),
-						companyAddress.getCity(),
+						companyAddress.getCountry(), companyAddress.getCity(),
 						companyAddress.getProvince(),
 						companyAddress.getPOBox(),
 						companyAddress.getCommuneID());
@@ -637,7 +649,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				e.printStackTrace();
 			}
 		}
-		
+
 		companyAdmin.setJuridicalPerson(true);
 		companyAdmin.store();
 
@@ -1526,7 +1538,10 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 					|| "".equals(user.getName())) {
 				UserHolder holder = getSkyrrClient().getUser(personalId);
 				if (holder != null) {
-					IWTimestamp t = new IWTimestamp(SocialSecurityNumber.getDateFromSocialSecurityNumber(holder.getPersonalID()));
+					IWTimestamp t = new IWTimestamp(
+							SocialSecurityNumber
+									.getDateFromSocialSecurityNumber(holder
+											.getPersonalID()));
 
 					try {
 						user = userBusiness
