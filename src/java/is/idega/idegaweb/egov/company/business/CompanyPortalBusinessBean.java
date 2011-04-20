@@ -60,7 +60,7 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 	public Group getAllCompaniesAdminsGroup(IWApplicationContext iwac) {
 		Group allAdminsGroup = null;
 		try {
-			allAdminsGroup = getGroupByName(getCompanyPortalRootGroup(iwac), EgovCompanyConstants.COMPANY_ADMINS_GROUP_IN_COMPANY_PORTAL);
+			allAdminsGroup = getGroupByName(getCompanyPortalRootGroup(iwac), EgovCompanyConstants.COMPANY_ADMINS_GROUP_IN_COMPANY_PORTAL, null);
 		} catch (RemoteException e) {
 			logger.log(Level.SEVERE, "Error getting company admins group", e);
 		}
@@ -75,7 +75,7 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 	
 	public Group getCompanySuperAdminsGroup(IWApplicationContext iwac) {
 		try {
-			return getGroupByName(getCompanyPortalRootGroup(iwac), EgovCompanyConstants.COMPANY_SUPER_ADMINS_GROUP_IN_COMPANY_PORTAL);
+			return getGroupByName(getCompanyPortalRootGroup(iwac), EgovCompanyConstants.COMPANY_SUPER_ADMINS_GROUP_IN_COMPANY_PORTAL, null);
 		} catch (RemoteException e) {
 			logger.log(Level.SEVERE, "Error getting company super admins group", e);
 		}
@@ -83,7 +83,7 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Group getGroupByName(Group parentGroup, String name) {
+	public Group getGroupByName(Group parentGroup, String name, String personalID) {
 		if (parentGroup == null || StringUtil.isEmpty(name)) {
 			return null;
 		}
@@ -93,16 +93,31 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 			return null;
 		}
 		
+		boolean foundGroup = false;
 		Group group = null;
-		for (Iterator<Group> childGroupsIter = childGroups.iterator(); (childGroupsIter.hasNext() && group == null);) {
+		for (Iterator<Group> childGroupsIter = childGroups.iterator(); childGroupsIter.hasNext();) {
 			group = childGroupsIter.next();
 			
-			if (!name.equals(group.getName())) {
-				group = null;
+			if (name.equals(group.getName())) {
+				if (personalID != null) {
+					String companySSN = group.getMetaData("COMPANY_PERSONAL_ID");
+					if (companySSN != null && personalID.equals(companySSN)) {
+						foundGroup = true;
+						break;						
+					}
+				} else {
+					foundGroup = true;
+					break;
+				}
 			}
+			
 		}
 		
-		return group;
+		if (foundGroup) {
+			return group;
+		}
+		
+		return null;
 	}
 	
 	public Group createCompanyGroup(IWApplicationContext iwac, String companyName, String personalID) {
@@ -290,7 +305,7 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		if (companyPortal == null) {
 			return null;
 		}
-		Group company = getGroupByName(companyPortal, companyName);
+		Group company = getGroupByName(companyPortal, companyName, personalID);
 		if (company == null) {
 			company = createCompanyGroup(iwac, companyPortal, companyName, personalID);
 		}

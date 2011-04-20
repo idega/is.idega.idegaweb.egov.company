@@ -22,7 +22,7 @@ public interface CompanyPortalBusiness {
 	
 	public Group getCompanySuperAdminsGroup(IWApplicationContext iwac);
 	
-	public Group getGroupByName(Group parentGroup, String name);
+	public Group getGroupByName(Group parentGroup, String name, String personalID);
 	public Group getChildGroupByType(Group group, String type);
 	public List<Group> getAllChildGroupsByType(Group group, String type);
 	

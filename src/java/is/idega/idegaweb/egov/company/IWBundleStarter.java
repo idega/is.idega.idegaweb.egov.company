@@ -117,7 +117,7 @@ public class IWBundleStarter implements IWBundleStartable {
 
 	private Group getGroupByName(IWApplicationContext iwac, Group parentGroup, String name) throws RemoteException {
 		CompanyPortalBusiness companyPortalBusiness = ELUtil.getInstance().getBean(CompanyPortalBusiness.SPRING_BEAN_IDENTIFIER);
-		return companyPortalBusiness.getGroupByName(parentGroup, name);
+		return companyPortalBusiness.getGroupByName(parentGroup, name, null);
 	}
 	
 	private Group createGroup(GroupBusiness groupBusiness, String name, String description, boolean createUnderRootDomain, Group parentGroup) {
