@@ -7,6 +7,7 @@ import is.idega.idegaweb.egov.accounting.business.CitizenBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
 import is.idega.idegaweb.egov.application.data.Application;
+import is.idega.idegaweb.egov.citizen.business.WSCitizenAccountBusinessBean;
 import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurLocator;
 import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurSoap;
 import is.idega.idegaweb.egov.citizen.wsclient.landsbankinn.SendLoginDataBusiness;
@@ -393,6 +394,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			String senderPin, String xkey, String user1, String user3,
 			String user3version) {
 
+		String mayor = getIWApplicationContext().getApplicationSettings().getProperty(WSCitizenAccountBusinessBean.CITIZEN_MAYOR_NAME);
+		String signature = getIWApplicationContext().getApplicationSettings().getProperty(WSCitizenAccountBusinessBean.CITIZEN_MAYOR_SIGNATURE_URL);
+
 		String definitionName = "idega.is";
 		String acct = senderPin + user1;
 		if (user3version == null || user3version.equals("")) {
@@ -428,6 +432,9 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		xml.append(user4);
 		xml.append("?>\n");
 		xml.append("\t\t<Section Name=\"IDEGA\" Occ=\"1\">\n");
+		xml.append("\t\t\t<Field Name=\"Company\">");
+		xml.append(true);
+		xml.append("</Field>\n");
 		xml.append("\t\t\t<Field Name=\"Name\">");
 		xml.append(name);
 		xml.append("</Field>\n");
@@ -436,6 +443,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		xml.append("</Field>\n");
 		xml.append("\t\t\t<Field Name=\"Password\">");
 		xml.append(password);
+		xml.append("</Field>\n");
+		xml.append("\t\t\t<Field Name=\"Mayor\">");
+		if (mayor != null)
+			xml.append(mayor);
+		xml.append("</Field>\n");
+		xml.append("\t\t\t<Field Name=\"Signature\">");
+		if (signature != null)
+			xml.append(signature);
 		xml.append("</Field>\n");
 		xml.append("\t\t</Section>\n");
 		xml.append("\t</Statement>\n");
