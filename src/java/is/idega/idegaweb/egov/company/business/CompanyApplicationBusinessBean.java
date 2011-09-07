@@ -394,6 +394,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			String senderPin, String xkey, String user1, String user3,
 			String user3version) {
 
+		String pageLink = getIWApplicationContext().getApplicationSettings().getProperty(WSCitizenAccountBusinessBean.BANK_SENDER_PAGELINK);
+		String logo = getIWApplicationContext().getApplicationSettings().getProperty(WSCitizenAccountBusinessBean.BANK_SENDER_LOGOLINK);
 		String mayor = getIWApplicationContext().getApplicationSettings().getProperty(WSCitizenAccountBusinessBean.CITIZEN_MAYOR_NAME);
 		String signature = getIWApplicationContext().getApplicationSettings().getProperty(WSCitizenAccountBusinessBean.CITIZEN_MAYOR_SIGNATURE_URL);
 
@@ -443,6 +445,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		xml.append("</Field>\n");
 		xml.append("\t\t\t<Field Name=\"Password\">");
 		xml.append(password);
+		xml.append("</Field>\n");
+		xml.append("\t\t\t<Field Name=\"PageLink\">");
+		if (pageLink != null)
+			xml.append(pageLink);
+		xml.append("</Field>\n");
+		xml.append("\t\t\t<Field Name=\"Logo\">");
+		if (logo != null)
+			xml.append(logo);
 		xml.append("</Field>\n");
 		xml.append("\t\t\t<Field Name=\"Mayor\">");
 		if (mayor != null)
