@@ -184,6 +184,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		}
 		return app;
 	}
+	
+	public User getCompanyContact(Company company) {
+		CompanyApplication app = getApplication(company);
+		if (app != null) {
+			return app.getApplicantUser();
+		}
+		return null;
+	}
 
 	@Override
 	public IWBundle getBundle() {

@@ -49,6 +49,12 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 			throws RemoteException;
 
 	/**
+	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getApplication
+	 */
+	public User getCompanyContact(Company company)
+			throws RemoteException;
+	
+	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getBundle
 	 */
 	public IWBundle getBundle() throws RemoteException;
