@@ -30,6 +30,7 @@ public class CompanyContactPreferences extends CitizenAccountPreferences {
 	public CompanyContactPreferences() {
 		super();
 		setToShowNameAndPersonalID(true);
+		setNameAndPersonalIDDisabled(false);
 	}
 
 	protected User getUser(IWContext iwc) {
