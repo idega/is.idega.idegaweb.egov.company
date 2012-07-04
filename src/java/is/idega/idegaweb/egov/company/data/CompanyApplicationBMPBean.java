@@ -27,16 +27,16 @@ import com.idega.user.data.User;
 
 /**
  *
- * 
- * @author <a href="anton@idega.com">Anton Makarov</a>
- * @version Revision: 1.1 
  *
- * Last modified: Seo 23, 2008 by Author: Anton 
+ * @author <a href="anton@idega.com">Anton Makarov</a>
+ * @version Revision: 1.1
+ *
+ * Last modified: Seo 23, 2008 by Author: Anton
  *
  */
 
 public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements CompanyApplication {
-	
+
 	private static final long serialVersionUID = -7638155652762635917L;
 
 	private static final String ENTITY_NAME = "COMPANY_APPLICATION";
@@ -46,10 +46,10 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 
 	private static final String COLUMN_ADMIN_USER = "admin_user";
 	private static final String COLUMN_APPLICANT_USER = "applicant_user";
-	
+
 	private static final String CATEGORY = "application_category_id";
 	private static final String CASE_CODE = "case_code";
-	private static final String CONTRACT_FILE = "contract_file"; 
+	private static final String CONTRACT_FILE = "contract_file";
 
 	private static final String EGOV_APPLICATION_GROUP = "EGOV_APPLICATION_GROUP";
 
@@ -80,62 +80,77 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		addManyToOneRelationship(CASE_CODE, CaseCode.class);
 		addManyToManyRelationShip(Group.class, EGOV_APPLICATION_GROUP);
 		addOneToOneRelationship(CONTRACT_FILE, ICFile.class);
+
+		super.initializeAttributes();
 	}
-	
+
 	// Getters
+	@Override
 	public CompanyType getType() {
 		return (CompanyType) getColumnValue(COLUMN_TYPE);
 	}
 
+	@Override
 	public User getAdminUser() {
 		return (User) getColumnValue(COLUMN_ADMIN_USER);
 	}
-	
+
+	@Override
 	public User getApplicantUser() {
 		return (User) getColumnValue(COLUMN_APPLICANT_USER);
 	}
 
+	@Override
 	public Company getCompany() {
 		return (Company) getColumnValue(COLUMN_COMPANY);
 	}
-	
+
+	@Override
 	public ICFile getContract() {
 		return (ICFile) getColumnValue(CONTRACT_FILE);
 	}
 
 	// Setters
+	@Override
 	public void setType(CompanyType type) {
 		setColumn(COLUMN_TYPE, type);
 	}
 
+	@Override
 	public void setAdminUser(User user) {
 		setColumn(COLUMN_ADMIN_USER, user);
 	}
-	
+
+	@Override
 	public void setApplicantUser(User user) {
 		setColumn(COLUMN_APPLICANT_USER, user);
 	}
 
+	@Override
 	public void setCompany(Company company) {
 		setColumn(COLUMN_COMPANY, company);
 	}
-	
+
+	@Override
 	public void setContract(ICFile contract) {
 		setColumn(CONTRACT_FILE, contract);
 	}
 
+	@Override
 	public void addGroup(Group group) throws IDOAddRelationshipException {
 		this.idoAddTo(group);
 	}
-	
+
+	@Override
 	public void removeGroup(Group group) throws IDORemoveRelationshipException {
 		super.idoRemoveFrom(group);
 	}
 
+	@Override
 	public void addLocalizedName(LocalizedText text) throws IDOAddRelationshipException {
 	  	idoAddTo(text);
 	}
-	
+
 	public Object ejbFindByCompany(Company company) throws FinderException {
 		Table table = new Table(this);
 
@@ -145,19 +160,20 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 
 		return idoFindOnePKByQuery(query);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Collection ejbFindAllByCaseCodes(String[] caseCodes) throws FinderException {
 		Table applicationTable = new Table(this);
-		
+
 		SelectQuery query = new SelectQuery(applicationTable);
 		query.addColumn(applicationTable.getColumn(getIDColumnName()));
 		query.addCriteria(new InCriteria(applicationTable.getColumn(CASE_CODE), caseCodes));
 		query.addGroupByColumn(applicationTable, getIDColumnName());
-		
+
 		return idoFindPKsByQuery(query);
 	}
-	
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public Collection<Group> getGroups() {
 		try {
@@ -177,216 +193,258 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	public CaseCode getCaseCode() {
 		return (CaseCode) getColumnValue(CASE_CODE);
 	}
-	
-	
-	
+
+
+
+	@Override
 	public void setPriority(Integer priority) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setPriority() not supported.");
 	}
-	
+
+	@Override
 	public Integer getPriority() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getPriority() not supported.");
 	}
-	
+
+	@Override
 	public void setAgeFrom(int age) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setAgeFrom() not supported.");
 	}
 
+	@Override
 	public int getAgeFrom() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getAgeFrom() not supported.");
 	}
 
+	@Override
 	public void setAgeTo(int age) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setAgeTo() not supported.");
 	}
 
+	@Override
 	public int getAgeTo() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getAgeTo() not supported.");
 	}
-	
+
+	@Override
 	public int getTimesClicked() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getTimesClicked() not supported.");
 	}
-	
+
+	@Override
 	public void setTimesClicked(int clicked) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setTimesClicked() not supported.");
 	}
 
+	@Override
 	public void setCategory(ApplicationCategory category) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setCategory() not supported.");
 	}
 
+	@Override
 	public ApplicationCategory getCategory() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getCategory() not supported.");
 	}
 
+	@Override
 	public void setElectronic(boolean isElectronic) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setElectronic() not supported.");
 	}
 
+	@Override
 	public boolean getElectronic() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getElectronic() not supported.");
 	}
-	
+
+	@Override
 	public void setRequiresLogin(boolean requiresLogin) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setRequiresLogin() not supported.");
 	}
 
+	@Override
 	public boolean getRequiresLogin() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getRequiresLogin() not supported.");
 	}
-	
+
+	@Override
 	public void setVisible(boolean visible) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setVisible() not supported.");
 	}
-	
+
+	@Override
 	public boolean getVisible() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getVisible() not supported.");
 	}
-	
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public void setLocalizedUrls(Map localizedEntries, boolean isNewApplication){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setLocalizedUrls() not supported.");
 	}
-	
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public void setLocalizedNames(Map localizedEntries, boolean isNewApplication){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setLocalizedNames() not supported.");
-	} 
-	
+	}
+
+	@Override
 	public String getLoginPageURL() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getLoginPageURL() not supported.");
 	}
-	
+
+	@Override
 	public void setLoginPageURL(String url) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setLoginPageURL() not supported.");
 	}
-	
+
+	@Override
 	public String getAppType() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getAppType() not supported.");
 	}
 
+	@Override
 	public boolean getHiddenFromGuests() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getHiddenFromGuests() not supported.");
 	}
 
+	@Override
 	public LocalizedText getLocalizedText(int icLocaleId) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getLocalizedText() not supported.");
 	}
 
+	@Override
 	public String getLocalizedUrl(Locale locale){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
-		throw new java.lang.UnsupportedOperationException("Method getLocalizedUrl() not supported.");			
+		throw new java.lang.UnsupportedOperationException("Method getLocalizedUrl() not supported.");
 	}
-	
+
+	@Override
 	public String getNameByLocale(Locale locale){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getNameByLocale() not supported.");
 	}
 
+	@Override
 	public String getNameByLocale(){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getNameByLocale() not supported.");
 	}
 
+	@Override
 	public boolean getOpensInNewWindow() {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getOpensInNewWindow() not supported.");
 	}
 
+	@Override
 	public String getQueryForMiddleTable(String tableName, int applicationId){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getQueryForMiddleTable() not supported.");
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public String getQueryForTxLocalizedText(int localeId, Collection localNamesIds){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getQueryForTxLocalizedText() not supported.");
 	}
 
+	@Override
 	public String getUrlByLocale(){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getUrlByLocale() not supported.");
 	}
 
+	@Override
 	public String getUrlByLocale(Locale locale){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getUrlByLocale() not supported.");
 	}
 
+	@Override
 	public void insertLocalizedTextEntry(int localeId, String headline, boolean settingNames){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method insertLocalizedTextEntry() not supported.");
 	}
-	
+
+	@Override
 	public boolean removeLocalizedEntries(){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method removeLocalizedEntries() not supported.");
 	}
-	
+
+	@Override
 	public void setAppType(String appType) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setAppType() not supported.");
 	}
 
+	@Override
 	public void setHiddenFromGuests(boolean hiddenFromGuests) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setHiddenFromGuests() not supported.");
 	}
 
+	@Override
 	public void setOpensInNewWindow(boolean opensInNew) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setOpensInNewWindow() not supported.");
 	}
 
+	@Override
 	public void setUrl(String url) {
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method setUrl() not supported.");
 	}
 
+	@Override
 	public void updateLocalizedTextEntry(Object primaryKey, String headline){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method updateLocalizedTextEntry() not supported.");
 	}
 
+	@Override
 	public String getLocalizedName(Locale locale){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getLocalizedName() not supported.");
 	}
 
+	@Override
 	public void addSubscriber(User subscriber)
 			throws IDOAddRelationshipException {
 		throw new UnsupportedOperationException("This method is not implemented!");
 	}
 
+	@Override
 	public Collection<User> getSubscribers() {
 		throw new UnsupportedOperationException("This method is not implemented!");
 	}
 
+	@Override
 	public void removeSubscriber(User subscriber)
 			throws IDORemoveRelationshipException {
 		throw new UnsupportedOperationException("This method is not implemented!");
