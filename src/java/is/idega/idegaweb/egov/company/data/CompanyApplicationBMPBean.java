@@ -433,20 +433,4 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		throw new java.lang.UnsupportedOperationException("Method getLocalizedName() not supported.");
 	}
 
-	@Override
-	public void addSubscriber(User subscriber)
-			throws IDOAddRelationshipException {
-		throw new UnsupportedOperationException("This method is not implemented!");
-	}
-
-	@Override
-	public Collection<User> getSubscribers() {
-		throw new UnsupportedOperationException("This method is not implemented!");
-	}
-
-	@Override
-	public void removeSubscriber(User subscriber)
-			throws IDORemoveRelationshipException {
-		throw new UnsupportedOperationException("This method is not implemented!");
-	}
 }
