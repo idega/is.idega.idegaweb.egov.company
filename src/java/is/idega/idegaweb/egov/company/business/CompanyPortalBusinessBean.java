@@ -21,7 +21,10 @@ import org.springframework.stereotype.Service;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
+import com.idega.business.IBORuntimeException;
 import com.idega.company.CompanyConstants;
+import com.idega.company.business.CompanyBusiness;
+import com.idega.company.data.Company;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.data.ICTreeNode;
 import com.idega.idegaweb.IWApplicationContext;
@@ -41,8 +44,6 @@ import com.idega.util.StringUtil;
 @Scope("singleton")
 @Service(CompanyPortalBusiness.SPRING_BEAN_IDENTIFIER)
 public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
-
-	private static final long serialVersionUID = -3548980819753114719L;
 	
 	private static final Logger logger = Logger.getLogger(CompanyPortalBusinessBean.class.getName());
 	
@@ -467,7 +468,6 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		return getSortedUsers(companyUsers, null);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private Collection<User> getUsersInGroup(Group group) {
 		if (group == null) {
 			return null;
@@ -612,4 +612,47 @@ public class CompanyPortalBusinessBean implements CompanyPortalBusiness {
 		return allUserCompanies.contains(companyGroup);
 	}
 
+	@Override
+	public Company getCompanyForUser(User user) {
+		if (user == null) {
+			logger.warning("User is not provided, unable to resolve companies");
+			return null;
+		}
+
+		List<Group> companies = getAllUserCompanies(user);
+		if (companies != null && companies.size() > 0) {
+			Group group = companies.iterator().next();
+
+			String personalID = group.getMetaData("COMPANY_PERSONAL_ID");
+			if (personalID != null) {
+				try {
+					return getCompanyBusiness().getCompany(personalID);
+				} catch (FinderException fe) {
+					fe.printStackTrace();
+				} catch (RemoteException re) {
+					throw new IBORuntimeException(re);
+				}
+			}
+		}
+
+		return null;
+	}
+	
+	private CompanyBusiness companyBusiness = null;
+
+	private CompanyBusiness getCompanyBusiness() {
+		if (this.companyBusiness != null) {
+			return this.companyBusiness;
+		}
+		
+		try {
+			this.companyBusiness = IBOLookup.getServiceInstance(
+					IWMainApplication.getDefaultIWApplicationContext(), 
+					CompanyBusiness.class);
+		} catch(IBOLookupException e) {
+			logger.log(Level.WARNING, "Unable to find " + CompanyBusiness.class);
+		}
+		
+		return this.companyBusiness;
+	}
 }
