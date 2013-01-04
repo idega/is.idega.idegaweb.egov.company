@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 
-import javax.ejb.FinderException;
-
 import com.idega.business.IBOLookup;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.LoginCreateException;
@@ -241,7 +239,7 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 		}
 
 	}
-	
+
 	protected CompanyApplicationBusiness getCompanyBusiness(IWContext iwc) throws RemoteException{
 		return (CompanyApplicationBusiness)IBOLookup.getServiceInstance(iwc, CompanyApplicationBusiness.class);
 	}
