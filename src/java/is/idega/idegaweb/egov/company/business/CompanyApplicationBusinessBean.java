@@ -89,7 +89,6 @@ import com.idega.io.MemoryFileBuffer;
 import com.idega.io.MemoryInputStream;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
-import com.idega.slide.business.IWSlideService;
 import com.idega.user.business.GroupBusiness;
 import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
@@ -174,6 +173,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return app;
 	}
 
+	@Override
 	public CompanyApplication getApplication(Company company) {
 		CompanyApplication app;
 		try {
@@ -184,7 +184,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		}
 		return app;
 	}
-	
+
+	@Override
 	public User getCompanyContact(Company company) {
 		CompanyApplication app = getApplication(company);
 		if (app != null) {
@@ -192,7 +193,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		}
 		return null;
 	}
-	
+
+	@Override
 	public void setCompanyContact(Company company, User user) {
 		CompanyApplication app = getApplication(company);
 		if (app != null) {
@@ -207,12 +209,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				EgovCompanyConstants.IW_BUNDLE_IDENTIFIER);
 	}
 
+	@Override
 	public List<String> approveApplication(IWContext iwc, String applicationId) {
 		CompanyApplication compApp = getApplication(applicationId);
 
 		return approveApplication(iwc, compApp);
 	}
 
+	@Override
 	public List<String> approveApplication(IWContext iwc,
 			CompanyApplication compApp) {
 		if (compApp == null) {
@@ -336,7 +340,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		filename.append(".xml");
 
 		if ("arion".equals(bank)) {
-			encodeAndSendXMLArion(xml, filename.toString());			
+			encodeAndSendXMLArion(xml, filename.toString());
 		} if ("landsbanki".equals(bank)) {
 			try {
 				SendLoginDataBusiness send_data = (SendLoginDataBusiness) getServiceInstance(SendLoginDataBusiness.class);
@@ -721,6 +725,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				: null;
 	}
 
+	@Override
 	public boolean rejectApplication(IWContext iwc, String applicationId,
 			String explanationText) {
 		CompanyApplication compApp = getApplication(applicationId);
@@ -768,6 +773,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return true;
 	}
 
+	@Override
 	public boolean requestInformation(IWApplicationContext iwac,
 			String applicationId, String explanationText) {
 		CompanyApplication compApp = getApplication(applicationId);
@@ -806,6 +812,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return true;
 	}
 
+	@Override
 	public boolean sendEmail(String email, String subject, String text) {
 		IWMainApplicationSettings settings = IWMainApplication
 				.getDefaultIWMainApplication().getSettings();
@@ -879,6 +886,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return user == null ? false : true;
 	}
 
+	@Override
 	public boolean isCompanyAdministrator(IWContext iwc) {
 		try {
 			return (isInstitutionAdministration(iwc) || iwc
@@ -891,6 +899,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return false;
 	}
 
+	@Override
 	public boolean isCompanyEmployee(IWContext iwc) {
 		try {
 			return (isCompanyAdministrator(iwc) || iwc.getAccessController()
@@ -923,6 +932,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return Boolean.valueOf(accountMetadata);
 	}
 
+	@Override
 	public CompanyApplicationHome getCompanyApplicationHome() {
 		try {
 			return (CompanyApplicationHome) IDOLookup
@@ -932,6 +942,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		}
 	}
 
+	@Override
 	public boolean makeUserCompanyAdmin(IWApplicationContext iwac,
 			User companyAdmin, Group companyGroup) {
 		if (companyAdmin == null || companyGroup == null) {
@@ -941,14 +952,13 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		companyGroup.setModerator(companyAdmin);
 		companyGroup.store();
 
-		AccessController accessController = iwac.getIWMainApplication()
-				.getAccessController();
-		accessController.addRoleToGroup(
-				EgovCompanyConstants.COMPANY_ADMIN_ROLE, companyAdmin, iwac);
+		AccessController accessController = iwac.getIWMainApplication().getAccessController();
+		accessController.addRoleToGroup(EgovCompanyConstants.COMPANY_ADMIN_ROLE, companyAdmin, iwac);
 
 		return true;
 	}
 
+	@Override
 	public boolean makeUserCommonEmployee(IWApplicationContext iwac,
 			User companyAdmin, Group company) {
 		if (company == null) {
@@ -957,10 +967,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		company.setModerator(null);
 		company.store();
 
-		AccessController accessController = iwac.getIWMainApplication()
-				.getAccessController();
-		accessController.removeRoleFromGroup(
-				EgovCompanyConstants.COMPANY_ADMIN_ROLE, companyAdmin, iwac);
+		AccessController accessController = iwac.getIWMainApplication().getAccessController();
+		accessController.removeRoleFromGroup(EgovCompanyConstants.COMPANY_ADMIN_ROLE, Integer.valueOf(companyAdmin.getId()), iwac);
 
 		return true;
 	}
@@ -970,6 +978,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 	 *      com.idega.user.data.User, java.lang.String, java.lang.String,
 	 *      java.lang.String, java.lang.String, boolean)
 	 */
+	@Override
 	public boolean createLogginForUser(IWContext iwc, User user,
 			String phoneHome, String phoneWork, String email, String roleKey,
 			boolean addToRootCitizenGroup) throws LoginCreateException {
@@ -1092,6 +1101,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return userApplicationList;
 	}
 
+	@Override
 	public PrintingService getPrintingService() {
 		try {
 			return (PrintingService) getServiceInstance(PrintingService.class);
@@ -1156,6 +1166,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return true;
 	}
 
+	@Override
 	public boolean addCommonCompanyPortalServices(IWContext iwc) {
 		CompanyEmployeeHome compEmplHome = null;
 		try {
@@ -1186,6 +1197,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return true;
 	}
 
+	@Override
 	public Collection<Application> getAssignedServices(IWContext iwc, User user) {
 		CompanyEmployeeHome compEmplHome = null;
 		try {
@@ -1216,6 +1228,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return compEmployee.getServices();
 	}
 
+	@Override
 	public Collection<Application> getUserApplications(IWContext iwc, User user) {
 		Collection<Application> userApplications = null;
 		try {
@@ -1236,12 +1249,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return userApplications;
 	}
 
+	@Override
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException {
 		return (CommuneMessageBusiness) IBOLookup.getServiceInstance(
 				IWMainApplication.getDefaultIWApplicationContext(),
 				CommuneMessageBusiness.class);
 	}
 
+	@Override
 	public CompanyApplication storeApplication(IWContext iwc, User admin,
 			CompanyType companyType, Company company, User performer)
 			throws CreateException, RemoteException {
@@ -1280,6 +1295,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		}
 	}
 
+	@Override
 	public List<CompanyApplication> getApplicationsByCaseCodesAndStatuses(
 			String[] caseCodes, List<String> caseStatuses) {
 		if (ArrayUtil.isEmpty(caseCodes)) {
@@ -1314,18 +1330,21 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return filteredApps;
 	}
 
+	@Override
 	public Collection<CompanyApplication> getUnhandledApplications(
 			String[] caseCodes) {
 		return getApplicationsByCaseCodesAndStatuses(caseCodes,
 				Arrays.asList(getStatusesForOpenCases()));
 	}
 
+	@Override
 	public Collection<CompanyApplication> getApprovedApplications(
 			String[] caseCodes) {
 		return getApplicationsByCaseCodesAndStatuses(caseCodes,
 				Arrays.asList(getStatusesForApprovedCases()));
 	}
 
+	@Override
 	public Collection<CompanyApplication> getRejectedApplications(
 			String[] caseCodes) {
 		return getApplicationsByCaseCodesAndStatuses(caseCodes,
@@ -1346,16 +1365,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return super.getApplicationName(app, locale);
 	}
 
-	public IWSlideService getIWSlideService() throws IBOLookupException {
-		try {
-			return (IWSlideService) IBOLookup.getServiceInstance(
-					getIWApplicationContext(), IWSlideService.class);
-		} catch (IBOLookupException e) {
-			logger.log(Level.SEVERE, "Error getting IWSlideService");
-			throw e;
-		}
-	}
-
+	@Override
 	public boolean closeAccount(IWContext iwc, String applicationId) {
 		CompanyApplication compApp = getApplication(applicationId);
 		if (compApp == null) {
@@ -1374,12 +1384,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return true;
 	}
 
+	@Override
 	public boolean reopenAccount(IWContext iwc, String applicationId) {
 		CompanyApplication compApp = getApplication(applicationId);
 
 		return reopenAccount(iwc, compApp);
 	}
 
+	@Override
 	public boolean reopenAccount(IWContext iwc, CompanyApplication compApp) {
 		if (compApp == null) {
 			return false;
@@ -1418,6 +1430,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		user.store();
 	}
 
+	@Override
 	public boolean isAccountOpen(CompanyApplication application) {
 		if (application == null) {
 			return false;
@@ -1440,6 +1453,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return false;
 	}
 
+	@Override
 	public String generateContract(String applicationId) {
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
@@ -1517,16 +1531,11 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 	private String saveToSlide(ICFile contractFile, InputStream contractIs,
 			String applicationId) {
-		IWSlideService service_bean;
 		try {
-			service_bean = getIWSlideService();
-			service_bean.uploadFileAndCreateFoldersFromStringAsRoot(
+			getRepositoryService().uploadFileAndCreateFoldersFromStringAsRoot(
 					CONTRACT_SLIDE_PATH, contractFile.getName(), contractIs,
-					contractFile.getMimeType(), true);
-		} catch (IBOLookupException e) {
-			e.printStackTrace();
-			return null;
-		} catch (RemoteException e) {
+					contractFile.getMimeType());
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -1536,6 +1545,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				.toString();
 	}
 
+	@Override
 	public AdminUser getUser(String personalId) {
 		if (StringUtil.isEmpty(personalId)) {
 			return null;
@@ -1661,6 +1671,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return null;
 	}
 
+	@Override
 	public CompanyInfo getCompany(String companyUniqueId, String companyPhone,
 			String companyFax, String companyEmail, String companyWebpage,
 			String companyBankAccount) {
@@ -1812,12 +1823,14 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		}
 	}
 
+	@Override
 	public boolean isInstitutionAdministration(IWContext iwc) {
 		return isUserLogged(iwc)
 				&& (iwc.isSuperAdmin() || iwc.getAccessController().hasRole(
 						EgovCompanyConstants.COMPANY_SUPER_ADMIN_ROLE, iwc));
 	}
 
+	@Override
 	public SkyrrClient getSkyrrClient() {
 		if (skyrrClient == null) {
 			ELUtil.getInstance().autowire(this);
@@ -1825,6 +1838,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return skyrrClient;
 	}
 
+	@Override
 	public void handle(Callback[] callbacks)
 			throws UnsupportedCallbackException {
 		String userId = getIWApplicationContext().getApplicationSettings()

@@ -1,6 +1,5 @@
 package is.idega.idegaweb.egov.company.business;
 
-
 import is.idega.block.nationalregister.webservice.client.business.SkyrrClient;
 import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
 import is.idega.idegaweb.egov.application.data.Application;
@@ -18,14 +17,12 @@ import java.util.Locale;
 import javax.ejb.CreateException;
 
 import com.idega.block.pdf.business.PrintingService;
-import com.idega.business.IBOLookupException;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
-import com.idega.slide.business.IWSlideService;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 
@@ -33,12 +30,14 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getApplication
 	 */
+	@Override
 	public CompanyApplication getApplication(String applicationId)
 			throws RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getApplication
 	 */
+	@Override
 	public CompanyApplication getApplication(Object primaryKey)
 			throws RemoteException;
 
@@ -53,12 +52,12 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	 */
 	public User getCompanyContact(Company company)
 			throws RemoteException;
-	
+
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#setCompanyContact
 	 */
 	public void setCompanyContact(Company company, User user) throws RemoteException;
-	
+
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getBundle
 	 */
@@ -195,13 +194,8 @@ public interface CompanyApplicationBusiness extends ApplicationBusiness {
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getApplicationName
 	 */
+	@Override
 	public String getApplicationName(Application app, Locale locale);
-
-	/**
-	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#getIWSlideService
-	 */
-	public IWSlideService getIWSlideService() throws IBOLookupException,
-			RemoteException;
 
 	/**
 	 * @see is.idega.idegaweb.egov.company.business.CompanyApplicationBusinessBean#closeAccount

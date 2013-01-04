@@ -51,7 +51,7 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 		AccessController accessController = iwc.getIWMainApplication().getAccessController();
 
 		DropdownMenu rolesDropdownMenu = new DropdownMenu(ROLES_DROP_DOWN_KEY);
-		Collection<ICRole> allRoles = accessController.getAllRoles();
+		Collection<ICRole> allRoles = accessController.getAllRolesLegacy();
 		for (ICRole role : allRoles) {
 			rolesDropdownMenu.addMenuElement(role.getRoleKey(), iwc.getIWMainApplication().getBundle(CORE_IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc).getLocalizedString(role.getRoleNameLocalizableKey(), role.getRoleNameLocalizableKey()));
 		}
@@ -162,7 +162,7 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 				AccessController accessController = iwc.getIWMainApplication().getAccessController();
 				try {
 					accessController.getRoleByRoleKey(selectedRoleKey);
-				} catch (FinderException e) {
+				} catch (Exception e) {
 					errors.add(this.getResourceBundle(iwc).getLocalizedString("role_selection_error", "Selected role is not valid, try again, or select different role"));
 					hasErrors = true;
 					e.printStackTrace();
