@@ -150,6 +150,10 @@ public class CompanyRegisterServiceImpl extends DefaultSpringBean implements Com
 		if (company != null)
 			return company;
 
+		if (isDevelopementState()) {
+			return company;
+		}
+		
 		// Looking via Web Service
 		try {
 			getLogger().info("Will query Web Service for company information by ID " + personalID);
