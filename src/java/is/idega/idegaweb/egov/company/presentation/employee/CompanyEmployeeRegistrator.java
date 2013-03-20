@@ -15,7 +15,7 @@ import com.idega.business.IBOLookup;
 import com.idega.core.accesscontrol.business.AccessController;
 import com.idega.core.accesscontrol.business.LoginCreateException;
 import com.idega.core.accesscontrol.data.ICRole;
-import com.idega.core.accesscontrol.data.LoginTableHome;
+import com.idega.core.accesscontrol.data.LoginTable;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Layer;
 import com.idega.presentation.text.Heading1;
@@ -63,7 +63,6 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void submitSimpleForm(IWContext iwc) throws RemoteException {
 		boolean hasErrors = false;
@@ -137,7 +136,7 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 		} else {
 
 			try {
-				Collection<LoginTableHome> logins = new ArrayList<LoginTableHome>();
+				Collection<LoginTable> logins = new ArrayList<LoginTable>();
 				logins.addAll(getLoginTableHome().findLoginsForUser(user));
 				if (!logins.isEmpty()) {
 					userLoginError.add(this.getResourceBundle(iwc).getLocalizedString(USER_ALLREADY_HAS_A_LOGIN_KEY, USER_ALLREADY_HAS_A_LOGIN_DEFAULT));
