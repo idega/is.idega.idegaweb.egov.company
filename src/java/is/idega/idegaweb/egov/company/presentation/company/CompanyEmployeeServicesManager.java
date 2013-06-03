@@ -1,5 +1,13 @@
 package is.idega.idegaweb.egov.company.presentation.company;
 
+import is.idega.idegaweb.egov.application.data.Application;
+import is.idega.idegaweb.egov.application.data.ApplicationHome;
+import is.idega.idegaweb.egov.company.data.CompanyEmployee;
+import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
+import is.idega.idegaweb.egov.company.data.EmployeeField;
+import is.idega.idegaweb.egov.company.data.EmployeeFieldHome;
+import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
+
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,14 +42,6 @@ import com.idega.util.ArrayUtil;
 import com.idega.util.CoreConstants;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
-
-import is.idega.idegaweb.egov.application.data.Application;
-import is.idega.idegaweb.egov.application.data.ApplicationHome;
-import is.idega.idegaweb.egov.company.data.CompanyEmployee;
-import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
-import is.idega.idegaweb.egov.company.data.EmployeeField;
-import is.idega.idegaweb.egov.company.data.EmployeeFieldHome;
-import is.idega.idegaweb.egov.company.presentation.CompanyBlock;
 
 public class CompanyEmployeeServicesManager extends CompanyBlock {
 
@@ -366,7 +366,7 @@ public class CompanyEmployeeServicesManager extends CompanyBlock {
 	
 	private void saveEmployee(IWContext iwc) {
 		String[] rvkFields = iwc.getParameterValues(RVK_FIELDS_INPUT);
-		String[] services = iwc.getParameterValues(SERVICES_INPUT);
+		Object[] services = iwc.getParameterValues(SERVICES_INPUT);
 		
 		CompanyEmployee emp = null;
 		
