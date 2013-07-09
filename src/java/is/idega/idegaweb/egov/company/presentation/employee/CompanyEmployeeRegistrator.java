@@ -139,7 +139,7 @@ public class CompanyEmployeeRegistrator extends CitizenAccountApplication {
 		} else {
 
 			try {
-				Collection<LoginTableHome> logins = new ArrayList<LoginTableHome>();
+				Collection<com.idega.core.accesscontrol.data.LoginTable> logins = new ArrayList<com.idega.core.accesscontrol.data.LoginTable>();
 				logins.addAll(getLoginTableHome().findLoginsForUser(user));
 				if (!logins.isEmpty()) {
 					userLoginError.add(this.getResourceBundle(iwc).getLocalizedString(USER_ALLREADY_HAS_A_LOGIN_KEY, USER_ALLREADY_HAS_A_LOGIN_DEFAULT));
