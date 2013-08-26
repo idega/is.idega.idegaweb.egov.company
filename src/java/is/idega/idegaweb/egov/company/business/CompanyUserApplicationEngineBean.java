@@ -13,28 +13,27 @@ import com.idega.util.CoreUtil;
 import com.idega.util.StringUtil;
 
 public class CompanyUserApplicationEngineBean extends UserApplicationEngineBean {
-	
+
 	private static final long serialVersionUID = 1198909285509307140L;
 
 	@Override
 	public UserDataBean getUserByPersonalId(String personalId) {
-		System.out.println("Trying to get user in GumboUserApplicationEngineBean");
 		if (StringUtil.isEmpty(personalId)) {
 			return null;
 		}
-		
+
 		IWContext iwc = CoreUtil.getIWContext();
 		if (iwc == null) {
 			return null;
 		}
-		
+
 		UserBusiness userBusiness = getUserBusiness(iwc);
 		if (userBusiness == null) {
 			return null;
 		}
-		
+
 		UserDataBean info = null;
-		
+
 		User user = null;
 		try {
 			user = userBusiness.getUser(personalId);
@@ -45,7 +44,7 @@ public class CompanyUserApplicationEngineBean extends UserApplicationEngineBean 
 		else {
 			info = getUserInfo(user);
 		}
-		
+
 		if (info == null && getCompanyHelper() != null) {
 			try {
 				info = getCompanyHelper().getCompanyInfo(personalId);
@@ -53,7 +52,7 @@ public class CompanyUserApplicationEngineBean extends UserApplicationEngineBean 
 				logger.log(Level.WARNING, "Error getting company information by ID: " + personalId, e);
 			}
 		}
-		
+
 		if (info == null) {
 			IWResourceBundle iwrb = iwc.getIWMainApplication().getBundle(UserConstants.IW_BUNDLE_IDENTIFIER).getResourceBundle(iwc);
 			info = new UserDataBean();
@@ -61,7 +60,7 @@ public class CompanyUserApplicationEngineBean extends UserApplicationEngineBean 
 													.append(": ").append(personalId).toString();
 			info.setErrorMessage(errorMessage);
 		}
-		
+
 		return info;
 	}
 }
