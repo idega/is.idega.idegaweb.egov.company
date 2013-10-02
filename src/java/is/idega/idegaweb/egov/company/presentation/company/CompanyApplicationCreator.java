@@ -337,7 +337,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		info.setStyleClass("info");
 		form.add(info);
 
-		Heading1 heading = new Heading1(iwrb.getLocalizedString("application.enter_company_info", "Enter company info"));
+		Heading1 heading = new Heading1(iwrb.getLocalizedString("application.enter_company_info2", "Enter company info"));
 		heading.setStyleClass("subHeader");
 		heading.setStyleClass("topSubHeader");
 		form.add(heading);
