@@ -38,13 +38,14 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 
 	@Autowired
 	private CompanyPortalBusiness companyBusiness;
-	
+
 	public CompanyContactPreferences() {
 		super();
 		setToShowNameAndPersonalID(true);
 		setNameAndPersonalIDDisabled(true);
 	}
 
+	@Override
 	protected User getUser(IWContext iwc) {
 		try {
 			return getCompanyApplicationBusiness(iwc).getCompanyContact(getCompanyForUser(iwc, iwc.getCurrentUser()));
@@ -54,6 +55,7 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 		}
 	}
 
+	@Override
 	protected void getUserInputs(IWContext iwc, Form form, Layer section) {
 		//	Scripts
 		Web2Business web2 = ELUtil.getInstance().getBean(Web2Business.SPRING_BEAN_IDENTIFIER);
@@ -70,11 +72,11 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 		PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
 
 		form.setEventListener(this.getClass());
-		
+
 		TextInput name = new TextInput(PARAMETER_NAME, user.getName());
 		name.setID("userNameInput");
 		createFormItem(this.iwrb.getLocalizedString("name", "Name"), name, section);
-		
+
 		if (isNameAndPersonalIDDisabled()) {
 			name.setDisabled(true);
 
@@ -82,7 +84,7 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 			hidden.setID("userNameHidden");
 			section.add(hidden);
 		}
-		
+
 		TextInput ssn = new TextInput(PARAMETER_SSN, user.getPersonalID());
 		ssn.setID("userSSNInput");
 		createFormItem(this.iwrb.getLocalizedString("social_security_number", "Social security number"), ssn, section);
@@ -92,8 +94,8 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 		List<Group> companies = getCompanyPortalBusiness().getAllUserCompanies(user);
 		if (companies != null && companies.size() > 0) {
 			Group group = companies.iterator().next();
-			
-			String personalID = group.getMetaData("COMPANY_PERSONAL_ID");
+
+			String personalID = group.getMetaData(EgovCompanyConstants.COMPANY_PERSONAL_ID_METADATA);
 			if (personalID != null) {
 				try {
 					return getCompanyBusiness(iwc).getCompany(personalID);
@@ -106,10 +108,10 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	private CompanyBusiness getCompanyBusiness(IWApplicationContext iwac) {
 		try {
 			return (CompanyBusiness) IBOLookup.getServiceInstance(iwac, CompanyBusiness.class);
@@ -123,7 +125,7 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 		if (this.companyBusiness == null) {
 			ELUtil.getInstance().autowire(this);
 		}
-		
+
 		return this.companyBusiness;
 	}
 
@@ -145,6 +147,7 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 		}
 	}
 
+	@Override
 	public boolean actionPerformed(IWContext iwc) throws IWException {
 		if (iwc.isParameterSet(PARAMETER_SSN)) {
 			try {

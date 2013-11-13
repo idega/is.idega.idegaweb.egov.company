@@ -343,7 +343,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			encodeAndSendXMLArion(xml, filename.toString());
 		} if ("landsbanki".equals(bank)) {
 			try {
-				SendLoginDataBusiness send_data = (SendLoginDataBusiness) getServiceInstance(SendLoginDataBusiness.class);
+				SendLoginDataBusiness send_data = getServiceInstance(SendLoginDataBusiness.class);
 				send_data.send(xml);
 			} catch (IBOLookupException e) {
 				e.printStackTrace();
@@ -516,7 +516,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return texts;
 	}
 
-	@SuppressWarnings("unchecked")
 	private String makeAccountsForCompanyAdmins(IWApplicationContext iwac,
 			CompanyApplication compApp) {
 		Company company = compApp.getCompany();
@@ -1104,23 +1103,23 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 	@Override
 	public PrintingService getPrintingService() {
 		try {
-			return (PrintingService) getServiceInstance(PrintingService.class);
+			return getServiceInstance(PrintingService.class);
 		} catch (RemoteException e) {
 			throw new IBORuntimeException(e.getMessage());
 		}
 	}
 
 	private UserBusiness getUserBusiness() throws RemoteException {
-		return (UserBusiness) getServiceInstance(UserBusiness.class);
+		return getServiceInstance(UserBusiness.class);
 	}
 
 	private GroupBusiness getGroupBusiness(IWApplicationContext iwac)
 			throws RemoteException {
-		return (GroupBusiness) getServiceInstance(GroupBusiness.class);
+		return getServiceInstance(GroupBusiness.class);
 	}
 
 	private CitizenBusiness getCitizenBusiness() throws RemoteException {
-		return (CitizenBusiness) getServiceInstance(CitizenBusiness.class);
+		return getServiceInstance(CitizenBusiness.class);
 	}
 
 	private Collection<Application> getCommonCompanyPortalServices(IWContext iwc) {
@@ -1251,7 +1250,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 	@Override
 	public CommuneMessageBusiness getMessageBusiness() throws RemoteException {
-		return (CommuneMessageBusiness) IBOLookup.getServiceInstance(
+		return IBOLookup.getServiceInstance(
 				IWMainApplication.getDefaultIWApplicationContext(),
 				CommuneMessageBusiness.class);
 	}
@@ -1288,7 +1287,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 	protected ApplicationBusiness getApplicationBusiness(IWContext iwc) {
 		try {
-			return (ApplicationBusiness) IBOLookup.getServiceInstance(iwc,
+			return IBOLookup.getServiceInstance(iwc,
 					ApplicationBusiness.class);
 		} catch (IBOLookupException e) {
 			throw new IBORuntimeException(e);
@@ -1680,7 +1679,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 		CompanyBusiness companyBusiness = null;
 		try {
-			companyBusiness = (CompanyBusiness) getServiceInstance(CompanyBusiness.class);
+			companyBusiness = getServiceInstance(CompanyBusiness.class);
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 		}
@@ -1817,7 +1816,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 	private CompanyRegisterBusiness getCompanyRegisterBusiness() {
 		try {
-			return (CompanyRegisterBusiness) getServiceInstance(CompanyRegisterBusiness.class);
+			return getServiceInstance(CompanyRegisterBusiness.class);
 		} catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
 		}
