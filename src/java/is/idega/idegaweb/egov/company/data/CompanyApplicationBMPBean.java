@@ -454,4 +454,9 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		throw new java.lang.UnsupportedOperationException("Method setEnabledTo not supported.");
 	}
 
+	@Override
+	public boolean isEnabled() {
+		return true;
+	}
+
 }
