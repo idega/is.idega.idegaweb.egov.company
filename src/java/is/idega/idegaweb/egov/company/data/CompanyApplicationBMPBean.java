@@ -3,6 +3,7 @@ package is.idega.idegaweb.egov.company.data;
 import is.idega.idegaweb.egov.application.data.ApplicationCategory;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -431,6 +432,31 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	public String getLocalizedName(Locale locale){
 		/**@todo: Implement this is.idega.idegaweb.egov.application.data.Application method*/
 		throw new java.lang.UnsupportedOperationException("Method getLocalizedName() not supported.");
+	}
+
+	@Override
+	public Timestamp getEnabledFrom() {
+		throw new java.lang.UnsupportedOperationException("Method getEnabledFrom not supported.");
+	}
+
+	@Override
+	public void setEnabledFrom(Timestamp enabledFrom) {
+		throw new java.lang.UnsupportedOperationException("Method setEnabledFrom not supported.");
+	}
+
+	@Override
+	public Timestamp getEnabledTo() {
+		throw new java.lang.UnsupportedOperationException("Method getEnabledTo not supported.");
+	}
+
+	@Override
+	public void setEnabledTo(Timestamp enabledTo) {
+		throw new java.lang.UnsupportedOperationException("Method setEnabledTo not supported.");
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 
 }
