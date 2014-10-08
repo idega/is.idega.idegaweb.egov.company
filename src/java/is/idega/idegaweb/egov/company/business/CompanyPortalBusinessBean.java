@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -285,7 +286,7 @@ public class CompanyPortalBusinessBean extends DefaultSpringBean implements Comp
 
 		UserBusiness userBusiness = null;
 		try {
-			userBusiness = (UserBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), UserBusiness.class);
+			userBusiness = IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), UserBusiness.class);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -363,7 +364,7 @@ public class CompanyPortalBusinessBean extends DefaultSpringBean implements Comp
 
 	private GroupBusiness getGroupBusiness(IWApplicationContext iwac) {
 		try {
-			return (GroupBusiness) IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, GroupBusiness.class);
 		} catch (IBOLookupException e) {
 			logger.log(Level.SEVERE, "Error getting " + GroupBusiness.class.getName(), e);
 		}
@@ -507,7 +508,7 @@ public class CompanyPortalBusinessBean extends DefaultSpringBean implements Comp
 
 	private UserBusiness getUserBusiness() {
 		try {
-			return (UserBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), UserBusiness.class);
+			return IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(), UserBusiness.class);
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 		}
@@ -660,6 +661,32 @@ public class CompanyPortalBusinessBean extends DefaultSpringBean implements Comp
 		return null;
 	}
 
+	@Override
+	public Company getCompanyByNameForUser(User user) {
+		if (user == null) {
+			logger.warning("User is not provided, unable to resolve companies");
+			return null;
+		}
+
+		List<Group> companies = getAllUserCompanies(user);
+		if (companies != null && companies.size() > 0) {
+			Group group = companies.iterator().next();
+
+			if (StringUtils.isNotBlank(group.getName())) {
+				try {
+					return getCompanyBusiness().getCompanyByName(group.getName());
+				} catch (FinderException fe) {
+					fe.printStackTrace();
+				} catch (RemoteException re) {
+					throw new IBORuntimeException(re);
+				}
+			}
+		}
+
+		return null;
+	}
+
+
 	private CompanyBusiness companyBusiness = null;
 
 	private CompanyBusiness getCompanyBusiness() {
@@ -705,9 +732,17 @@ public class CompanyPortalBusinessBean extends DefaultSpringBean implements Comp
 				getLogger().log(Level.WARNING, "Unable to get user by personal ID: " + personalId, e);
 			}
 
+			if (user == null) {
+				try {
+					user = getUserBusiness().getUser(Integer.valueOf(personalId));
+				} catch (Exception e) {
+					getLogger().log(Level.WARNING, "Unable to get user by user ID: " + personalId, e);
+				}
+			}
+
 			// Getting company for a user
 			if (user == null) {
-				getLogger().warning("User does not exist by ID " + personalId);
+				getLogger().warning("User does not exist by personal ID " + personalId);
 			} else {
 				getLogger().info("Found user (" + user + ") by personal ID (" + personalId + "), will look for the company for this user");
 				company = getCompanyForUser(user);

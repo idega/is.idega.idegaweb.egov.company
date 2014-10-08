@@ -9,18 +9,29 @@
  */
 package is.idega.idegaweb.egov.company.bean;
 
+
 public class CompanyInfo {
 
 	private String companyPK;
+
 	private String companyName;
+
 	private String companyPersonalID;
+
 	private String companyAddress;
+
 	private String companyPostalCode;
+
 	private String companyCity;
+
 	private String companyPhone;
+
 	private String companyFax;
+
 	private String companyEmail;
+
 	private String companyWebPage;
+
 	private String companyBankAccount;
 
 	public String getCompanyPK() {

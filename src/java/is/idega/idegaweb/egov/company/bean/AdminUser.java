@@ -9,13 +9,19 @@
  */
 package is.idega.idegaweb.egov.company.bean;
 
+
 public class AdminUser {
 
 	private String userPK;
+
 	private String userName;
+
 	private String userPersonalID;
+
 	private String userWorkPhone;
+
 	private String userMobilePhone;
+
 	private String userEmail;
 
 	public String getUserPK() {

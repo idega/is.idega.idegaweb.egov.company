@@ -51,4 +51,6 @@ public interface CompanyPortalBusiness {
 	public boolean isMemberOfCompany(IWApplicationContext iwac, Group group, User user);
 
 	public Company getCompanyByPersonalIdOrUserId(String personalId);
+
+	public Company getCompanyByNameForUser(User user);
 }

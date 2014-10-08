@@ -52,4 +52,5 @@ public class EgovCompanyConstants {
 	public static final String COMPANY_PORTAL_CURRENT_COMPANY_ATTRIBUTE = "companyPortalCurrentCompanyId";
 
 	public static final String COMPANY_PERSONAL_ID_METADATA = "COMPANY_PERSONAL_ID";
+	public static final String COMPANY_NAME_METADATA = "NAME";
 }
