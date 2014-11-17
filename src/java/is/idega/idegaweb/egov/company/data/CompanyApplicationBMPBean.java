@@ -459,4 +459,13 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		return true;
 	}
 
+	@Override
+	public void setPaymentRequired(boolean isPaymentRequired) {
+		throw new UnsupportedOperationException("Not implemented yet!");		
+	}
+
+	@Override
+	public boolean isPaymentRequired() {
+		throw new UnsupportedOperationException("Not implemented yet!");
+	}
 }
