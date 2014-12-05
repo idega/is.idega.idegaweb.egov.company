@@ -5,7 +5,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.idega.bpm.company.event.CompanyCreatedEvent;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyHome;
 import com.idega.core.business.DefaultSpringBean;
@@ -14,7 +13,7 @@ import com.idega.core.location.data.AddressHome;
 import com.idega.core.location.data.PostalCode;
 import com.idega.core.location.data.PostalCodeHome;
 import com.idega.data.IDOLookup;
-import com.idega.jbpm.identity.CompanyData;
+import com.idega.event.CompanyCreatedEvent;
 import com.idega.user.data.MetadataConstants;
 import com.idega.user.data.User;
 
@@ -24,10 +23,9 @@ public class NewCompanyRegistrationServices extends DefaultSpringBean implements
 
 	@Override
 	public void onApplicationEvent(CompanyCreatedEvent event) {
-		CompanyData data = event.getCompany();
 		Company company = null;
 		try {
-			company = getCreatedCompany(data);
+			company = getCreatedCompany(event);
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating company!", e);
 		}
@@ -43,7 +41,7 @@ public class NewCompanyRegistrationServices extends DefaultSpringBean implements
 		user.store();
 	}
 
-	private Company getCreatedCompany(CompanyData data) throws Exception {
+	private Company getCreatedCompany(CompanyCreatedEvent data) throws Exception {
 		CompanyHome companyHome = (CompanyHome) IDOLookup.getHome(Company.class);
 		Company company = null;
 
