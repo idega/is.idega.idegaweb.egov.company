@@ -1,6 +1,5 @@
 package is.idega.idegaweb.egov.company.presentation.company;
 
-import is.idega.idegaweb.egov.application.data.Application;
 import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
@@ -10,8 +9,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.ejb.FinderException;
 
@@ -56,22 +53,22 @@ import com.idega.util.expression.ELUtil;
 
 /**
  * Application (and case) for company creator
- * 
- * @author <a href="anton@idega.com">Anton Makarov</a>
- * @version Revision: 1.0 
  *
- * Last modified: Jul 30, 2008 by Author: Anton 
+ * @author <a href="anton@idega.com">Anton Makarov</a>
+ * @version Revision: 1.0
+ *
+ * Last modified: Jul 30, 2008 by Author: Anton
  *
  */
 
 public class CompanyApplicationCreator extends ApplicationForm {
-	
+
 	protected static final int iNumberOfPhases = 2;
 
 	protected static final int ACTION_PHASE_1 = 1;
 //	private static final int ACTION_OVERVIEW = 2;
 	protected static final int ACTION_SAVE = 2;
-	
+
 	protected static final String PARAMETER_TYPE = "prm_type";
 	protected static final String PARAMETER_ACTION = "prm_action";
 	protected static final String PARAMETER_AGREEMENT = "prm_agreement";
@@ -84,7 +81,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 	protected static final String PARAMETER_FAX = "prm_fax";
 	protected static final String PARAMETER_WEB_PAGE = "prm_web_page";
 	protected static final String PARAMETER_EMAIL = "prm_email";
-	//protected static final String PARAMETER_BANK_ACCOUNT = "prm_bank_account";
+	protected static final String PARAMETER_BANK_ACCOUNT = "prm_bank_account";
 
 	protected static final String PARAMETER_ADMIN_PK = "prm_admin_pk";
 	protected static final String PARAMETER_ADMIN_PERSONAL_ID = "prm_admin_personal_id";
@@ -92,19 +89,19 @@ public class CompanyApplicationCreator extends ApplicationForm {
 	protected static final String PARAMETER_WORK_PHONE = "prm_work_phone";
 	protected static final String PARAMETER_MOBILE_PHONE = "prm_mobile_phone";
 	protected static final String PARAMETER_ADMIN_EMAIL = "prm_admin_email";
-	
+
 	protected static final String BANK_ACCOUNT_DEFAULT = "0000-00-000000";
-	
+
 //	private String requiredFieldLocalizationKey = "this_field_is_required";
 //	private String requiredFieldLocalizationValue = "This field is required!";
-	
+
 	protected IWResourceBundle iwrb;
 
 	@Override
 	public String getBundleIdentifier() {
 		return EgovCompanyConstants.IW_BUNDLE_IDENTIFIER;
 	}
-	
+
 	@Override
 	protected void present(IWContext iwc) {
 		iwrb = getResourceBundle(iwc);
@@ -128,7 +125,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			re.printStackTrace();
 		}
 	}
-	
+
 	protected void showPhaseOne(IWContext iwc, int nextPhase, int iNumberOfPhases) throws RemoteException {
 		Company company = null;
 		if (iwc.isParameterSet(PARAMETER_COMPANY_PERSONAL_ID)) {
@@ -136,17 +133,17 @@ public class CompanyApplicationCreator extends ApplicationForm {
 				company = getCompanyBusiness(iwc).getCompany(iwc.getParameter(PARAMETER_COMPANY_PERSONAL_ID));
 			} catch (FinderException e) {}
 		}
-		
+
 		User user = null;
 		if (iwc.isParameterSet(PARAMETER_ADMIN_PERSONAL_ID)) {
 			try {
 				user = getUserBusiness(iwc).getUser(iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID));
 			} catch (FinderException e) {}
 		}
-		
+
 		Form form = getMainForm(iwc, company, user, iwrb.getLocalizedString("application.company_information", "Company information"), ACTION_PHASE_1,
 				iNumberOfPhases);
-		
+
 		Layer bottom = new Layer(Layer.DIV);
 		bottom.setStyleClass("bottom");
 		form.add(bottom);
@@ -157,10 +154,10 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		bottom.add(next);
 		add(form);
 	}
-	
+
 //	private void showOverview(IWContext iwc, int prevPhase, int currentPhase, int nextPhase, int iNumberOfPhases) throws RemoteException {
 //		Company company = null;
-//		
+//
 //		if (!iwc.isParameterSet(PARAMETER_AGREEMENT)) {
 //			setError(PARAMETER_AGREEMENT, iwrb.getLocalizedString("application_error.must_agree_terms", "You have to agree to the terms."));
 //		}
@@ -176,7 +173,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 //				setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.company_not_found",
 //						"The personal ID you have entered is not in the company register."));
 //			}
-//			
+//
 //			CompanyApplication application = null;
 //			try {
 //				application = getCompanyApplicationBusiness().getCompanyApplicationHome().findByCompany(company);
@@ -207,7 +204,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 //						"You have entered an invalid bank account number."));
 //			}
 //		}
-//		
+//
 //		User user = null;
 //		if (iwc.isParameterSet(PARAMETER_ADMIN_PERSONAL_ID)) {
 //			try {
@@ -254,44 +251,44 @@ public class CompanyApplicationCreator extends ApplicationForm {
 //		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(prevPhase));
 //		back.setToFormSubmit(form);
 //		bottom.add(back);
-//		
+//
 //		add(form);
 //	}
-	
+
 	private void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject, String parameter, String styleClass, boolean required) {
 		Layer formItem = new Layer(Layer.DIV);
 		formItem.setStyleClass("formItem");
 		if (!StringUtil.isEmpty(styleClass)) {
 			formItem.setStyleClass(styleClass);
 		}
-		
+
 		Label label = new Label(new Span(new Text(labelText)), interfaceObject);
 		formItem.add(label);
 		formItem.add(interfaceObject);
-		
+
 		if (required) {
 			formItem.setStyleClass("required");
 //			addRequiredFieldMark(formItem);
-			
+
 			if (hasError(parameter)) {
 				formItem.setStyleClass("hasError");
 			}
 		}
-		
+
 		container.add(formItem);
 	}
-	
+
 	protected void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject, String parameter, boolean required) {
 		addFormItem(container, labelText, interfaceObject, parameter, null, required);
 	}
-	
+
 	protected void addFormItem(Layer container, String labelText, InterfaceObject interfaceObject) {
 		addFormItem(container, labelText, interfaceObject, null, false);
 	}
-	
-	protected void addFormItems(Layer section, TextInput personalID, TextInput name, TextInput address, TextInput postalCode, TextInput city, TextInput phone, TextInput fax, TextInput webPage, TextInput email) {
+
+	protected void addFormItems(Layer section, TextInput personalID, TextInput name, TextInput address, TextInput postalCode, TextInput city, TextInput phone, TextInput fax, TextInput webPage, TextInput email, TextInput bankAccount) {
 		addFormItem(section, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID, PARAMETER_COMPANY_PERSONAL_ID, true);
-		
+
 		addFormItem(section, iwrb.getLocalizedString("name", "Name"), name);
 
 		addFormItem(section, iwrb.getLocalizedString("address", "Address"), address);
@@ -308,15 +305,17 @@ public class CompanyApplicationCreator extends ApplicationForm {
 
 		addFormItem(section, iwrb.getLocalizedString("email", "E-mail"), email, PARAMETER_EMAIL, true);
 
-		//addFormItem(section, iwrb.getLocalizedString("bank_account", "Bank account"), bankAccount, PARAMETER_BANK_ACCOUNT, true);		
+		if (bankAccount != null) {
+			addFormItem(section, iwrb.getLocalizedString("bank_account", "Bank account"), bankAccount, PARAMETER_BANK_ACCOUNT, true);
+		}
 	}
-	
+
 	protected Form getMainForm(IWContext iwc, Company company, User contactPerson, String phaseHeader, int phaseNumber, int iNumberOfPhases) {
 		Form form = createForm(phaseNumber);
 		form.setOnSubmit(new StringBuilder("showLoadingMessage('").append(iwrb.getLocalizedString("loading", "Loading...")).append("'); return false;")
 				.toString());
 		addErrors(iwc, form);
-		
+
 		//	Scripts
 		List<String> scripts = new ArrayList<String>();
 		scripts.add(CoreConstants.DWR_ENGINE_SCRIPT);
@@ -330,7 +329,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 
 		//	CSS
 		PresentationUtil.addStyleSheetToHeader(iwc, web2.getBundleUriToHumanizedMessagesStyleSheet());
-		
+
 		form.add(getPhasesHeader(phaseHeader, phaseNumber, iNumberOfPhases));
 
 		Layer info = new Layer(Layer.DIV);
@@ -377,7 +376,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			if (compAddress != null) {
 				compPostalCode = compAddress.getPostalCode();
 				compCity = compAddress.getCity();
-				
+
 				String compStreetAddress = compAddress.getStreetAddress();
 				address.setContent(StringUtil.isEmpty(compStreetAddress) ? CoreConstants.EMPTY : compStreetAddress);
 			}
@@ -423,7 +422,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 //		bankAccount.setContent(StringUtil.isEmpty(bankAccountNumber) ? BANK_ACCOUNT_DEFAULT : bankAccountNumber);
 //		bankAccount.keepStatusOnAction(true);
 
-		addFormItems(section, personalID, name, address, postalCode, city, phone, fax, webPage, email);
+		addFormItems(section, personalID, name, address, postalCode, city, phone, fax, webPage, email, null);
 
 		section.add(new CSSSpacer());
 
@@ -481,7 +480,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		addFormItem(section, iwrb.getLocalizedString("mobile_phone", "Mobile phone"), mobilePhone, PARAMETER_MOBILE_PHONE, true);
 
 		addFormItem(section, iwrb.getLocalizedString("email", "E-mail"), adminEmail, PARAMETER_ADMIN_EMAIL, true);
-		
+
 		section.add(new CSSSpacer());
 
 		heading = new Heading1(iwrb.getLocalizedString("application.agreement_info", "Agreement information"));
@@ -500,19 +499,19 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		paragraph.setStyleClass("agreement");
 		paragraph.add(new Text(iwrb.getLocalizedString("application.agreement", "Agreement text")));
 		section.add(paragraph);
-		
+
 		addFormItem(section, iwrb.getLocalizedString("application.agree_terms", "Yes, I agree"), agree, PARAMETER_AGREEMENT, "radioButtonItem", true);
 
 		form.add(adminPK);
 		form.add(new CSSSpacer());
-		
+
 		return form;
 	}
 
 	protected void save(IWContext iwc) throws RemoteException {
 		boolean success = true;
 		Company company = null;
-		
+
 		if (!iwc.isParameterSet(PARAMETER_AGREEMENT)) {
 			setError(PARAMETER_AGREEMENT, iwrb.getLocalizedString("application_error.must_agree_terms", "You have to agree to the terms."));
 		}
@@ -528,7 +527,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 				setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.company_not_found",
 						"The personal ID you have entered is not in the company register."));
 			}
-			
+
 			CompanyApplication application = null;
 			try {
 				application = getCompanyApplicationBusiness().getCompanyApplicationHome().findByCompany(company);
@@ -559,7 +558,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 						"You have entered an invalid bank account number."));
 			}
 		}*/
-		
+
 		User user = null;
 		if (iwc.isParameterSet(PARAMETER_ADMIN_PERSONAL_ID)) {
 			try {
@@ -589,7 +588,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			showPhaseOne(iwc, ACTION_SAVE, iNumberOfPhases);
 			return;
 		}
-		
+
 		CompanyType companyType = null;
 		if (iwc.isParameterSet(PARAMETER_TYPE)) {
 			try {
@@ -632,7 +631,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 				e.printStackTrace();
 			}
 //		}
-			
+
 //		if (company != null && !StringUtil.isEmpty(companyPersonalID)) {
 //			try {
 //				company = getCompanyBusiness(iwc).getCompany(companyPersonalID);
@@ -640,7 +639,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 //				e.printStackTrace();
 //			}
 //		}
-//		
+//
 //		if (company == null) {
 //			success = false;
 //		}
@@ -654,7 +653,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
-			
+
 			try {
 				Phone fax = userBusiness.getPhoneHome().create();
 				fax.setPhoneTypeId(PhoneTypeBMPBean.FAX_NUMBER_ID);
@@ -663,7 +662,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
-			
+
 			try {
 				Email email = userBusiness.getEmailHome().create();
 				email.setEmailAddress(companyEmail);
@@ -671,11 +670,11 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
-				
+
 			company.setWebPage(companyWebPage);
 //			company.setBankAccount(companyBankAccount);
 			company.store();
-			
+
 			User currentUser = null;
 			try {
 				currentUser = iwc.getCurrentUser();
@@ -690,7 +689,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 				success = false;
 				e.printStackTrace();
 			}
-			
+
 			if (application == null) {
 				success = false;
 			}
@@ -731,47 +730,47 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			bottom.add(link);
 		}
 	}
-	
+
 	protected CompanyApplicationBusiness getCompanyApplicationBusiness() {
 		try {
-			return (CompanyApplicationBusiness) IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),
+			return IBOLookup.getServiceInstance(IWMainApplication.getDefaultIWApplicationContext(),
 					CompanyApplicationBusiness.class);
 		} catch (IBOLookupException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	protected CompanyBusiness getCompanyBusiness(IWApplicationContext iwac) {
 		try {
-			return (CompanyBusiness) IBOLookup.getServiceInstance(iwac, CompanyBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, CompanyBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
 		}
 	}
-	
+
 //	private void addRequiredFieldMark(Layer container) {
 //		Span requiredText = new Span(new Text("*"));
 //		requiredText.setStyleClass("requiredFieldUserApp");
 //		requiredText.setToolTip(iwrb.getLocalizedString(requiredFieldLocalizationKey, requiredFieldLocalizationValue));
 //		container.add(requiredText);
-//	}	
-	
+//	}
+
 	private int parseAction(IWContext iwc) {
 		if (iwc.isParameterSet(PARAMETER_ACTION)) {
 			return Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
 		}
 		return ACTION_PHASE_1;
 	}
-	
+
 	private Form createForm(int phase) {
 		Form form = new Form();
 		form.setID("companyApplication");
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(phase)));
 		if (phase != ACTION_PHASE_1) {
 			form.maintainParameter(PARAMETER_AGREEMENT);
-			
+
 			form.maintainParameter(PARAMETER_ADDRESS);
 			//form.maintainParameter(PARAMETER_BANK_ACCOUNT);
 			form.maintainParameter(PARAMETER_CITY);
