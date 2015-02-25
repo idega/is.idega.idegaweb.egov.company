@@ -84,7 +84,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 	protected static final String PARAMETER_FAX = "prm_fax";
 	protected static final String PARAMETER_WEB_PAGE = "prm_web_page";
 	protected static final String PARAMETER_EMAIL = "prm_email";
-	protected static final String PARAMETER_BANK_ACCOUNT = "prm_bank_account";
+	//protected static final String PARAMETER_BANK_ACCOUNT = "prm_bank_account";
 
 	protected static final String PARAMETER_ADMIN_PK = "prm_admin_pk";
 	protected static final String PARAMETER_ADMIN_PERSONAL_ID = "prm_admin_personal_id";
@@ -289,7 +289,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		addFormItem(container, labelText, interfaceObject, null, false);
 	}
 	
-	protected void addFormItems(Layer section, TextInput personalID, TextInput name, TextInput address, TextInput postalCode, TextInput city, TextInput phone, TextInput fax, TextInput webPage, TextInput email, TextInput bankAccount) {
+	protected void addFormItems(Layer section, TextInput personalID, TextInput name, TextInput address, TextInput postalCode, TextInput city, TextInput phone, TextInput fax, TextInput webPage, TextInput email) {
 		addFormItem(section, iwrb.getLocalizedString("personal_id", "Personal ID"), personalID, PARAMETER_COMPANY_PERSONAL_ID, true);
 		
 		addFormItem(section, iwrb.getLocalizedString("name", "Name"), name);
@@ -308,7 +308,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 
 		addFormItem(section, iwrb.getLocalizedString("email", "E-mail"), email, PARAMETER_EMAIL, true);
 
-		addFormItem(section, iwrb.getLocalizedString("bank_account", "Bank account"), bankAccount, PARAMETER_BANK_ACCOUNT, true);		
+		//addFormItem(section, iwrb.getLocalizedString("bank_account", "Bank account"), bankAccount, PARAMETER_BANK_ACCOUNT, true);		
 	}
 	
 	protected Form getMainForm(IWContext iwc, Company company, User contactPerson, String phaseHeader, int phaseNumber, int iNumberOfPhases) {
@@ -414,16 +414,16 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		email.setID("companyEmail");
 		email.keepStatusOnAction(true);
 
-		TextInput bankAccount = new TextInput(PARAMETER_BANK_ACCOUNT);
-		bankAccount.setID("companyBankAccount");
-		String bankAccountNumber = BANK_ACCOUNT_DEFAULT;
-		if (company != null) {
-			bankAccountNumber = company.getBankAccount();
-		}
-		bankAccount.setContent(StringUtil.isEmpty(bankAccountNumber) ? BANK_ACCOUNT_DEFAULT : bankAccountNumber);
-		bankAccount.keepStatusOnAction(true);
+//		TextInput bankAccount = new TextInput(PARAMETER_BANK_ACCOUNT);
+//		bankAccount.setID("companyBankAccount");
+//		String bankAccountNumber = BANK_ACCOUNT_DEFAULT;
+//		if (company != null) {
+//			bankAccountNumber = company.getBankAccount();
+//		}
+//		bankAccount.setContent(StringUtil.isEmpty(bankAccountNumber) ? BANK_ACCOUNT_DEFAULT : bankAccountNumber);
+//		bankAccount.keepStatusOnAction(true);
 
-		addFormItems(section, personalID, name, address, postalCode, city, phone, fax, webPage, email, bankAccount);
+		addFormItems(section, personalID, name, address, postalCode, city, phone, fax, webPage, email);
 
 		section.add(new CSSSpacer());
 
@@ -547,7 +547,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		else if (!EmailValidator.getInstance().validateEmail(iwc.getParameter(PARAMETER_EMAIL))) {
 			setError(PARAMETER_EMAIL, iwrb.getLocalizedString("application_error.invalid_email", "You have entered an invalid e-mail address."));
 		}
-		if (!iwc.isParameterSet(PARAMETER_BANK_ACCOUNT) || iwc.getParameter(PARAMETER_BANK_ACCOUNT).equals(BANK_ACCOUNT_DEFAULT)) {
+		/*if (!iwc.isParameterSet(PARAMETER_BANK_ACCOUNT) || iwc.getParameter(PARAMETER_BANK_ACCOUNT).equals(BANK_ACCOUNT_DEFAULT)) {
 			setError(PARAMETER_BANK_ACCOUNT, iwrb.getLocalizedString("application_error.must_enter_bank_account", "You have to enter a bank account."));
 		}
 		else {
@@ -558,7 +558,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 				setError(PARAMETER_BANK_ACCOUNT, iwrb.getLocalizedString("application_error.invalid_bank_account_number",
 						"You have entered an invalid bank account number."));
 			}
-		}
+		}*/
 		
 		User user = null;
 		if (iwc.isParameterSet(PARAMETER_ADMIN_PERSONAL_ID)) {
@@ -604,7 +604,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		String companyFax = iwc.isParameterSet(PARAMETER_FAX) ? iwc.getParameter(PARAMETER_FAX) : null;
 		String companyWebPage = iwc.isParameterSet(PARAMETER_WEB_PAGE) ? iwc.getParameter(PARAMETER_WEB_PAGE) : null;
 		String companyEmail = iwc.isParameterSet(PARAMETER_EMAIL) ? iwc.getParameter(PARAMETER_EMAIL) : null;
-		String companyBankAccount = iwc.isParameterSet(PARAMETER_BANK_ACCOUNT) ? iwc.getParameter(PARAMETER_BANK_ACCOUNT) : null;
+		//String companyBankAccount = iwc.isParameterSet(PARAMETER_BANK_ACCOUNT) ? iwc.getParameter(PARAMETER_BANK_ACCOUNT) : null;
 
 //		String adminPersonalID = iwc.isParameterSet(PARAMETER_ADMIN_PERSONAL_ID) ? iwc.getParameter(PARAMETER_ADMIN_PERSONAL_ID) : null;
 		String adminWorkPhone = iwc.isParameterSet(PARAMETER_WORK_PHONE) ? iwc.getParameter(PARAMETER_WORK_PHONE) : null;
@@ -673,7 +673,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			}
 				
 			company.setWebPage(companyWebPage);
-			company.setBankAccount(companyBankAccount);
+//			company.setBankAccount(companyBankAccount);
 			company.store();
 			
 			User currentUser = null;
@@ -773,7 +773,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 			form.maintainParameter(PARAMETER_AGREEMENT);
 			
 			form.maintainParameter(PARAMETER_ADDRESS);
-			form.maintainParameter(PARAMETER_BANK_ACCOUNT);
+			//form.maintainParameter(PARAMETER_BANK_ACCOUNT);
 			form.maintainParameter(PARAMETER_CITY);
 			form.maintainParameter(PARAMETER_EMAIL);
 			form.maintainParameter(PARAMETER_FAX);
