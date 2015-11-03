@@ -1,10 +1,5 @@
 package is.idega.idegaweb.egov.company.presentation.employee;
 
-import is.idega.idegaweb.egov.citizen.presentation.CitizenAccountPreferences;
-import is.idega.idegaweb.egov.company.EgovCompanyConstants;
-import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
-import is.idega.idegaweb.egov.company.business.CompanyPortalBusiness;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +22,16 @@ import com.idega.presentation.Layer;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.TextInput;
-import com.idega.user.business.UserBusiness;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.CoreConstants;
 import com.idega.util.PresentationUtil;
 import com.idega.util.expression.ELUtil;
+
+import is.idega.idegaweb.egov.citizen.presentation.CitizenAccountPreferences;
+import is.idega.idegaweb.egov.company.EgovCompanyConstants;
+import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
+import is.idega.idegaweb.egov.company.business.CompanyPortalBusiness;
 
 public class CompanyContactPreferences extends CitizenAccountPreferences implements IWPageEventListener {
 
@@ -114,7 +113,7 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 
 	private CompanyBusiness getCompanyBusiness(IWApplicationContext iwac) {
 		try {
-			return (CompanyBusiness) IBOLookup.getServiceInstance(iwac, CompanyBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, CompanyBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
@@ -131,16 +130,7 @@ public class CompanyContactPreferences extends CitizenAccountPreferences impleme
 
 	protected CompanyApplicationBusiness getCompanyApplicationBusiness(IWApplicationContext iwac) {
 		try {
-			return (CompanyApplicationBusiness) IBOLookup.getServiceInstance(iwac, CompanyApplicationBusiness.class);
-		}
-		catch (IBOLookupException ile) {
-			throw new IBORuntimeException(ile);
-		}
-	}
-
-	private UserBusiness getUserBusiness(IWApplicationContext iwac) {
-		try {
-			return (UserBusiness) IBOLookup.getServiceInstance(iwac, UserBusiness.class);
+			return IBOLookup.getServiceInstance(iwac, CompanyApplicationBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);
