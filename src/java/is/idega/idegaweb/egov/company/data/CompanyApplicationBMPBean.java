@@ -1,8 +1,5 @@
 package is.idega.idegaweb.egov.company.data;
 
-import is.idega.idegaweb.egov.application.data.ApplicationCategory;
-import is.idega.idegaweb.egov.company.EgovCompanyConstants;
-
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Locale;
@@ -13,6 +10,7 @@ import javax.ejb.FinderException;
 import com.idega.block.process.data.AbstractCaseBMPBean;
 import com.idega.block.process.data.CaseCode;
 import com.idega.block.text.data.LocalizedText;
+import com.idega.block.text.model.LocalizedTextModel;
 import com.idega.company.data.Company;
 import com.idega.company.data.CompanyType;
 import com.idega.core.file.data.ICFile;
@@ -25,6 +23,9 @@ import com.idega.data.query.SelectQuery;
 import com.idega.data.query.Table;
 import com.idega.user.data.Group;
 import com.idega.user.data.User;
+
+import is.idega.idegaweb.egov.application.data.ApplicationCategory;
+import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 
 /**
  *
@@ -461,11 +462,17 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 
 	@Override
 	public void setPaymentRequired(boolean isPaymentRequired) {
-		throw new UnsupportedOperationException("Not implemented yet!");		
+		throw new UnsupportedOperationException("Not implemented yet!");
 	}
 
 	@Override
 	public boolean isPaymentRequired() {
 		throw new UnsupportedOperationException("Not implemented yet!");
 	}
+
+	@Override
+	public <T extends LocalizedTextModel, L extends Collection<T>> L getLocalizedTexts() {
+		return null;
+	}
+
 }
