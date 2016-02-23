@@ -475,4 +475,14 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		return null;
 	}
 
+	@Override
+	public String getLocalizedName() {
+		return null;
+	}
+
+	@Override
+	public String getLocalizedName(int icLocaleId) {
+		return null;
+	}
+
 }
