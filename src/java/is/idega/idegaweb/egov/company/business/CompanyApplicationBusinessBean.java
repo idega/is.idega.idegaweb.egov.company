@@ -1,25 +1,5 @@
 package is.idega.idegaweb.egov.company.business;
 
-import is.idega.block.nationalregister.webservice.client.business.CompanyHolder;
-import is.idega.block.nationalregister.webservice.client.business.SkyrrClient;
-import is.idega.block.nationalregister.webservice.client.business.UserHolder;
-import is.idega.idegaweb.egov.accounting.business.CitizenBusiness;
-import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
-import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
-import is.idega.idegaweb.egov.application.data.Application;
-import is.idega.idegaweb.egov.citizen.business.WSCitizenAccountBusinessBean;
-import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurLocator;
-import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurSoap;
-import is.idega.idegaweb.egov.citizen.wsclient.landsbankinn.SendLoginDataBusiness;
-import is.idega.idegaweb.egov.company.EgovCompanyConstants;
-import is.idega.idegaweb.egov.company.bean.AdminUser;
-import is.idega.idegaweb.egov.company.bean.CompanyInfo;
-import is.idega.idegaweb.egov.company.data.CompanyApplication;
-import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
-import is.idega.idegaweb.egov.company.data.CompanyEmployee;
-import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
-import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,9 +29,9 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.client.Stub;
 import org.apache.axis.configuration.FileProvider;
-import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.handler.WSHandlerConstants;
+import org.apache.wss4j.common.ext.WSPasswordCallback;
+import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.pdf.business.PrintingContext;
@@ -108,6 +88,26 @@ import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
 import com.idega.util.text.Name;
 import com.idega.util.text.SocialSecurityNumber;
+
+import is.idega.block.nationalregister.webservice.client.business.CompanyHolder;
+import is.idega.block.nationalregister.webservice.client.business.SkyrrClient;
+import is.idega.block.nationalregister.webservice.client.business.UserHolder;
+import is.idega.idegaweb.egov.accounting.business.CitizenBusiness;
+import is.idega.idegaweb.egov.application.business.ApplicationBusiness;
+import is.idega.idegaweb.egov.application.business.ApplicationBusinessBean;
+import is.idega.idegaweb.egov.application.data.Application;
+import is.idega.idegaweb.egov.citizen.business.WSCitizenAccountBusinessBean;
+import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurLocator;
+import is.idega.idegaweb.egov.citizen.wsclient.arion.BirtingurSoap;
+import is.idega.idegaweb.egov.citizen.wsclient.landsbankinn.SendLoginDataBusiness;
+import is.idega.idegaweb.egov.company.EgovCompanyConstants;
+import is.idega.idegaweb.egov.company.bean.AdminUser;
+import is.idega.idegaweb.egov.company.bean.CompanyInfo;
+import is.idega.idegaweb.egov.company.data.CompanyApplication;
+import is.idega.idegaweb.egov.company.data.CompanyApplicationHome;
+import is.idega.idegaweb.egov.company.data.CompanyEmployee;
+import is.idega.idegaweb.egov.company.data.CompanyEmployeeHome;
+import is.idega.idegaweb.egov.message.business.CommuneMessageBusiness;
 
 public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		implements CompanyApplicationBusiness, CallbackHandler {
@@ -378,7 +378,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			stub._setProperty(WSHandlerConstants.USER, userId);
 			stub._setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, this
 					.getClass().getName());
-			stub._setProperty(WSHandlerConstants.ADD_UT_ELEMENTS,
+			stub._setProperty(WSHandlerConstants.ADD_USERNAMETOKEN_NONCE,
 					"Nonce Created");
 			stub._setProperty(WSHandlerConstants.TIMESTAMP,
 					IWTimestamp.getTimestampRightNow());
@@ -1848,7 +1848,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		for (int i = 0; i < callbacks.length; i++) {
 			if (callbacks[i] instanceof WSPasswordCallback) {
 				WSPasswordCallback pc = (WSPasswordCallback) callbacks[i];
-				if (pc.getIdentifer().equals(userId)) {
+				if (pc.getIdentifier().equals(userId)) {
 					pc.setPassword(passwd);
 				}
 			} else {
