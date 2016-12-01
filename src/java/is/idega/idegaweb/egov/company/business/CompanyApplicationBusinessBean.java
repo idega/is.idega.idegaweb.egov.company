@@ -29,9 +29,9 @@ import javax.xml.rpc.ServiceException;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.client.Stub;
 import org.apache.axis.configuration.FileProvider;
-import org.apache.wss4j.common.ext.WSPasswordCallback;
-import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSPasswordCallback;
+import org.apache.ws.security.handler.WSHandlerConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.pdf.business.PrintingContext;
@@ -378,7 +378,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			stub._setProperty(WSHandlerConstants.USER, userId);
 			stub._setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, this
 					.getClass().getName());
-			stub._setProperty(WSHandlerConstants.ADD_USERNAMETOKEN_NONCE,
+			stub._setProperty(WSHandlerConstants.ADD_UT_ELEMENTS,
 					"Nonce Created");
 			stub._setProperty(WSHandlerConstants.TIMESTAMP,
 					IWTimestamp.getTimestampRightNow());
