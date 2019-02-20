@@ -1,6 +1,7 @@
 package is.idega.idegaweb.egov.company.presentation.institution;
 
 import is.idega.idegaweb.egov.application.data.Application;
+import is.idega.idegaweb.egov.application.data.dao.ApplicationDAO;
 import is.idega.idegaweb.egov.application.presentation.ApplicationCreator;
 import is.idega.idegaweb.egov.company.EgovCompanyConstants;
 import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
@@ -19,6 +20,8 @@ import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -47,7 +50,18 @@ import com.idega.util.expression.ELUtil;
 public class ServicesRegister extends ApplicationCreator {
 	
 	private static final String SELECTED_GROUPS_PARAMETER_NAME = "prm_selected_groups_for_application";
-	
+
+	@Autowired
+	private ApplicationDAO applicationDAO;
+
+	private ApplicationDAO getApplicationDAO() {
+		if (this.applicationDAO == null) {
+			ELUtil.getInstance().autowire(this);
+		}
+
+		return this.applicationDAO;
+	}
+
 	public ServicesRegister() {
 		setRequiresLogin(true);
 		setVisibleApplication(true);
@@ -182,6 +196,9 @@ public class ServicesRegister extends ApplicationCreator {
 		for (Group group: groupsForApp) {
 			try {
 				app.addGroup(group);
+				getApplicationDAO().insert(
+						(Integer) app.getPrimaryKey(), 
+						(Integer) group.getPrimaryKey());
 			} catch(IDOAddRelationshipException e) {
 				Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error adding group " + group + " to application: " + app, e);
 			}
