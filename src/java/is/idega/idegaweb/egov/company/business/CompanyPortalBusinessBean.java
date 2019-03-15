@@ -1,8 +1,5 @@
 package is.idega.idegaweb.egov.company.business;
 
-import is.idega.idegaweb.egov.company.EgovCompanyConstants;
-import is.idega.idegaweb.egov.company.data.CompanyApplication;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,6 +41,9 @@ import com.idega.util.CoreUtil;
 import com.idega.util.ListUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
+
+import is.idega.idegaweb.egov.company.EgovCompanyConstants;
+import is.idega.idegaweb.egov.company.data.CompanyApplication;
 
 @Scope(BeanDefinition.SCOPE_SINGLETON)
 @Service(CompanyPortalBusiness.SPRING_BEAN_IDENTIFIER)
@@ -90,7 +90,6 @@ public class CompanyPortalBusinessBean extends DefaultSpringBean implements Comp
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public Group getGroupByName(Group parentGroup, String name, String personalID) {
 		if (parentGroup == null || StringUtil.isEmpty(name)) {
 			return null;
@@ -353,7 +352,6 @@ public class CompanyPortalBusinessBean extends DefaultSpringBean implements Comp
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<Group> getAllChildGroupsByType(Group group, String type) {
 		if (group == null || StringUtil.isEmpty(type)) {
 			return null;
@@ -577,7 +575,7 @@ public class CompanyPortalBusinessBean extends DefaultSpringBean implements Comp
 			return null;
 		}
 
-		ICTreeNode parentGroupNode = group.getParentNode();
+		ICTreeNode<?> parentGroupNode = group.getParentNode();
 		if (parentGroupNode == null) {
 			return null;
 		}
@@ -746,17 +744,19 @@ public class CompanyPortalBusinessBean extends DefaultSpringBean implements Comp
 			} else {
 				getLogger().info("Found user (" + user + ") by personal ID (" + personalId + "), will look for the company for this user");
 				company = getCompanyForUser(user);
-				if (company == null)
+				if (company == null) {
 					getLogger().warning("Company does not exist for the user " + user);
-				else
+				} else {
 					getLogger().info("Found company (" + company + ") for user " + user);
+				}
 			}
 		} else {
 			getLogger().info("Found company (" + company + ") by ID " + personalId);
 		}
 
-		if (company == null)
+		if (company == null) {
 			getLogger().warning("Unable to find company for the personal ID: " + personalId);
+		}
 
 		return company;
 	}
