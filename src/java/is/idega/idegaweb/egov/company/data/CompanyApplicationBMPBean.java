@@ -494,4 +494,13 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	public void setShowInIframe(Boolean showInIframe) {
 	}
 
+	@Override
+	public void setIdentifierPrefix(String prefix) {
+	}
+
+	@Override
+	public String getIdentifierPrefix() {
+		return null;
+	}
+
 }
