@@ -1707,37 +1707,41 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			}
 
 			if (company == null) {
-				CompanyHolder holder = getSkyrrClient().getCompany(
-						companyUniqueId);
-				if (holder != null) {
-					try {
-						getCompanyRegisterBusiness().updateEntry(
-								holder.getPersonalID(), null,
-								holder.getPostalCode(), null, null,
-								holder.getName(), holder.getAddress(),
-								holder.getPersonalID(), "", null,
-								holder.getVatNumber(), holder.getAddress(), "",
-								null, null, null, null, null, "", null);
-					} catch (RemoteException e) {
-						e.printStackTrace();
-					}
-				} else if (useIndividualWS) {
-					UserHolder userHolder = getSkyrrClient().getUser(
+				try {
+					CompanyHolder holder = getSkyrrClient().getCompany(
 							companyUniqueId);
-					if (userHolder != null) {
+					if (holder != null) {
 						try {
 							getCompanyRegisterBusiness().updateEntry(
-									userHolder.getPersonalID(), null,
-									userHolder.getPostalCode(), null, null,
-									userHolder.getName(),
-									userHolder.getAddress(),
-									userHolder.getPersonalID(), "", null, null,
-									userHolder.getAddress(), "", null, null,
-									null, null, null, "", null);
+									holder.getPersonalID(), null,
+									holder.getPostalCode(), null, null,
+									holder.getName(), holder.getAddress(),
+									holder.getPersonalID(), "", null,
+									holder.getVatNumber(), holder.getAddress(), "",
+									null, null, null, null, null, "", null);
 						} catch (RemoteException e) {
 							e.printStackTrace();
 						}
+					} else if (useIndividualWS) {
+						UserHolder userHolder = getSkyrrClient().getUser(
+								companyUniqueId);
+						if (userHolder != null) {
+							try {
+								getCompanyRegisterBusiness().updateEntry(
+										userHolder.getPersonalID(), null,
+										userHolder.getPostalCode(), null, null,
+										userHolder.getName(),
+										userHolder.getAddress(),
+										userHolder.getPersonalID(), "", null, null,
+										userHolder.getAddress(), "", null, null,
+										null, null, null, "", null);
+							} catch (RemoteException e) {
+								e.printStackTrace();
+							}
+						}
 					}
+				} catch (Exception e) {
+					getLogger().log(Level.WARNING, "Failed to get company address from Skyrr serivice, cause of:", e);
 				}
 			}
 		}
