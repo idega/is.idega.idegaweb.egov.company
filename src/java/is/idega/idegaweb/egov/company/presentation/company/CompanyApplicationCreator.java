@@ -444,7 +444,7 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		adminPK.keepStatusOnAction(true);
 
 		TextInput adminPersonalID = new TextInput(PARAMETER_ADMIN_PERSONAL_ID);
-//		adminPersonalID.setID("userPersonalID");
+		adminPersonalID.setID("userPersonalID");
 		adminPersonalID.keepStatusOnAction(true);
 		adminPersonalID.setOnKeyUp(new StringBuilder("CompanyApplicationCreator.getContactPersonInformation(event, '").append(adminPersonalID.getId())
 										.append("', '").append(iwrb.getLocalizedString("user_not_found", "Sorry, unable to find user by provided ID"))

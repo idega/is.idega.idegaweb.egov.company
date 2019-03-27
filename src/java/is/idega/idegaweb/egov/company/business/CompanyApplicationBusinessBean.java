@@ -1696,60 +1696,89 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				.getBoolean(ALLOW_INDIVIDUALS_FOR_COMPANY_LOOKUP, false);
 
 		Company company = null;
+		
+		try {
+			company = companyBusiness.getCompany(companyUniqueId);
+		} catch (RemoteException e) {
+			getLogger().log(
+					Level.WARNING, 
+					String.format("Failed to get company by id %s", companyUniqueId), e);
+		} catch (FinderException e) {
+			company = null;
+		}
 
 		if (useWS) {
-			try {
-				company = companyBusiness.getCompany(companyUniqueId);
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			} catch (FinderException e) {
-				company = null;
-			}
-
 			if (company == null) {
+				String personalId = null;
+				String postalCode = null;
+				String name = null;
+				String address = null;
+				String vatNumber = null;
+
 				try {
-					CompanyHolder holder = getSkyrrClient().getCompany(
-							companyUniqueId);
+					CompanyHolder holder = getSkyrrClient().getCompany(companyUniqueId);
 					if (holder != null) {
-						try {
-							getCompanyRegisterBusiness().updateEntry(
-									holder.getPersonalID(), null,
-									holder.getPostalCode(), null, null,
-									holder.getName(), holder.getAddress(),
-									holder.getPersonalID(), "", null,
-									holder.getVatNumber(), holder.getAddress(), "",
-									null, null, null, null, null, "", null);
-						} catch (RemoteException e) {
-							e.printStackTrace();
-						}
-					} else if (useIndividualWS) {
+						personalId = holder.getPersonalID();
+						postalCode = holder.getPostalCode();
+						name = holder.getName();
+						address = holder.getAddress();
+						vatNumber = holder.getVatNumber();
+					}
+				} catch (Exception e) {
+					getLogger().log(Level.WARNING, "Failed to get company address from Skyrr, cause of:", e);
+				}
+
+				try {
+					if (useIndividualWS) {
 						UserHolder userHolder = getSkyrrClient().getUser(
 								companyUniqueId);
 						if (userHolder != null) {
-							try {
-								getCompanyRegisterBusiness().updateEntry(
-										userHolder.getPersonalID(), null,
-										userHolder.getPostalCode(), null, null,
-										userHolder.getName(),
-										userHolder.getAddress(),
-										userHolder.getPersonalID(), "", null, null,
-										userHolder.getAddress(), "", null, null,
-										null, null, null, "", null);
-							} catch (RemoteException e) {
-								e.printStackTrace();
+							if (StringUtil.isEmpty(personalId)) {
+								personalId = userHolder.getPersonalID();
+							}
+	
+							if (StringUtil.isEmpty(postalCode)) {
+								postalCode = userHolder.getPostalCode();
+							}
+	
+							if (StringUtil.isEmpty(name)) {
+								name = userHolder.getName();
+							}
+	
+							if (StringUtil.isEmpty(address)) {
+								address = userHolder.getAddress();
 							}
 						}
 					}
 				} catch (Exception e) {
 					getLogger().log(Level.WARNING, "Failed to get company address from Skyrr, cause of:", e);
 				}
+
+				try {
+					getCompanyRegisterBusiness().updateEntry(
+							personalId, null, postalCode, null, null, name, 
+							address, personalId, "", null, vatNumber, 
+							address, "", null, null, null, null, null, "", null);
+				} catch (Exception e) {
+					getLogger().log(Level.WARNING, 
+							"Failed to create company record by user in ePlatform, cause of:", e);
+				}
 			}
 		}
 
-		try {
-			if (company == null) {
+		if (company == null) {
+			try {
 				company = companyBusiness.getCompany(companyUniqueId);
+			} catch (RemoteException e) {
+				getLogger().log(
+						Level.WARNING, 
+						String.format("Failed to get company by id %s", companyUniqueId), e);
+			} catch (FinderException e) {
+				company = null;
 			}
+		}
+
+		if (company != null) {
 			Address address = company.getAddress();
 			PostalCode code = address != null ? address.getPostalCode() : null;
 			Phone phone = company.getPhone();
@@ -1795,16 +1824,11 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			} else {
 				companyInfo.setBankAccount(company.getBankAccount());
 			}
-		} catch (FinderException fe) {
-			logger.log(Level.INFO, "Company was not found by provided ID: "
-					+ companyUniqueId);
-			return null;
-		} catch (RemoteException re) {
-			re.printStackTrace();
-			return null;
+
+			return companyInfo;
 		}
 
-		return companyInfo;
+		return null;
 	}
 
 	private CompanyPortalBusiness getCompanyPortalBusiness(
