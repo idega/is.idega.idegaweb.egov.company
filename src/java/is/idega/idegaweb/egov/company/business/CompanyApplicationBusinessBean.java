@@ -467,20 +467,24 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		xml.append(password);
 		xml.append("</Field>\n");
 		xml.append("\t\t\t<Field Name=\"PageLink\">");
-		if (pageLink != null)
+		if (pageLink != null) {
 			xml.append(pageLink);
+		}
 		xml.append("</Field>\n");
 		xml.append("\t\t\t<Field Name=\"Logo\">");
-		if (logo != null)
+		if (logo != null) {
 			xml.append(logo);
+		}
 		xml.append("</Field>\n");
 		xml.append("\t\t\t<Field Name=\"Mayor\">");
-		if (mayor != null)
+		if (mayor != null) {
 			xml.append(mayor);
+		}
 		xml.append("</Field>\n");
 		xml.append("\t\t\t<Field Name=\"Signature\">");
-		if (signature != null)
+		if (signature != null) {
 			xml.append(signature);
+		}
 		xml.append("</Field>\n");
 		xml.append("\t\t</Section>\n");
 		xml.append("\t</Statement>\n");
@@ -1696,12 +1700,12 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				.getBoolean(ALLOW_INDIVIDUALS_FOR_COMPANY_LOOKUP, false);
 
 		Company company = null;
-		
+
 		try {
 			company = companyBusiness.getCompany(companyUniqueId);
 		} catch (RemoteException e) {
 			getLogger().log(
-					Level.WARNING, 
+					Level.WARNING,
 					String.format("Failed to get company by id %s", companyUniqueId), e);
 		} catch (FinderException e) {
 			company = null;
@@ -1725,42 +1729,41 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 						vatNumber = holder.getVatNumber();
 					}
 				} catch (Exception e) {
-					getLogger().log(Level.WARNING, "Failed to get company address from Skyrr, cause of:", e);
+					getLogger().log(Level.WARNING, "Failed to get company's info from Skyrr for personal ID: " + companyUniqueId, e);
 				}
 
 				try {
 					if (useIndividualWS) {
-						UserHolder userHolder = getSkyrrClient().getUser(
-								companyUniqueId);
+						UserHolder userHolder = getSkyrrClient().getUser(companyUniqueId);
 						if (userHolder != null) {
 							if (StringUtil.isEmpty(personalId)) {
 								personalId = userHolder.getPersonalID();
 							}
-	
+
 							if (StringUtil.isEmpty(postalCode)) {
 								postalCode = userHolder.getPostalCode();
 							}
-	
+
 							if (StringUtil.isEmpty(name)) {
 								name = userHolder.getName();
 							}
-	
+
 							if (StringUtil.isEmpty(address)) {
 								address = userHolder.getAddress();
 							}
 						}
 					}
 				} catch (Exception e) {
-					getLogger().log(Level.WARNING, "Failed to get company address from Skyrr, cause of:", e);
+					getLogger().log(Level.WARNING, "Failed to get user's info from Skyrr by personal ID: " + companyUniqueId, e);
 				}
 
 				try {
 					getCompanyRegisterBusiness().updateEntry(
-							personalId, null, postalCode, null, null, name, 
-							address, personalId, "", null, vatNumber, 
+							personalId, null, postalCode, null, null, name,
+							address, personalId, "", null, vatNumber,
 							address, "", null, null, null, null, null, "", null);
 				} catch (Exception e) {
-					getLogger().log(Level.WARNING, 
+					getLogger().log(Level.WARNING,
 							"Failed to create company record by user in ePlatform, cause of:", e);
 				}
 			}
@@ -1771,7 +1774,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				company = companyBusiness.getCompany(companyUniqueId);
 			} catch (RemoteException e) {
 				getLogger().log(
-						Level.WARNING, 
+						Level.WARNING,
 						String.format("Failed to get company by id %s", companyUniqueId), e);
 			} catch (FinderException e) {
 				company = null;
