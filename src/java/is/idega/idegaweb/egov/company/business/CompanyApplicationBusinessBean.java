@@ -1711,11 +1711,13 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			company = null;
 		}
 
+		String name = null;
+		String companyName = company == null ? null : company.getName();
+
 		if (useWS) {
-			if (company == null) {
+			if (company == null || StringUtil.isEmpty(companyName)) {
 				String personalId = null;
 				String postalCode = null;
-				String name = null;
 				String address = null;
 				String vatNumber = null;
 
@@ -1789,7 +1791,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			Email email = company.getEmail();
 
 			companyInfo.setPK(company.getPrimaryKey().toString());
-			companyInfo.setName(company.getName());
+			companyName = company.getName();
+			companyInfo.setName(StringUtil.isEmpty(companyName) ? name : companyName);
 			if (address != null) {
 				companyInfo.setAddress(address.getStreetAddress());
 			}
