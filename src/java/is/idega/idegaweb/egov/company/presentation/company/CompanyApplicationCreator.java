@@ -1,10 +1,5 @@
 package is.idega.idegaweb.egov.company.presentation.company;
 
-import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
-import is.idega.idegaweb.egov.company.EgovCompanyConstants;
-import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
-import is.idega.idegaweb.egov.company.data.CompanyApplication;
-
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +23,7 @@ import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWMainApplicationSettings;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.CSSSpacer;
 import com.idega.presentation.IWContext;
@@ -50,6 +46,11 @@ import com.idega.util.EmailValidator;
 import com.idega.util.PresentationUtil;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
+
+import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
+import is.idega.idegaweb.egov.company.EgovCompanyConstants;
+import is.idega.idegaweb.egov.company.business.CompanyApplicationBusiness;
+import is.idega.idegaweb.egov.company.data.CompanyApplication;
 
 /**
  * Application (and case) for company creator
@@ -483,24 +484,26 @@ public class CompanyApplicationCreator extends ApplicationForm {
 
 		section.add(new CSSSpacer());
 
-		heading = new Heading1(iwrb.getLocalizedString("application.agreement_info", "Agreement information"));
-		heading.setStyleClass("subHeader");
-		form.add(heading);
+		if (isAgreementShown(iwc)) {
+			heading = new Heading1(iwrb.getLocalizedString("application.agreement_info", "Agreement information"));
+			heading.setStyleClass("subHeader");
+			form.add(heading);
 
-		section = new Layer(Layer.DIV);
-		section.setStyleClass("formSection");
-		form.add(section);
+			section = new Layer(Layer.DIV);
+			section.setStyleClass("formSection");
+			form.add(section);
 
-		CheckBox agree = new CheckBox(PARAMETER_AGREEMENT, Boolean.TRUE.toString());
-		agree.setStyleClass("checkbox");
-		agree.keepStatusOnAction(true);
+			CheckBox agree = new CheckBox(PARAMETER_AGREEMENT, Boolean.TRUE.toString());
+			agree.setStyleClass("checkbox");
+			agree.keepStatusOnAction(true);
 
-		Paragraph paragraph = new Paragraph();
-		paragraph.setStyleClass("agreement");
-		paragraph.add(new Text(iwrb.getLocalizedString("application.agreement", "Agreement text")));
-		section.add(paragraph);
+			Paragraph paragraph = new Paragraph();
+			paragraph.setStyleClass("agreement");
+			paragraph.add(new Text(iwrb.getLocalizedString("application.agreement", "Agreement text")));
+			section.add(paragraph);
 
-		addFormItem(section, iwrb.getLocalizedString("application.agree_terms", "Yes, I agree"), agree, PARAMETER_AGREEMENT, "radioButtonItem", true);
+			addFormItem(section, iwrb.getLocalizedString("application.agree_terms", "Yes, I agree"), agree, PARAMETER_AGREEMENT, "radioButtonItem", true);
+		}
 
 		form.add(adminPK);
 		form.add(new CSSSpacer());
@@ -508,12 +511,19 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		return form;
 	}
 
+	private boolean isAgreementShown(IWContext iwc) {
+		IWMainApplicationSettings settings = iwc == null ? IWMainApplication.getDefaultIWMainApplication().getSettings() : iwc.getApplicationSettings();
+		return settings.getBoolean("cac.show_agreement", false);
+	}
+
 	protected void save(IWContext iwc) throws RemoteException {
 		boolean success = true;
 		Company company = null;
 
-		if (!iwc.isParameterSet(PARAMETER_AGREEMENT)) {
-			setError(PARAMETER_AGREEMENT, iwrb.getLocalizedString("application_error.must_agree_terms", "You have to agree to the terms."));
+		if (isAgreementShown(iwc)) {
+			if (!iwc.isParameterSet(PARAMETER_AGREEMENT)) {
+				setError(PARAMETER_AGREEMENT, iwrb.getLocalizedString("application_error.must_agree_terms", "You have to agree to the terms."));
+			}
 		}
 		if (!iwc.isParameterSet(PARAMETER_COMPANY_PERSONAL_ID)) {
 			setError(PARAMETER_COMPANY_PERSONAL_ID, iwrb.getLocalizedString("application_error.must_enter_personal_id",
@@ -769,7 +779,9 @@ public class CompanyApplicationCreator extends ApplicationForm {
 		form.setID("companyApplication");
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(phase)));
 		if (phase != ACTION_PHASE_1) {
-			form.maintainParameter(PARAMETER_AGREEMENT);
+			if (isAgreementShown(null)) {
+				form.maintainParameter(PARAMETER_AGREEMENT);
+			}
 
 			form.maintainParameter(PARAMETER_ADDRESS);
 			//form.maintainParameter(PARAMETER_BANK_ACCOUNT);
