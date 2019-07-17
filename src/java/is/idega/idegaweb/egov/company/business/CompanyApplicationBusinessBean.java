@@ -1674,10 +1674,35 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		return null;
 	}
 
+	private CompanyHolder getCompanyInfo(String companyUniqueId) {
+		try {
+			CompanyHolder holder = getSkyrrClient().getCompany(companyUniqueId);
+			return holder;
+		} catch (Exception e) {
+			getLogger().log(Level.WARNING, "Failed to get company's info from Skyrr for personal ID: " + companyUniqueId, e);
+		}
+		return null;
+	}
+
+	private UserHolder getPersonInfo(String companyUniqueId) {
+		try {
+			UserHolder userHolder = getSkyrrClient().getUser(companyUniqueId);
+			return userHolder;
+		} catch (Exception e) {
+			getLogger().log(Level.WARNING, "Failed to get user's info from Skyrr by personal ID: " + companyUniqueId, e);
+		}
+		return null;
+	}
+
 	@Override
-	public CompanyInfo getCompany(String companyUniqueId, String companyPhone,
-			String companyFax, String companyEmail, String companyWebpage,
-			String companyBankAccount) {
+	public CompanyInfo getCompany(
+			String companyUniqueId,
+			String companyPhone,
+			String companyFax,
+			String companyEmail,
+			String companyWebpage,
+			String companyBankAccount
+	) {
 		CompanyInfo companyInfo = new CompanyInfo();
 		companyInfo.setPersonalID(companyUniqueId);
 
@@ -1721,42 +1746,66 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 				String address = null;
 				String vatNumber = null;
 
-				try {
-					CompanyHolder holder = getSkyrrClient().getCompany(companyUniqueId);
-					if (holder != null) {
-						personalId = holder.getPersonalID();
-						postalCode = holder.getPostalCode();
-						name = holder.getName();
-						address = holder.getAddress();
-						vatNumber = holder.getVatNumber();
-					}
-				} catch (Exception e) {
-					getLogger().log(Level.WARNING, "Failed to get company's info from Skyrr for personal ID: " + companyUniqueId, e);
+				CompanyHolder holder = getCompanyInfo(companyUniqueId);
+				if (holder != null) {
+					personalId = holder.getPersonalID();
+					postalCode = holder.getPostalCode();
+					name = holder.getName();
+					address = holder.getAddress();
+					vatNumber = holder.getVatNumber();
 				}
 
-				try {
-					if (useIndividualWS) {
-						UserHolder userHolder = getSkyrrClient().getUser(companyUniqueId);
-						if (userHolder != null) {
-							if (StringUtil.isEmpty(personalId)) {
-								personalId = userHolder.getPersonalID();
-							}
+				if (useIndividualWS) {
+					UserHolder userHolder = getPersonInfo(companyUniqueId);
+					if (userHolder != null) {
+						if (StringUtil.isEmpty(personalId)) {
+							personalId = userHolder.getPersonalID();
+						}
 
+						if (StringUtil.isEmpty(postalCode)) {
+							postalCode = userHolder.getPostalCode();
+						}
+
+						if (StringUtil.isEmpty(name)) {
+							name = userHolder.getName();
+						}
+
+						if (StringUtil.isEmpty(address)) {
+							address = userHolder.getAddress();
+						}
+					}
+				}
+
+				if (StringUtil.isEmpty(personalId) || StringUtil.isEmpty(name) || StringUtil.isEmpty(postalCode) || StringUtil.isEmpty(address)) {
+					User companyUser = null;
+					try {
+						companyUser = getUserBusiness().getUser(companyUniqueId);
+					} catch (Exception e) {}
+					if (companyUser != null) {
+						if (StringUtil.isEmpty(personalId)) {
+							personalId = companyUser.getPersonalID();
+						}
+						if (StringUtil.isEmpty(name)) {
+							name = companyUser.getName();
+						}
+
+						Address userAddress = null;
+						try {
+							userAddress = companyUser.getUsersMainAddress();
+						} catch (Exception e) {}
+						if (userAddress != null) {
 							if (StringUtil.isEmpty(postalCode)) {
-								postalCode = userHolder.getPostalCode();
-							}
-
-							if (StringUtil.isEmpty(name)) {
-								name = userHolder.getName();
+								PostalCode userPostalCode = userAddress.getPostalCode();
+								if (userPostalCode != null) {
+									postalCode = userPostalCode.getPostalCode();
+								}
 							}
 
 							if (StringUtil.isEmpty(address)) {
-								address = userHolder.getAddress();
+								address = userAddress.getStreetAddressNominative();
 							}
 						}
 					}
-				} catch (Exception e) {
-					getLogger().log(Level.WARNING, "Failed to get user's info from Skyrr by personal ID: " + companyUniqueId, e);
 				}
 
 				try {
@@ -1765,8 +1814,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 							address, personalId, "", null, vatNumber,
 							address, "", null, null, null, null, null, "", null);
 				} catch (Exception e) {
-					getLogger().log(Level.WARNING,
-							"Failed to create company record by user in ePlatform, cause of:", e);
+					getLogger().log(Level.WARNING, "Failed to create company record: personal ID: " + personalId + ", postal code: " + postalCode + ", name: " + name + ", address: " + address + ", VAT number: " + vatNumber, e);
 				}
 			}
 		}
