@@ -503,4 +503,16 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 		return null;
 	}
 
+	@Override
+	public ICFile getIcon() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setIcon(ICFile icon) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
