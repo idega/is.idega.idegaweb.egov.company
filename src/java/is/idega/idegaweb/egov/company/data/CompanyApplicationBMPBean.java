@@ -505,14 +505,20 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 
 	@Override
 	public ICFile getIcon() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setIcon(ICFile icon) {
-		// TODO Auto-generated method stub
+	}
 
+	@Override
+	public boolean isAllowedToSubmitSavedFormBeforeDeadline() {
+		return false;
+	}
+
+	@Override
+	public void setAllowedToSubmitSavedFormBeforeDeadline(boolean allowedToSubmitSavedFormBeforeDeadline) {
 	}
 
 }
