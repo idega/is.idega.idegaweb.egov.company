@@ -82,15 +82,10 @@
  */
 package is.idega.idegaweb.egov.company.business.impl;
 
-import is.idega.block.nationalregister.webservice.client.business.CompanyHolder;
-import is.idega.block.nationalregister.webservice.client.business.SkyrrClient;
-import is.idega.idegaweb.egov.company.business.CompanyRegisterService;
-
 import java.util.logging.Level;
 
 import javax.ejb.FinderException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -103,6 +98,10 @@ import com.idega.core.business.DefaultSpringBean;
 import com.idega.util.CoreConstants;
 import com.idega.util.StringUtil;
 import com.idega.util.expression.ELUtil;
+
+import is.idega.block.nationalregister.webservice.client.business.CompanyHolder;
+import is.idega.block.nationalregister.webservice.client.business.SkyrrClient;
+import is.idega.idegaweb.egov.company.business.CompanyRegisterService;
 
 /**
  * <p>Same as {@link CompanyService}, but working with national register.</p>
@@ -120,13 +119,8 @@ public class CompanyRegisterServiceImpl extends DefaultSpringBean implements Com
 		return getServiceInstance(CompanyBusiness.class);
 	}
 
-	@Autowired
-	private SkyrrClient skyrrClient;
-
 	public SkyrrClient getSkyrrClient() {
-		if (skyrrClient == null)
-			ELUtil.getInstance().autowire(this);
-		return skyrrClient;
+		return ELUtil.getInstance().getBean(SkyrrClient.BEAN_NAME);
 	}
 
 	/* (non-Javadoc)

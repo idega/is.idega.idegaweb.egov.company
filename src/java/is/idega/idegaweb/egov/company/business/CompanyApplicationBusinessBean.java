@@ -32,7 +32,6 @@ import org.apache.axis.configuration.FileProvider;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.handler.WSHandlerConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.idega.block.pdf.business.PrintingContext;
 import com.idega.block.pdf.business.PrintingService;
@@ -138,9 +137,6 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 	protected static final String SERVICE_URL = "https://www.arionbanki.is/Netbanki4/StandardServices/Birtingur.asmx";
 
 	protected static final String COMPANY_BANK = "COMPANY_BANK";
-
-	@Autowired
-	private SkyrrClient skyrrClient;
 
 	@Override
 	public CompanyApplication getApplication(String applicationId) {
@@ -282,7 +278,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			return null;
 		}
 
-		List<String> texts = new ArrayList<String>();
+		List<String> texts = new ArrayList<>();
 		texts.add(text);
 		LoginTable login = LoginDBHandler.getUserLogin(compApp.getAdminUser());
 		text = new StringBuilder(text).append("\n\r").toString();
@@ -502,7 +498,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 
-		List<String> texts = new ArrayList<String>();
+		List<String> texts = new ArrayList<>();
 		texts.add(new StringBuilder(iwrb.getLocalizedString("login_here",
 				"Login here")).append(": ").append(serverLink).toString());
 		texts.add(new StringBuilder(iwrb.getLocalizedString("your_user_name",
@@ -1068,7 +1064,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 		Collection<Group> appGroups = null;
 		boolean superAdmin = iwc.isSuperAdmin();
-		Collection<Application> userApplicationList = new ArrayList<Application>();
+		Collection<Application> userApplicationList = new ArrayList<>();
 		Group companyPortalRootGroup = null;
 		try {
 			companyPortalRootGroup = companyPortalBusiness
@@ -1082,7 +1078,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 			boolean appAdded = false;
 			appGroups = app.getGroups();
 			appGroups = ListUtil.isEmpty(appGroups) ? null
-					: new ArrayList<Group>(appGroups);
+					: new ArrayList<>(appGroups);
 			if (ListUtil.isEmpty(appGroups)) {
 				logger.log(Level.INFO, "Application " + app.getName()
 						+ " has no groups!");
@@ -1152,8 +1148,8 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		boolean needSaveEmployee = false;
 		Collection<Application> currentServices = compEmployee.getServices();
 		List<Application> allUserApplications = ListUtil
-				.isEmpty(currentServices) ? new ArrayList<Application>()
-				: new ArrayList<Application>(currentServices);
+				.isEmpty(currentServices) ? new ArrayList<>()
+				: new ArrayList<>(currentServices);
 		for (Application application : rootGroupServices) {
 			if (!allUserApplications.contains(application)) {
 				needSaveEmployee = true;
@@ -1317,11 +1313,11 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 		}
 
 		if (ListUtil.isEmpty(caseStatuses)) {
-			return new ArrayList<CompanyApplication>(applications);
+			return new ArrayList<>(applications);
 		}
 
 		CaseStatus status = null;
-		List<CompanyApplication> filteredApps = new ArrayList<CompanyApplication>();
+		List<CompanyApplication> filteredApps = new ArrayList<>();
 		for (CompanyApplication compApp : applications) {
 			status = compApp.getCaseStatus();
 			if (status != null && caseStatuses.contains(status.getStatus())
@@ -1913,10 +1909,7 @@ public class CompanyApplicationBusinessBean extends ApplicationBusinessBean
 
 	@Override
 	public SkyrrClient getSkyrrClient() {
-		if (skyrrClient == null) {
-			ELUtil.getInstance().autowire(this);
-		}
-		return skyrrClient;
+		return ELUtil.getInstance().getBean(SkyrrClient.BEAN_NAME);
 	}
 
 	@Override
