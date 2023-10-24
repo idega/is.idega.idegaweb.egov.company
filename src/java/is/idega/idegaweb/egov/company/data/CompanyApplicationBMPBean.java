@@ -521,4 +521,13 @@ public class CompanyApplicationBMPBean extends AbstractCaseBMPBean implements Co
 	public void setAllowedToSubmitSavedFormBeforeDeadline(boolean allowedToSubmitSavedFormBeforeDeadline) {
 	}
 
+	@Override
+	public Integer getAllowedToSubmitSavedFormAfterXDaysOfDeadline() {
+		return null;
+	}
+
+	@Override
+	public void setAllowedToSubmitSavedFormAfterXDaysOfDeadline(Integer days) {
+	}
+
 }
